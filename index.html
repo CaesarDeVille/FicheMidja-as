@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventaire D&D</title>
+<style>
+:root {
+  --bg:      #0d0700;
+  --bg2:     #1e1008;
+  --bg3:     #140c00;
+  --border:  #8b6914;
+  --border2: #6a4a10;
+  --border3: #3a2808;
+  --gold:    #f0c040;
+  --text:    #e8d5a0;
+  --muted:   #8b6914;
+  --dim:     #5a3c10;
+  --filled:  #c8922a;
+  --hover:   #2e1a06;
+  --font:    'Palatino Linotype','Book Antiqua',Palatino,serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  width: 1920px;
+  min-height: 1080px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  gap: 8px;
+}
+
+/* ══ THEME BAR ══ */
+.theme-bar {
+  width: 1920px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border2);
+  border-radius: 6px;
+  padding: 6px 14px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.tb-title { font-size: 13px; color: var(--gold); letter-spacing: 2px; margin-right: auto; }
+.tb-group { display: flex; align-items: center; gap: 5px; }
+.tb-group label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.tb-group input[type="color"] { width: 26px; height: 20px; border: 1px solid var(--border2); border-radius: 2px; background: none; cursor: pointer; padding: 1px; }
+.tb-group select { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); font-family: var(--font); font-size: 11px; padding: 2px 4px; border-radius: 2px; cursor: pointer; }
+.btn-sm { background: var(--bg3); border: 1px solid var(--border2); color: var(--muted); font-family: var(--font); font-size: 10px; padding: 3px 8px; border-radius: 2px; cursor: pointer; }
+.btn-sm:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ══ FIXED 1920×1080 ══ */
+.aspect-wrap { width: 1920px; height: 1032px; }
+.app {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  background: var(--bg2);
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px 8px;
+}
+.title-bar {
+  text-align: center; font-size: 18px; letter-spacing: 4px; color: var(--gold);
+  margin-bottom: 8px; border-bottom: 2px solid var(--border); padding-bottom: 6px; flex-shrink: 0;
+}
+
+/* ══ 3 COLUMNS ══ */
+.main-body {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 40px;
+  align-items: stretch;
+}
+
+/* ══ SHARED SLOT ══ */
+.slot {
+  background: #0a0600;
+  border: 1.5px solid var(--border2);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  text-align: center;
+  transition: border-color .15s, background .15s;
+  padding: 10px 12px;
+  user-select: none; overflow: hidden;
+  min-height: 60px; min-width: 0;
+}
+.slot:hover  { border-color: var(--gold); background: var(--hover); }
+.slot.filled { border-color: var(--filled); background: var(--bg3); }
+.lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; line-height: 1.3; }
+.val {
+  font-size: 16px; color: var(--gold); margin-top: 4px; font-weight: 500;
+  width: 100%; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+.val-type {
+  font-size: 12px; color: #9a9a9a; margin-top: 3px;
+  width: 100%; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+.val-effet {
+  font-size: 12px; color: #7ab8d4; margin-top: 3px; font-style: italic;
+  width: 100%; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.vband {
+  writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+  background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); text-align: center; padding: 10px 4px;
+  transition: border-color .15s, background .15s;
+  flex-shrink: 0; user-select: none; font-size: 14px; letter-spacing: 1px;
+}
+.vband:hover  { border-color: var(--gold); color: var(--gold); background: var(--hover); }
+.vband.filled { border-color: var(--filled); color: var(--filled); }
+
+.ring-pip {
+  background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--muted);
+  transition: border-color .15s, background .15s;
+  user-select: none; flex-shrink: 0;
+}
+.ring-pip:hover  { border-color: var(--gold); background: var(--hover); color: var(--gold); }
+.ring-pip.filled { border-color: var(--filled); color: var(--filled); }
+
+/* ══════════════════════════════════
+   COL 1 — ÉQUIPEMENT
+   Fixed pixel sizes matching proto proportions
+══════════════════════════════════ */
+.col-equip {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%; min-height: 0; height: 100%;
+}
+
+/* Row 1: Amulette(v) | Couvre-Chef */
+.eq-r1 { display: flex; gap: 8px; min-height: 120px; flex-shrink: 0; }
+.eq-r1 .vband { width: 140px; }
+.eq-r1 .slot  { flex: 1; }
+
+/* Row 2: [Gants/Bracelet] | Armure | Cape(v) */
+.eq-r2 { display: flex; gap: 8px; flex-shrink: 0; min-height: 280px; }
+.eq-r2-left  { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.eq-r2-left .slot { width: 100%; }
+.slot-gants    { min-height: 160px; flex: 2; }
+.slot-bracelet { min-height: 110px; flex: 1; }
+.slot-armure   { flex: 1; min-height: 280px; }
+.eq-r2 .vband  { width: 140px; }
+
+/* Row 3: ○ ○ Anneaux | Ceinture */
+.eq-r3 { display: flex; gap: 8px; min-height: 60px; flex-shrink: 0; align-items: stretch; }
+.rings-group { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.ring-pip { width: 44px; height: 44px; }
+.rings-lbl { font-size: 12px; color: var(--dim); white-space: nowrap; }
+.slot-ceinture { flex: 1; }
+
+/* Row 4: Bottes */
+.slot-bottes { width: 100%; min-height: 120px; flex-shrink: 0; }
+
+/* ══════════════════════════════════
+   COL 2 — ARMES / CENTRE
+══════════════════════════════════ */
+.col-centre {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%; min-height: 0;
+}
+
+.slot-arme { width: 100%; flex: 0 0 140px; border-color: var(--border) !important; }
+.slot-arme .val { font-size: 18px; color: var(--gold); }
+
+.centre-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 120px; }
+.slot-dos, .slot-epaule { height: 100%; }
+
+.centre-row3 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 100px; }
+.slot-ceintG, .slot-ceintD { height: 100%; }
+
+/* ══════════════════════════════════
+   COL 3 — INVENTAIRE (flexible)
+══════════════════════════════════ */
+.col-inv {
+  display: flex; flex-direction: column; gap: 8px;
+  min-width: 0; min-height: 0;
+}
+
+/* Sac | Poches — header titles */
+.inv-header {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0;
+}
+.inv-title-cell {
+  background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 5px 6px; gap: 3px;
+}
+.inv-title-txt { font-size: 20px; color: var(--gold); font-weight: bold; letter-spacing: 1px; }
+.sac-select {
+  background: var(--bg); border: 1px solid var(--border2);
+  color: var(--muted); font-family: var(--font); font-size: 10px;
+  padding: 2px 3px; border-radius: 2px; cursor: pointer; width: 100%;
+}
+
+/* Sac | Poches — grids side by side, fills available height */
+.inv-grids {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  flex: 1; min-height: 0;
+}
+.grid-col {
+  border: 1.5px solid var(--border2); border-radius: 3px;
+  overflow-y: auto; height: 100%;
+}
+.grid-col::-webkit-scrollbar { width: 4px; }
+.grid-col::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.grid-cell {
+  background: var(--bg3); border-bottom: 1px solid var(--border3);
+  font-size: 12px; color: var(--dim); padding: 5px 10px; min-height: 28px;
+  cursor: pointer; display: flex; align-items: center;
+  transition: background .15s, color .15s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; user-select: none;
+}
+.grid-cell:last-child { border-bottom: none; }
+.grid-cell:hover  { background: var(--hover); color: var(--gold); }
+.grid-cell.filled { color: var(--text); }
+
+/* Mun + Spé */
+.inv-spe { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.spe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.spe-cell {
+  background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
+  font-size: 12px; color: var(--muted); padding: 6px 10px; height: 36px;
+  cursor: pointer; display: flex; align-items: center;
+  transition: background .15s, color .15s; user-select: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.spe-cell:hover  { background: var(--hover); color: var(--gold); border-color: var(--gold); }
+.spe-cell.filled { color: var(--text); border-color: var(--filled); }
+.spe-full { width: 100%; height: 36px; }
+
+/* Munitions split cell */
+.mun-cell {
+  display: flex; align-items: stretch; height: 36px;
+  border: 1.5px solid var(--border2); border-radius: 3px; overflow: hidden;
+}
+.mun-cell .mun-name { border: none; border-radius: 0; }
+.mun-counter {
+  display: flex; align-items: center; gap: 2px;
+  background: var(--bg3); border-left: 1px solid var(--border2);
+  padding: 0 5px; flex-shrink: 0;
+}
+.mun-input {
+  width: 32px; background: transparent; border: none; outline: none;
+  color: var(--gold); font-family: var(--font); font-size: 11px;
+  text-align: center; padding: 0;
+  -moz-appearance: textfield;
+}
+.mun-input::-webkit-outer-spin-button,
+.mun-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.mun-input::placeholder { color: var(--dim); }
+.mun-sep { color: var(--muted); font-size: 12px; }
+
+/* ══ BOTTOM BAR ══ */
+.bottom-bar {
+  display: flex; justify-content: center; gap: 10px;
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border3); flex-shrink: 0; flex-wrap: wrap;
+}
+.btn {
+  background: var(--bg3); border: 1.5px solid var(--border);
+  color: var(--gold); font-family: var(--font); font-size: 11px;
+  padding: 5px 12px; border-radius: 3px; cursor: pointer;
+  letter-spacing: 1px; transition: background .15s, border-color .15s;
+}
+.btn:hover { background: var(--hover); border-color: var(--gold); }
+.btn.danger { border-color: #7a2010; color: #f04040; }
+.btn.danger:hover { background: #2e0a0a; border-color: #f04040; }
+
+/* ══ CHARACTER PANEL ══ */
+.char-panel {
+  background: #0a0600;
+  border: 1.5px solid var(--border2);
+  border-radius: 4px;
+  padding: 10px 14px;
+  flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 7px;
+  margin-top: 8px;
+}
+.char-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+.char-lbl {
+  font-size: 11px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: .5px; white-space: nowrap; flex-shrink: 0;
+}
+.char-input {
+  background: transparent;
+  border: none; border-bottom: 1px solid var(--border2);
+  color: var(--gold); font-family: var(--font); font-size: 13px;
+  padding: 2px 4px; outline: none;
+  transition: border-color .15s;
+}
+.char-input:focus { border-color: var(--gold); }
+.char-input.wide { flex: 1; min-width: 80px; }
+.char-input.narrow { width: 65px; }
+.char-sep { color: var(--border2); font-size: 13px; flex-shrink: 0; }
+.blessure-wrap { display: flex; align-items: center; gap: 6px; }
+.blessure-cb {
+  width: 22px; height: 22px;
+  appearance: none; -webkit-appearance: none;
+  background: #0a0600; border: 1.5px solid var(--border2);
+  border-radius: 3px; cursor: pointer;
+  position: relative; flex-shrink: 0;
+  transition: border-color .15s;
+}
+.blessure-cb:checked { border-color: #c84040; background: rgba(200,64,64,.12); }
+.blessure-cb:checked::after {
+  content: '✕'; position: absolute;
+  color: #c84040; font-size: 13px; font-weight: bold;
+  top: 50%; left: 50%; transform: translate(-50%,-52%);
+}
+.blessure-cb:hover { border-color: var(--gold); }
+
+/* ══ MODAL ══ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.82); z-index: 300;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 2px solid var(--border);
+  border-radius: 6px; padding: 20px 22px; width: 340px; max-width: 95vw;
+}
+.modal-title {
+  font-size: 16px; color: var(--gold); margin-bottom: 14px; text-align: center;
+  border-bottom: 1px solid var(--border2); padding-bottom: 8px; letter-spacing: 1px;
+}
+.mfield { margin-bottom: 10px; }
+.mfield label { display: block; font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.mfield input, .mfield textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--font); font-size: 13px;
+  padding: 6px 8px; border-radius: 2px; outline: none; transition: border-color .15s;
+}
+.mfield input:focus, .mfield textarea:focus { border-color: var(--gold); }
+.mfield textarea { height: 60px; resize: vertical; }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+/* ══ TOAST ══ */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--bg2); border: 1.5px solid var(--border); color: var(--gold);
+  padding: 8px 20px; border-radius: 4px; font-family: var(--font);
+  font-size: 13px; z-index: 400; pointer-events: none; opacity: 0; transition: opacity .2s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ══ THEME BAR ══ -->
+<div class="theme-bar">
+  <span class="tb-title">⚔ D&D INVENTAIRE</span>
+  <div class="tb-group"><label>Fond</label><input type="color" id="tc-bg" value="#0d0700" oninput="applyTheme()"></div>
+  <div class="tb-group"><label>Panneau</label><input type="color" id="tc-bg2" value="#1e1008" oninput="applyTheme()"></div>
+  <div class="tb-group"><label>Accent</label><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
+  <div class="tb-group"><label>Texte</label><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
+  <div class="tb-group"><label>Bordure</label><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
+  <div class="tb-group">
+    <label>Police</label>
+    <select id="tc-font" onchange="applyTheme()">
+      <option value="'Palatino Linotype','Book Antiqua',Palatino,serif">Palatino</option>
+      <option value="'Times New Roman',Times,serif">Times New Roman</option>
+      <option value="Georgia,serif">Georgia</option>
+      <option value="fantasy">Fantasy</option>
+      <option value="'Courier New',Courier,monospace">Courier</option>
+      <option value="Arial,Helvetica,sans-serif">Arial</option>
+    </select>
+  </div>
+  <button class="btn-sm" onclick="resetTheme()">↺ Reset</button>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="aspect-wrap">
+<div class="app">
+  <div class="title-bar">⚔ &nbsp; INVENTAIRE &nbsp; ⚔</div>
+
+  <div class="main-body">
+
+    <!-- ═══ COL 1 : ÉQUIPEMENT ═══ -->
+    <div class="col-equip">
+
+      <!-- R1: Amulette | Couvre-Chef -->
+      <div class="eq-r1">
+        <div class="slot" style="width:140px;" id="sl-amulette" onclick="open_('amulette')">
+          <span class="lbl">Amulette</span>
+          <span class="val" id="dsp-amulette-nom">—</span>
+          <span class="val-type" id="dsp-amulette-type"></span>
+          <span class="val-effet" id="dsp-amulette-effet"></span>
+        </div>
+        <div class="slot" style="flex:1;" onclick="open_('couvre-chef')">
+          <span class="lbl">Couvre-Chef</span>
+          <span class="val" id="dsp-couvre-chef-nom">—</span>
+          <span class="val-type" id="dsp-couvre-chef-type"></span>
+          <span class="val-effet" id="dsp-couvre-chef-effet"></span>
+        </div>
+      </div>
+
+      <!-- R2: [Gants / Bracelet] | Armure | Cape -->
+      <div class="eq-r2">
+        <div class="eq-r2-left">
+          <div class="slot slot-gants" onclick="open_('gants')">
+            <span class="lbl">Gants</span>
+            <span class="val" id="dsp-gants-nom">—</span>
+            <span class="val-type" id="dsp-gants-type"></span>
+            <span class="val-effet" id="dsp-gants-effet"></span>
+          </div>
+          <div class="slot slot-bracelet" onclick="open_('bracelet')">
+            <span class="lbl">Bracelet</span>
+            <span class="val" id="dsp-bracelet-nom">—</span>
+            <span class="val-type" id="dsp-bracelet-type"></span>
+            <span class="val-effet" id="dsp-bracelet-effet"></span>
+          </div>
+        </div>
+        <div class="slot slot-armure" onclick="open_('armure')">
+          <span class="lbl">Armure</span>
+          <span class="val" id="dsp-armure-nom">—</span>
+          <span class="val-type" id="dsp-armure-type"></span>
+          <span class="val-effet" id="dsp-armure-effet"></span>
+        </div>
+        <div class="slot" style="width:140px;" id="sl-cape" onclick="open_('cape')">
+          <span class="lbl">Cape / Manteau</span>
+          <span class="val" id="dsp-cape-nom">—</span>
+          <span class="val-type" id="dsp-cape-type"></span>
+          <span class="val-effet" id="dsp-cape-effet"></span>
+        </div>
+      </div>
+
+      <!-- R3: ○ ○ Anneaux | Ceinture -->
+      <div class="eq-r3">
+        <div class="rings-group">
+          <div class="ring-pip" id="rp1" onclick="open_('anneau1')" title="Anneau 1">○</div>
+          <div class="ring-pip" id="rp2" onclick="open_('anneau2')" title="Anneau 2">○</div>
+          <span class="rings-lbl">Anneaux</span>
+        </div>
+        <div class="slot slot-ceinture" onclick="open_('ceinture')">
+          <span class="lbl">Ceinture</span>
+          <span class="val" id="dsp-ceinture-nom">—</span>
+          <span class="val-type" id="dsp-ceinture-type"></span>
+          <span class="val-effet" id="dsp-ceinture-effet"></span>
+        </div>
+      </div>
+
+      <!-- R4: Bottes -->
+      <div class="slot slot-bottes" onclick="open_('bottes')">
+        <span class="lbl">Bottes</span>
+        <span class="val" id="dsp-bottes-nom">—</span>
+        <span class="val-type" id="dsp-bottes-type"></span>
+        <span class="val-effet" id="dsp-bottes-effet"></span>
+      </div>
+
+      <!-- PANNEAU PERSONNAGE -->
+      <div class="char-panel">
+        <div class="char-row">
+          <span class="char-lbl">Nom</span>
+          <input class="char-input wide" id="char-nom" type="text" placeholder="Nom du personnage" oninput="saveChar()">
+        </div>
+        <div class="char-row">
+          <span class="char-lbl">Âge Bio</span>
+          <input class="char-input narrow" id="char-age" type="text" placeholder="—" oninput="saveChar()">
+          <span class="char-sep">|</span>
+          <span class="char-lbl">Naissance</span>
+          <input class="char-input wide" id="char-naiss" type="text" placeholder="—" oninput="saveChar()">
+        </div>
+        <div class="char-row">
+          <span class="char-lbl">PV</span>
+          <input class="char-input narrow" id="char-pv" type="text" placeholder="—" oninput="saveChar()">
+          <span class="char-sep">|</span>
+          <span class="char-lbl">PA</span>
+          <input class="char-input narrow" id="char-pa" type="text" placeholder="—" oninput="saveChar()">
+          <span class="char-sep">|</span>
+          <span class="char-lbl">PS</span>
+          <input class="char-input narrow" id="char-ps" type="text" placeholder="—" oninput="saveChar()">
+          <span class="char-sep">|</span>
+          <span class="char-lbl">PE</span>
+          <input class="char-input narrow" id="char-pe" type="text" placeholder="—" oninput="saveChar()">
+        </div>
+        <div class="char-row">
+          <span class="char-lbl">Blessures</span>
+          <div class="blessure-wrap">
+            <input class="blessure-cb" type="checkbox" id="bl1" onchange="saveChar()">
+            <input class="blessure-cb" type="checkbox" id="bl2" onchange="saveChar()">
+            <input class="blessure-cb" type="checkbox" id="bl3" onchange="saveChar()">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ COL 2 : ARMES / CENTRE ═══ -->
+    <div class="col-centre">
+      <div class="slot slot-arme" onclick="open_('arme')">
+        <span class="lbl">Arme — Portée</span>
+        <span class="val" id="dsp-arme-nom">—</span>
+        <span class="val-type" id="dsp-arme-type"></span>
+        <span class="val-effet" id="dsp-arme-effet"></span>
+      </div>
+      <div class="centre-row2">
+        <div class="slot slot-dos" onclick="open_('dos')">
+          <span class="lbl">Dos — Épaule G.</span>
+          <span class="val" id="dsp-dos-nom">—</span>
+          <span class="val-type" id="dsp-dos-type"></span>
+          <span class="val-effet" id="dsp-dos-effet"></span>
+        </div>
+        <div class="slot slot-epaule" onclick="open_('epaule')">
+          <span class="lbl">Dos — Épaule D.</span>
+          <span class="val" id="dsp-epaule-nom">—</span>
+          <span class="val-type" id="dsp-epaule-type"></span>
+          <span class="val-effet" id="dsp-epaule-effet"></span>
+        </div>
+      </div>
+      <div class="centre-row3">
+        <div class="slot slot-ceintG" onclick="open_('ceintureGauche')">
+          <span class="lbl">Ceinture — Gauche</span>
+          <span class="val" id="dsp-ceintureGauche-nom">—</span>
+          <span class="val-type" id="dsp-ceintureGauche-type"></span>
+          <span class="val-effet" id="dsp-ceintureGauche-effet"></span>
+        </div>
+        <div class="slot slot-ceintD" onclick="open_('ceintureDroite')">
+          <span class="lbl">Ceinture — Droite</span>
+          <span class="val" id="dsp-ceintureDroite-nom">—</span>
+          <span class="val-type" id="dsp-ceintureDroite-type"></span>
+          <span class="val-effet" id="dsp-ceintureDroite-effet"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COL 3 : INVENTAIRE ═══ -->
+    <div class="col-inv">
+
+      <div class="inv-header">
+        <div class="inv-title-cell">
+          <span class="inv-title-txt">Sac</span>
+          <select class="sac-select" id="bagSize" onchange="updateBag()">
+            <option value="sacoche">Sacoche (6 empl.)</option>
+            <option value="petit">Petit sac (9 empl. + 1 spé)</option>
+            <option value="moyen" selected>Sac moyen (11 empl. + 2 spé)</option>
+            <option value="grand">Grand sac (13 empl. + 3 spé)</option>
+          </select>
+        </div>
+        <div class="inv-title-cell">
+          <span class="inv-title-txt">Poches</span>
+        </div>
+      </div>
+
+      <div class="inv-grids">
+        <div class="grid-col" id="bagGrid"></div>
+        <div class="grid-col" id="pocheGrid"></div>
+      </div>
+
+      <div class="inv-spe" id="speSection">
+        <div class="spe-row">
+          <div class="mun-cell">
+            <div class="mun-name spe-cell" id="sl-mun" onclick="open_('mun')" style="flex:1;border-right:none;border-radius:3px 0 0 3px;">Munitions</div>
+            <div class="mun-counter">
+              <input class="mun-input" id="mun-cur" type="number" min="0" max="9999" placeholder="0" title="Quantité actuelle" oninput="saveMun()">
+              <span class="mun-sep">/</span>
+              <input class="mun-input" id="mun-max" type="number" min="0" max="9999" placeholder="0" title="Quantité max" oninput="saveMun()">
+            </div>
+          </div>
+          <div class="mun-cell">
+            <div class="mun-name spe-cell" style="flex:1;border-right:none;border-radius:3px 0 0 3px;cursor:default;">Bourse</div>
+            <div class="mun-counter">
+              <input class="mun-input" id="bourse-val" type="text" placeholder="0 po" title="Contenu de la bourse" style="width:70px;" oninput="saveBourse()">
+            </div>
+          </div>
+        </div>
+        <div id="speDynamic"></div>
+      </div>
+
+    </div>
+
+  </div><!-- main-body -->
+
+  <div class="bottom-bar">
+    <button class="btn" onclick="saveData()">💾 Sauvegarder</button>
+    <button class="btn" onclick="exportData()">⬆ Exporter JSON</button>
+    <label class="btn" style="cursor:pointer;">⬇ Importer JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="btn danger" onclick="clearAll()">✕ Effacer tout</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Emplacement</div>
+    <div class="mfield"><label>Nom</label><input type="text" id="fNom" placeholder="Nom de l'objet..."></div>
+    <div class="mfield"><label>Type</label><input type="text" id="fType" placeholder="Arme, Armure, Potion..."></div>
+    <div class="mfield"><label>Effet / Description</label><textarea id="fEffet" placeholder="Bonus, effets, notes..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>
+      <button class="btn" onclick="closeModal()">Annuler</button>
+      <button class="btn" onclick="saveSlot()">✔ OK</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── THEME ── */
+const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif"};
+
+function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function dk(h,f=.5){const[r,g,b]=hexToRgb(h);return`rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;}
+function lt(h,f=1.4){const[r,g,b]=hexToRgb(h);return`rgb(${Math.min(255,Math.round(r*f))},${Math.min(255,Math.round(g*f))},${Math.min(255,Math.round(b*f))})`;}
+function bl(h,a=.2){const[r,g,b]=hexToRgb(h);return`rgba(${r},${g},${b},${a})`;}
+
+function applyTheme(){
+  const bg=document.getElementById('tc-bg').value;
+  const bg2=document.getElementById('tc-bg2').value;
+  const gold=document.getElementById('tc-gold').value;
+  const text=document.getElementById('tc-text').value;
+  const border=document.getElementById('tc-border').value;
+  const font=document.getElementById('tc-font').value;
+  const s=document.documentElement.style;
+  s.setProperty('--bg',bg);
+  s.setProperty('--bg2',bg2);
+  s.setProperty('--bg3',dk(bg2,.75));
+  s.setProperty('--border',border);
+  s.setProperty('--border2',dk(border,.9));
+  s.setProperty('--border3',dk(border,.6));
+  s.setProperty('--gold',gold);
+  s.setProperty('--text',text);
+  s.setProperty('--muted',dk(gold,.75));
+  s.setProperty('--dim',dk(gold,.55));
+  s.setProperty('--filled',lt(dk(gold,.9),1.1));
+  s.setProperty('--hover',bl(border,.3));
+  s.setProperty('--font',font);
+  document.body.style.fontFamily=font;
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font}));
+}
+
+function resetTheme(){
+  document.getElementById('tc-bg').value=DEFAULTS.bg;
+  document.getElementById('tc-bg2').value=DEFAULTS.bg2;
+  document.getElementById('tc-gold').value=DEFAULTS.gold;
+  document.getElementById('tc-text').value=DEFAULTS.text;
+  document.getElementById('tc-border').value=DEFAULTS.border;
+  document.getElementById('tc-font').value=DEFAULTS.font;
+  applyTheme();
+}
+
+function loadTheme(){
+  try{
+    const t=JSON.parse(localStorage.getItem('dnd_theme')||'null');
+    if(t){
+      if(t.bg)document.getElementById('tc-bg').value=t.bg;
+      if(t.bg2)document.getElementById('tc-bg2').value=t.bg2;
+      if(t.gold)document.getElementById('tc-gold').value=t.gold;
+      if(t.text)document.getElementById('tc-text').value=t.text;
+      if(t.border)document.getElementById('tc-border').value=t.border;
+      if(t.font)document.getElementById('tc-font').value=t.font;
+    }
+  }catch(e){}
+  applyTheme();
+}
+
+/* ── DATA ── */
+const BAG_CONFIG = {
+  sacoche: { norm: 6,  spe: 0 },
+  petit:   { norm: 9,  spe: 1 },
+  moyen:   { norm: 11, spe: 2 },
+  grand:   { norm: 13, spe: 3 },
+};
+const POCKET_N = 20;
+
+const SPE_OPTIONS = [
+  '— Vide —',
+  'Tente',
+  'Sac de couchage',
+  'Marmite',
+  'Séchoir',
+  'Échelle Pliable',
+  'Porte Fioles',
+  'Porte Parchemins',
+  'Trousse de Soin',
+  'Sac de Rations',
+  "Sac d'Outils",
+  'Livre Inventaire (+4 à +7 empl.)',
+];
+
+const LABELS = {
+  cape:'Cape / Manteau', amulette:'Amulette', 'couvre-chef':'Couvre-Chef',
+  arme:'Arme / Portée', armure:'Armure', dos:'Dos', epaule:'Épaule',
+  ceintureGauche:'Ceinture Gauche', ceintureDroite:'Ceinture Droite',
+  ceinture:'Ceinture', bottes:'Bottes', gants:'Gants', bracelet:'Bracelet',
+  anneau1:'Anneau 1', anneau2:'Anneau 2', mun:'Munitions',
+};
+
+// Named equip slots that use nom/type/effet display
+const NAMED_SLOTS = ['couvre-chef','arme','armure','dos','epaule',
+  'ceintureGauche','ceintureDroite','ceinture','bottes','gants','bracelet',
+  'amulette','cape','anneau1','anneau2'];
+
+let data = {}, curSlot = null;
+
+function loadData() {
+  try { data = JSON.parse(localStorage.getItem('dnd_inv') || '{}'); } catch(e) { data = {}; }
+  document.getElementById('bagSize').value = data._bagSize || 'moyen';
+  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
+}
+
+function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
+function saveData() { persist(); toast('Sauvegardé !'); }
+
+function exportData() {
+  const out = Object.assign({}, data, { _bagSize: document.getElementById('bagSize').value });
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'inventaire-dnd.json'; a.click();
+}
+
+function importData(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      data = JSON.parse(ev.target.result);
+      document.getElementById('bagSize').value = data._bagSize || 'moyen';
+      buildBag(); buildPoche(); buildSpe(); refresh(); persist(); toast('Importé !');
+    } catch { toast('Erreur JSON'); }
+  };
+  r.readAsText(f);
+}
+
+function clearAll() {
+  if (!confirm('Effacer tout ?')) return;
+  data = {}; document.getElementById('bagSize').value = 'moyen';
+  buildBag(); buildPoche(); buildSpe(); refresh(); persist();
+}
+
+/* ── bag normal slots ── */
+function getBagConfig() {
+  const sz = document.getElementById('bagSize').value;
+  const cfg = BAG_CONFIG[sz] || BAG_CONFIG.moyen;
+  const speCount = cfg.spe;
+  let extraNorm = 0;
+  const speSlots = []; // { label, key } for named spe slots
+  for (let i = 0; i < speCount; i++) {
+    const v = data['_spe' + i] || '';
+    if (!v) continue;
+    if (v.startsWith('Livre')) {
+      extraNorm += 5; // midpoint +4 à +7
+    } else {
+      speSlots.push({ label: v, index: i });
+    }
+  }
+  return { norm: cfg.norm + extraNorm, speSlots };
+}
+
+function buildBag() {
+  const { norm, speSlots } = getBagConfig();
+  const g = document.getElementById('bagGrid'); g.innerHTML = '';
+
+  // normal slots
+  for (let i = 0; i < norm; i++) {
+    const k = 'bag_' + i;
+    const d = data[k];
+    const el = document.createElement('div');
+    el.className = 'grid-cell' + (d?.nom ? ' filled' : '');
+    el.id = 'sl-' + k;
+    el.innerHTML = d?.nom
+      ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
+      : 'Emplacement sac';
+    el.onclick = () => open_(k);
+    g.appendChild(el);
+  }
+
+  // 3 named slots per spe accessory
+  speSlots.forEach(({ label, index }) => {
+    for (let j = 0; j < 3; j++) {
+      const k = 'spe_' + index + '_' + j;
+      const d = data[k];
+      const el = document.createElement('div');
+      el.className = 'grid-cell' + (d?.nom ? ' filled' : '');
+      el.id = 'sl-' + k;
+      // subtle left border to visually group
+      el.style.borderLeft = '3px solid #4a6a8a';
+      el.innerHTML = d?.nom
+        ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
+        : `<span style="color:#4a7a9a;font-style:italic;">${label}</span>`;
+      el.onclick = () => open_(k, label);
+      g.appendChild(el);
+    }
+  });
+}
+
+function buildPoche() {
+  const g = document.getElementById('pocheGrid'); g.innerHTML = '';
+  for (let i = 0; i < POCKET_N; i++) {
+    const k = 'poche_' + i, el = document.createElement('div');
+    const d = data[k];
+    el.className = 'grid-cell' + (d?.nom ? ' filled' : '');
+    el.id = 'sl-' + k;
+    el.innerHTML = d?.nom
+      ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
+      : 'Emplacement poche';
+    el.onclick = () => open_(k); g.appendChild(el);
+  }
+}
+
+/* ── spe slots ── */
+function buildSpe() {
+  const sz = document.getElementById('bagSize').value;
+  const speCount = (BAG_CONFIG[sz] || BAG_CONFIG.moyen).spe;
+  const container = document.getElementById('speDynamic');
+  container.innerHTML = '';
+  for (let i = 0; i < speCount; i++) {
+    const key = '_spe' + i;
+    const val = data[key] || '';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:8px;';
+    const lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:11px;color:var(--muted);white-space:nowrap;min-width:48px;';
+    lbl.textContent = 'Spé ' + (i + 1);
+    const sel = document.createElement('select');
+    sel.className = 'spe-select-dd';
+    sel.style.cssText = 'flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;padding:6px 8px;border-radius:3px;cursor:pointer;height:36px;';
+    SPE_OPTIONS.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt === '— Vide —' ? '' : opt;
+      o.textContent = opt;
+      if ((val === '' && opt === '— Vide —') || val === o.value) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => { data[key] = sel.value; buildBag(); persist(); };
+    row.appendChild(lbl); row.appendChild(sel);
+    container.appendChild(row);
+  }
+  if (speCount === 0) {
+    const none = document.createElement('div');
+    none.style.cssText = 'font-size:11px;color:var(--dim);margin-top:6px;font-style:italic;';
+    none.textContent = 'Cette sacoche n\'a pas d\'emplacement spécial.';
+    container.appendChild(none);
+  }
+}
+
+function updateBag() {
+  data._bagSize = document.getElementById('bagSize').value;
+  buildBag(); buildSpe(); persist();
+}
+
+/* ── refresh named slots ── */
+function setSlotDisplay(key) {
+  const d = data[key] || {};
+  const n = document.getElementById('dsp-' + key + '-nom');
+  const t = document.getElementById('dsp-' + key + '-type');
+  const ef = document.getElementById('dsp-' + key + '-effet');
+  if (n) n.textContent = d.nom || '—';
+  if (t) t.textContent = d.type || '';
+  if (ef) ef.textContent = d.effet || '';
+  const sl = document.getElementById('sl-' + key);
+  if (sl) sl.classList.toggle('filled', !!(d.nom));
+}
+
+function refresh() {
+  NAMED_SLOTS.forEach(k => setSlotDisplay(k));
+
+  // rings
+  [1, 2].forEach(n => {
+    const k = 'anneau' + n, el = document.getElementById('rp' + n);
+    if (el) { el.textContent = data[k]?.nom ? '●' : '○'; el.classList.toggle('filled', !!(data[k]?.nom)); }
+  });
+
+  // mun
+  const munEl = document.getElementById('sl-mun');
+  if (munEl) { munEl.textContent = data.mun?.nom || 'Munitions'; munEl.classList.toggle('filled', !!(data.mun?.nom)); }
+  const mc = data._munCur, mm = data._munMax;
+  const ci = document.getElementById('mun-cur'), mi = document.getElementById('mun-max');
+  if (ci && mc != null) ci.value = mc; if (mi && mm != null) mi.value = mm;
+  const bi = document.getElementById('bourse-val');
+  if (bi && data._bourse != null) bi.value = data._bourse;
+
+  // bag + poche cells
+  buildBag(); buildPoche();
+}
+
+function open_(key, speLabel) {
+  curSlot = key;
+  const label = key.startsWith('bag_') ? 'Sac — Emplacement ' + (+key.split('_')[1] + 1)
+    : key.startsWith('poche_') ? 'Poche ' + (+key.split('_')[1] + 1)
+    : key.startsWith('spe_') ? (speLabel || 'Emplacement spécial')
+    : LABELS[key] || key;
+  document.getElementById('modalTitle').textContent = label;
+  const d = data[key] || {};
+  document.getElementById('fNom').value = d.nom || '';
+  document.getElementById('fType').value = d.type || '';
+  document.getElementById('fEffet').value = d.effet || '';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fNom').focus(), 60);
+}
+
+function saveSlot() {
+  if (!curSlot) return;
+  const nom = document.getElementById('fNom').value.trim();
+  const type = document.getElementById('fType').value.trim();
+  const effet = document.getElementById('fEffet').value.trim();
+  if (nom || type || effet) data[curSlot] = { nom, type, effet }; else delete data[curSlot];
+  persist(); refresh(); closeModal();
+}
+
+function clearSlot() { if (!curSlot) return; delete data[curSlot]; persist(); refresh(); closeModal(); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); curSlot = null; }
+function bgClose(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open') && document.activeElement.tagName !== 'TEXTAREA') saveSlot();
+});
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function saveMun() {
+  const cur = document.getElementById('mun-cur').value;
+  const max = document.getElementById('mun-max').value;
+  if (cur !== '') data._munCur = cur; else delete data._munCur;
+  if (max !== '') data._munMax = max; else delete data._munMax;
+  persist();
+}
+
+function saveBourse() {
+  const v = document.getElementById('bourse-val').value;
+  if (v !== '') data._bourse = v; else delete data._bourse;
+  persist();
+}
+
+function saveChar() {
+  data._char = {
+    nom:   document.getElementById('char-nom').value,
+    age:   document.getElementById('char-age').value,
+    naiss: document.getElementById('char-naiss').value,
+    pv:    document.getElementById('char-pv').value,
+    pa:    document.getElementById('char-pa').value,
+    ps:    document.getElementById('char-ps').value,
+    pe:    document.getElementById('char-pe').value,
+    bl1:   document.getElementById('bl1').checked,
+    bl2:   document.getElementById('bl2').checked,
+    bl3:   document.getElementById('bl3').checked,
+  };
+  persist();
+}
+
+function loadChar() {
+  const c = data._char || {};
+  const f = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
+  f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
+  f('char-pv', c.pv); f('char-pa', c.pa); f('char-ps', c.ps); f('char-pe', c.pe);
+  fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
+}
+
+loadTheme();
+loadData();
+</script>
+</body>
+</html>
