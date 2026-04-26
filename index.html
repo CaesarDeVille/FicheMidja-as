@@ -99,6 +99,27 @@ body {
   word-break: break-word;
 }
 
+/* Anneau : tout sur 1 ligne max */
+#sl-anneau1 .val, #sl-anneau2 .val { -webkit-line-clamp: 1; }
+#sl-anneau1 .val-type, #sl-anneau2 .val-type { -webkit-line-clamp: 1; }
+#sl-anneau1 .val-effet, #sl-anneau2 .val-effet { -webkit-line-clamp: 1; }
+
+/* Armure : effet jusqu'à 9 lignes */
+#sl-armure .val-effet { -webkit-line-clamp: 9; }
+
+/* Cape : effet jusqu'à 9 lignes */
+#sl-cape .val-effet { -webkit-line-clamp: 9; }
+
+/* Gants : effet jusqu'à 4 lignes */
+#sl-gants .val-effet { -webkit-line-clamp: 4; }
+
+/* Arme en Main : effet 5 lignes */
+#sl-arme .val-effet { -webkit-line-clamp: 5; }
+
+/* Dos, Épaule, Ceintures : effet 9 lignes */
+#sl-dos .val-effet, #sl-epaule .val-effet,
+#sl-ceintureGauche .val-effet, #sl-ceintureDroite .val-effet { -webkit-line-clamp: 9; }
+
 .vband {
   writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
   background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
@@ -144,12 +165,12 @@ body {
 .eq-r2 .vband  { width: 140px; }
 
 /* Row 3: Anneau G | Anneau D | Ceinture */
-.eq-r3 { display: flex; gap: 8px; height: 101px; flex-shrink: 0; align-items: stretch; }
+.eq-r3 { display: flex; gap: 8px; height: 110px; flex-shrink: 0; align-items: stretch; }
 .slot-anneau  { width: 101px; flex-shrink: 0; flex-grow: 0; }
 .slot-ceinture { flex: 1; }
 
 /* Row 4: Bottes */
-.slot-bottes { width: 100%; min-height: 80px; flex-shrink: 0; }
+.slot-bottes { width: 100%; min-height: 110px; flex-shrink: 0; }
 
 /* ══════════════════════════════════
    COL 2 — ARMES / CENTRE
@@ -480,6 +501,15 @@ body {
 [draggable="true"] { cursor: grab; }
 
 /* ══ TOAST ══ */
+/* ══ SLOT IMAGE BACKGROUND ══ */
+.slot { position: relative; }
+.slot-img-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  opacity: .28; border-radius: 2px; pointer-events: none; z-index: 0;
+}
+.slot > :not(.slot-img-bg) { position: relative; z-index: 1; }
+
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: var(--bg2); border: 1.5px solid var(--border); color: var(--gold);
@@ -658,6 +688,9 @@ body {
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="infuse">Infusé ?</span>
           <input type="checkbox" id="inv-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
+          <span class="char-sep">|</span>
+          <input class="char-input" id="inv-minos-lbl" type="text" value="Pièce de Minos" style="width:110px;font-size:11px;" oninput="syncMinosLabel(this.value)">
+          <input type="checkbox" id="inv-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
         </div>
       </div>
 
@@ -802,6 +835,9 @@ body {
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="infuse">Infusé ?</span>
           <input type="checkbox" id="infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
+          <span class="char-sep">|</span>
+          <input class="char-input" id="comp-minos-lbl" type="text" value="Pièce de Minos" style="width:110px;font-size:11px;" oninput="syncMinosLabel(this.value)">
+          <input type="checkbox" id="comp-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
         </div>
       </div>
 
@@ -866,6 +902,7 @@ body {
     <div class="mfield" id="fTypeField"><label>Type</label><input type="text" id="fType" placeholder="Arme, Armure, Potion..."></div>
     <div class="mfield" id="fEffetField"><label>Effet / Description</label><textarea id="fEffet" placeholder="Bonus, effets, notes..."></textarea></div>
     <div class="mfield" id="fCoutField" style="display:none;"><label>Coût</label><input type="text" id="fCout" placeholder="ex: 2 PE"></div>
+    <div class="mfield" id="fImgField"><label>Lien d'image (optionnel)</label><input type="text" id="fImg" placeholder="https://..."></div>
     <div class="modal-btns">
       <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>
       <button class="btn" onclick="closeModal()">Annuler</button>
@@ -1042,6 +1079,8 @@ function getBagConfig() {
       extraNorm += bonus;
     } else if (v === 'Autre') {
       speSlots.push({ label: 'Autre', index: i, count: 1 });
+    } else if (v === 'Tente' || v === 'Sac de couchage' || v === 'Échelle Pliable') {
+      // Ces accessoires n'ajoutent pas d'emplacement de stockage
     } else {
       speSlots.push({ label: v, index: i, count: 3 });
     }
@@ -1072,7 +1111,7 @@ function buildBag() {
     el.innerHTML = d?.nom
       ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
       : (isLivre ? '<span style="color:#2a6a9a;font-style:italic;">Livre Inventaire</span>' : 'Emplacement sac');
-    el.onclick = () => open_(k);
+    el.onclick = () => { if (!wasDragging) open_(k); };
     makeDraggable(el, k);
     makeDropTarget(el, k);
     g.appendChild(el);
@@ -1090,7 +1129,7 @@ function buildBag() {
       el.innerHTML = d?.nom
         ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
         : `<span style="color:#4a7a9a;font-style:italic;">${label}</span>`;
-      el.onclick = () => open_(k, label);
+      el.onclick = () => { if (!wasDragging) open_(k, label); };
       makeDraggable(el, k);
       makeDropTarget(el, k);
       g.appendChild(el);
@@ -1101,14 +1140,19 @@ function buildBag() {
 function buildPoche() {
   const g = document.getElementById('pocheGrid'); g.innerHTML = '';
   for (let i = 0; i < POCKET_N; i++) {
-    const k = 'poche_' + i, el = document.createElement('div');
+    const k = 'poche_' + i;
     const d = data[k];
+    const el = document.createElement('div');
     el.className = 'grid-cell' + (d?.nom ? ' filled' : '');
     el.id = 'sl-' + k;
+    el.dataset.slotKey = k;
     el.innerHTML = d?.nom
       ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
-      : 'Emplacement poche';
-    el.onclick = () => open_(k); g.appendChild(el);
+      : t('emplacement_poche');
+    el.onclick = () => { if (!wasDragging) open_(k); };
+    makeDraggable(el, k);
+    makeDropTarget(el, k);
+    g.appendChild(el);
   }
 }
 
@@ -1184,18 +1228,25 @@ function updateBag() {
 /* ── refresh named slots ── */
 function setSlotDisplay(key) {
   const d = data[key] || {};
-  const n = document.getElementById('dsp-' + key + '-nom');
-  const t = document.getElementById('dsp-' + key + '-type');
+  const n  = document.getElementById('dsp-' + key + '-nom');
+  const tp = document.getElementById('dsp-' + key + '-type');
   const ef = document.getElementById('dsp-' + key + '-effet');
-  if (n) n.textContent = d.nom || '—';
-  if (t) t.textContent = d.type || '';
+  if (n)  n.textContent  = d.nom   || '—';
+  if (tp) tp.textContent = d.type  || '';
   if (ef) ef.textContent = d.effet || '';
   const sl = document.getElementById('sl-' + key);
   if (sl) {
     const hasSomething = !!(d.nom);
     sl.classList.toggle('filled', hasSomething);
-    // explicit background so theme changes don't fight us
     sl.style.background = hasSomething ? 'var(--bg3)' : '#0a0600';
+    // background image
+    let bg = sl.querySelector('.slot-img-bg');
+    if (d.img) {
+      if (!bg) { bg = document.createElement('div'); bg.className = 'slot-img-bg'; sl.insertBefore(bg, sl.firstChild); }
+      bg.style.backgroundImage = `url('${d.img}')`;
+    } else if (bg) {
+      bg.remove();
+    }
   }
 }
 
@@ -1204,6 +1255,9 @@ function refresh() {
     setSlotDisplay(k);
     const sl = document.getElementById('sl-' + k);
     if (sl && !sl.dataset.dragReady) {
+      // wrap existing onclick to guard against drag
+      const originalOnclick = sl.onclick;
+      sl.onclick = () => { if (!wasDragging && originalOnclick) originalOnclick(); };
       makeSlotDraggable(sl, k);
       sl.dataset.dragReady = '1';
     }
@@ -1232,6 +1286,7 @@ function open_(key, speLabel) {
   document.getElementById('fNom').value = d.nom || '';
   document.getElementById('fType').value = d.type || '';
   document.getElementById('fEffet').value = d.effet || '';
+  document.getElementById('fImg').value = d.img || '';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -1240,11 +1295,17 @@ function saveSlot() {
   if (curSortKey !== null) { saveSortSlot(); return; }
   if (curFreeType !== null) { saveFreeSlot(); return; }
   if (!curSlot) return;
-  const nom = document.getElementById('fNom').value.trim();
-  const type = document.getElementById('fType').value.trim();
+  const nom   = document.getElementById('fNom').value.trim();
+  const type  = document.getElementById('fType').value.trim();
   const effet = document.getElementById('fEffet').value.trim();
-  if (nom || type || effet) data[curSlot] = { nom, type, effet }; else delete data[curSlot];
-  persist(); refresh(); closeModal();
+  const img   = document.getElementById('fImg').value.trim();
+  if (nom || type || effet || img) data[curSlot] = { nom, type, effet, img }; else delete data[curSlot];
+  persist();
+  const k = curSlot;
+  closeModal();
+  if (k.startsWith('bag_') || k.startsWith('spe_')) buildBag();
+  else if (k.startsWith('poche_')) buildPoche();
+  else refresh();
 }
 
 function clearSlot() {
@@ -1254,14 +1315,20 @@ function clearSlot() {
     curFreeType=null; curFreeIdx=null; closeModal(); return;
   }
   if (!curSlot) return;
-  delete data[curSlot]; persist(); refresh(); closeModal();
+  const k = curSlot;
+  delete data[k]; persist();
+  closeModal();
+  if (k.startsWith('bag_') || k.startsWith('spe_')) buildBag();
+  else if (k.startsWith('poche_')) buildPoche();
+  else refresh();
 }
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
-  // restore all fields
   document.getElementById('fTypeField').style.display  = '';
   document.getElementById('fEffetField').style.display = '';
   document.getElementById('fCoutField').style.display  = 'none';
+  document.getElementById('fImgField').style.display   = '';
+  document.getElementById('fImg').value = '';
   curSlot = null; curSortKey = null; curSortIdx = null;
   curFreeType = null; curFreeIdx = null;
 }
@@ -1277,6 +1344,24 @@ function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function syncMinosLabel(val) {
+  data._minosLabel = val;
+  ['inv-minos-lbl','comp-minos-lbl'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el !== document.activeElement) el.value = val;
+  });
+  persist();
+}
+
+function syncMinos(val) {
+  data._minos = val;
+  ['inv-minos-cb','comp-minos-cb'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el !== document.activeElement) el.checked = val;
+  });
+  persist();
 }
 
 function saveMun() {
@@ -1306,6 +1391,11 @@ function loadChar() {
   if (c.gender) {
     document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
   }
+  // minos
+  const ml = document.getElementById('inv-minos-lbl');
+  if (ml) ml.value = data._minosLabel || 'Pièce de Minos';
+  const mc2 = document.getElementById('inv-minos-cb');
+  if (mc2) mc2.checked = data._minos || false;
 }
 
 /* ══ PAGE NAVIGATION ══ */
@@ -1362,6 +1452,11 @@ function loadCompChar() {
   const infuse = data._infuse || false;
   const cb = document.getElementById('infuse-cb');
   if (cb) cb.checked = infuse;
+  // minos
+  const ml = document.getElementById('comp-minos-lbl');
+  if (ml) ml.value = data._minosLabel || 'Pièce de Minos';
+  const mc2 = document.getElementById('comp-minos-cb');
+  if (mc2) mc2.checked = data._minos || false;
 }
 
 function toggleInfuse(val) {
@@ -1431,7 +1526,10 @@ function makeDropdownRow(prefix, allOptions, levels, isMagic, container) {
   const isMain = (prefix === 'pri_');
   const maxMain = getMaxPrincipales();
   const remaining = isMain ? (maxMain - used.length) : (allOptions.length - used.length);
-  const emptyCount = Math.min(3, Math.max(0, remaining));
+
+  // Show used rows + 1 empty if slots remain, min 3 total when nothing selected yet
+  const baseEmpty = used.length === 0 ? Math.min(3, remaining) : (remaining > 0 ? 1 : 0);
+  const emptyCount = Math.max(0, baseEmpty);
 
   container.innerHTML = '';
   used.forEach(name => addSkillRow(prefix, name, levels, isMagic, allOptions, localArr, container));
@@ -1569,6 +1667,7 @@ function openSortModal(key, idx, current) {
   document.getElementById('fTypeField').style.display  = 'none';
   document.getElementById('fEffetField').style.display = 'none';
   document.getElementById('fCoutField').style.display  = 'none';
+  document.getElementById('fImgField').style.display   = 'none';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -1706,10 +1805,9 @@ function renderCompetences() {
 
 /* ══ DRAG & DROP ══ */
 let dragSrcKey = null;
+let wasDragging = false;
 
 function getSlotData(key) {
-  // bag/spe/poche keys → data[key]
-  // equip keys (named slots) → data[key]
   return data[key] ? { ...data[key] } : null;
 }
 
@@ -1731,6 +1829,7 @@ function makeDraggable(el, key) {
   el.draggable = true;
   el.addEventListener('dragstart', e => {
     dragSrcKey = key;
+    wasDragging = true;
     el.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', key);
@@ -1738,6 +1837,8 @@ function makeDraggable(el, key) {
   el.addEventListener('dragend', () => {
     el.classList.remove('dragging');
     document.querySelectorAll('.drag-over').forEach(x => x.classList.remove('drag-over'));
+    // reset wasDragging after click event fires
+    setTimeout(() => { wasDragging = false; }, 50);
   });
 }
 
@@ -1759,7 +1860,6 @@ function makeDropTarget(el, key) {
 }
 
 function makeSlotDraggable(slotEl, key) {
-  // For equipment .slot divs — same logic
   makeDraggable(slotEl, key);
   makeDropTarget(slotEl, key);
 }
