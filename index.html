@@ -501,6 +501,79 @@ body {
 [draggable="true"] { cursor: grab; }
 
 /* ══ TOAST ══ */
+/* ══ PARAMÈTRES PAGE ══ */
+.param-layout {
+  display: grid; grid-template-columns: 260px 1fr 1fr 1fr; gap: 20px;
+  flex: 1; min-height: 0; overflow-y: auto; padding: 4px 2px;
+}
+.param-col { display: flex; flex-direction: column; gap: 6px; }
+.param-section-title {
+  font-size: 14px; color: var(--gold); letter-spacing: 1px;
+  border-bottom: 1px solid var(--border2); padding-bottom: 4px;
+}
+.param-info { font-size: 11px; color: var(--dim); font-style: italic; }
+.param-fields { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.param-row { display: flex; align-items: center; gap: 8px; }
+.param-lbl { font-size: 12px; color: var(--muted); white-space: nowrap; flex: 1; }
+.param-input {
+  width: 70px; background: var(--bg3); border: 1.5px solid var(--border2);
+  color: var(--gold); font-family: var(--font); font-size: 13px;
+  padding: 4px 8px; border-radius: 3px; outline: none; text-align: center;
+  transition: border-color .15s;
+}
+.param-input:focus { border-color: var(--gold); }
+.param-toggle-lbl {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text); cursor: pointer; user-select: none;
+}
+.param-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.param-comp-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.param-comp-input {
+  flex: 1; background: var(--bg3); border: 1.5px solid var(--border2);
+  color: var(--text); font-family: var(--font); font-size: 12px;
+  padding: 4px 8px; border-radius: 3px; outline: none;
+  transition: border-color .15s;
+}
+.param-comp-input:focus { border-color: var(--gold); }
+.param-del-btn {
+  background: none; border: 1.5px solid #5a2010; color: #c04040;
+  border-radius: 3px; width: 24px; height: 24px; cursor: pointer;
+  font-size: 14px; line-height: 1; flex-shrink: 0;
+  transition: border-color .15s, background .15s;
+}
+.param-del-btn:hover { border-color: #f04040; background: rgba(200,64,64,.1); }
+.param-add-btn {
+  background: var(--bg3); border: 1.5px dashed var(--border2);
+  color: var(--muted); font-family: var(--font); font-size: 11px;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer;
+  letter-spacing: .5px; align-self: flex-start; margin-top: 2px;
+  transition: border-color .15s, color .15s;
+}
+.param-add-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.param-input-wide { flex: 1; text-align: left; min-width: 120px; }
+.param-cat-header {
+  display: flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid var(--border2); padding-bottom: 4px; margin-bottom: 4px;
+}
+.param-format-sel {
+  background: var(--bg3); border: 1px solid var(--border2); color: var(--muted);
+  font-family: var(--font); font-size: 11px; padding: 3px 6px;
+  border-radius: 3px; cursor: pointer; width: 100%; margin-bottom: 4px;
+}
+.param-format-sel:focus { outline: none; border-color: var(--gold); }
+.param-custom-fmt { margin-bottom: 4px; }
+
+.param-reset-btn {
+  background: #2a1606; border: 1.5px solid #c84040; color: #f08080;
+  font-family: var(--font); font-size: 12px; padding: 8px 14px;
+  border-radius: 4px; cursor: pointer; letter-spacing: .5px; width: 100%;
+  transition: background .15s, border-color .15s;
+}
+.param-reset-btn:hover { background: #3a1010; border-color: #f04040; color: #f04040; }
+
 /* ══ SLOT IMAGE BACKGROUND ══ */
 .slot { position: relative; }
 .slot-img-bg {
@@ -558,6 +631,7 @@ body {
     <button class="nav-btn" id="nav-competences" onclick="showPage('competences')">⚔ Compétences</button>
     <button class="nav-btn active" id="nav-inventaire" onclick="showPage('inventaire')">🎒 Inventaire</button>
     <button class="nav-btn" id="nav-capital" onclick="showPage('capital')">💰 Capital</button>
+    <button class="nav-btn" id="nav-parametres" onclick="showPage('parametres')">⚙ Paramètres</button>
   </div>
 
   <!-- PAGE INVENTAIRE -->
@@ -841,6 +915,16 @@ body {
         </div>
       </div>
 
+      <!-- STATISTIQUES (hidden by default) -->
+      <div id="comp-stats-section" style="display:none;">
+        <div class="comp-body" style="margin-bottom:10px;">
+          <div class="comp-col" style="grid-column:1/-1;">
+            <div class="comp-section-title" style="margin-bottom:8px;">Statistiques</div>
+            <div id="list-stats" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- COMPÉTENCES BODY : 3 cols -->
       <div class="comp-body">
 
@@ -890,6 +974,157 @@ body {
       💰 Capital — à venir
     </div>
   </div><!-- end page-capital -->
+
+  <!-- PAGE PARAMÈTRES -->
+  <div id="page-parametres" class="page">
+    <div class="param-layout">
+
+      <!-- COL 1: Ressources + Magie -->
+      <div class="param-col">
+        <div class="param-section-title">📊 Ressources</div>
+        <div class="param-info">Renomme les étiquettes et abréviations.</div>
+        <div class="param-fields">
+          <div class="param-row">
+            <input class="param-input param-input-wide" id="cfg-pv-name" type="text" placeholder="Points de Vie" oninput="saveParamRes('pv','name',this.value)">
+            <input class="param-input" id="cfg-pv" type="text" placeholder="PV" oninput="saveParamStat('pv',this.value)">
+          </div>
+          <div class="param-row">
+            <input class="param-input param-input-wide" id="cfg-pa-name" type="text" placeholder="Points d'Armure" oninput="saveParamRes('pa','name',this.value)">
+            <input class="param-input" id="cfg-pa" type="text" placeholder="PA" oninput="saveParamStat('pa',this.value)">
+          </div>
+          <div class="param-row">
+            <input class="param-input param-input-wide" id="cfg-pe-name" type="text" placeholder="Points d'Endurance" oninput="saveParamRes('pe','name',this.value)">
+            <input class="param-input" id="cfg-pe" type="text" placeholder="PE" oninput="saveParamStat('pe',this.value)">
+          </div>
+          <div class="param-row" id="cfg-ps-row">
+            <input class="param-input param-input-wide" id="cfg-ps-name" type="text" placeholder="Points de Sort" oninput="saveParamRes('ps','name',this.value)">
+            <input class="param-input" id="cfg-ps" type="text" placeholder="PS" oninput="saveParamStat('ps',this.value)">
+          </div>
+        </div>
+
+        <div class="param-section-title" style="margin-top:20px;">🔮 Magie</div>
+        <div class="param-row" style="margin-top:8px;">
+          <label class="param-toggle-lbl">
+            <input type="checkbox" id="cfg-magie" class="blessure-cb" onchange="saveParamMagie(this.checked)" style="accent-color:#7ab8d4;" checked>
+            Ce JDR utilise de la magie ?
+          </label>
+        </div>
+        <div class="param-info" style="margin-top:2px;margin-bottom:8px;">Si décoché, Infusion, PS, Livre de Sorts et Compétences Magiques disparaissent.</div>
+        <div id="cfg-infusion-row">
+          <div class="param-row">
+            <label class="param-toggle-lbl">
+              <input type="checkbox" id="cfg-infusion" class="blessure-cb" onchange="saveParamInfusion(this.checked)" style="accent-color:#7ab8d4;" checked>
+              Infusion nécessaire à la magie
+            </label>
+          </div>
+          <div class="param-info" style="margin-top:2px;">Si décoché, la magie est libre et "Infusé ?" disparaît (mais reste coché en interne).</div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer toutes les compétences par défaut</button>
+          <div class="param-info" style="margin-top:4px;">Remet les listes de compétences d'origine. Les données de personnage ne sont pas effacées.</div>
+        </div>
+
+      </div>
+
+      <!-- COL 2: Statistiques + Principales + Secondaires -->
+      <div class="param-col">
+
+        <!-- Statistiques -->
+        <div class="param-cat-header">
+          <span class="param-section-title" style="margin:0;">Statistiques</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span class="param-info" style="font-style:normal;">Afficher</span>
+            <input type="checkbox" id="cfg-show-stats" class="blessure-cb" onchange="saveParamShow('stats',this.checked)">
+          </div>
+        </div>
+        <div id="cfg-list-sta" class="param-list"></div>
+        <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
+
+        <!-- Principales -->
+        <div class="param-cat-header" style="margin-top:14px;">
+          <span class="param-section-title" style="margin:0;">Compétences Principales</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span class="param-info" style="font-style:normal;">Afficher</span>
+            <input type="checkbox" id="cfg-show-pri" class="blessure-cb" onchange="saveParamShow('pri',this.checked)" checked>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-pri" onchange="saveParamFormat('pri',this.value)">
+            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+            <option value="AEM">AEM — Adepte, Expert, Maître</option>
+            <option value="CUSTOM">Personnalisé (texte libre)</option>
+          </select>
+          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('pri')">↺ Défaut</button>
+        </div>
+        <div id="cfg-list-pri" class="param-list"></div>
+        <button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button>
+
+        <!-- Secondaires -->
+        <div class="param-cat-header" style="margin-top:14px;">
+          <span class="param-section-title" style="margin:0;">Compétences Secondaires</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span class="param-info" style="font-style:normal;">Afficher</span>
+            <input type="checkbox" id="cfg-show-sec" class="blessure-cb" onchange="saveParamShow('sec',this.checked)" checked>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-sec" onchange="saveParamFormat('sec',this.value)">
+            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+            <option value="AEM">AEM — Adepte, Expert, Maître</option>
+            <option value="CUSTOM">Personnalisé (texte libre)</option>
+          </select>
+          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('sec')">↺ Défaut</button>
+        </div>
+        <div id="cfg-list-sec" class="param-list"></div>
+        <button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button>
+
+      </div>
+
+      <!-- COL 3: Martiales -->
+      <div class="param-col">
+        <div class="param-cat-header">
+          <span class="param-section-title" style="margin:0;">Compétences Martiales</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span class="param-info" style="font-style:normal;">Afficher</span>
+            <input type="checkbox" id="cfg-show-mar" class="blessure-cb" onchange="saveParamShow('mar',this.checked)" checked>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mar" onchange="saveParamFormat('mar',this.value)">
+            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+            <option value="AEM">AEM — Adepte, Expert, Maître</option>
+            <option value="CUSTOM">Personnalisé (texte libre)</option>
+          </select>
+          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mar')">↺ Défaut</button>
+        </div>
+        <div id="cfg-list-mar" class="param-list"></div>
+        <button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button>
+      </div>
+
+      <!-- COL 4: Magiques -->
+      <div class="param-col">
+        <div class="param-cat-header">
+          <span class="param-section-title" style="margin:0;">Compétences Magiques</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span class="param-info" style="font-style:normal;">Afficher</span>
+            <input type="checkbox" id="cfg-show-mag" class="blessure-cb" onchange="saveParamShow('mag',this.checked)" checked>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mag" onchange="saveParamFormat('mag',this.value)">
+            <option value="AEM">AEM — Adepte, Expert, Maître</option>
+            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+            <option value="CUSTOM">Personnalisé (texte libre)</option>
+          </select>
+          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺ Défaut</button>
+        </div>
+        <div id="cfg-list-mag" class="param-list"></div>
+        <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
+      </div>
+
+    </div>
+  </div><!-- end page-parametres -->
 
 </div><!-- end app -->
 </div><!-- end aspect-wrap -->
@@ -1017,18 +1252,6 @@ function loadData() {
   try { data = JSON.parse(localStorage.getItem('dnd_inv') || '{}'); } catch(e) { data = {}; }
   document.getElementById('bagSize').value = data._bagSize || 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-  // apply infuse state to PS fields only (no persist, no re-render)
-  const infuse = data._infuse || false;
-  [['comp-char-ps','ps-lbl'],['char-ps','inv-ps-lbl']].forEach(([inp,lbl]) => {
-    const i = document.getElementById(inp);
-    const l = document.getElementById(lbl);
-    if (i) { i.disabled = !infuse; i.style.opacity = infuse?'1':'.4'; }
-    if (l) l.style.opacity = infuse?'1':'.4';
-  });
-  ['infuse-cb','inv-infuse-cb'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.checked = infuse;
-  });
 }
 
 function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
@@ -1049,6 +1272,7 @@ function importData(e) {
       data = JSON.parse(ev.target.result);
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
+      applyStatLabels(); applyMagieSetting(); applyParamShow();
       persist(); toast('Importé !');
     } catch { toast('Erreur JSON'); }
   };
@@ -1059,7 +1283,8 @@ function clearAll() {
   if (!confirm('Effacer tout ?')) return;
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
-  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); persist();
+  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
+  applyStatLabels(); applyMagieSetting(); applyParamShow(); persist();
 }
 
 /* ── bag normal slots ── */
@@ -1400,11 +1625,12 @@ function loadChar() {
 
 /* ══ PAGE NAVIGATION ══ */
 function showPage(name) {
-  ['inventaire','competences','capital'].forEach(p => {
+  ['inventaire','competences','capital','parametres'].forEach(p => {
     document.getElementById('page-'+p).classList.toggle('active', p===name);
     document.getElementById('nav-'+p).classList.toggle('active', p===name);
   });
   if (name === 'competences') renderCompetences();
+  if (name === 'parametres') renderParametres();
 }
 
 /* ══ SYNC CHAR ══ */
@@ -1503,20 +1729,32 @@ function setCompData(key, val) { if(!data._comp)data._comp={}; data._comp[key]=v
 
 /* Apprentissage level → extra principale slots: Novice+1, Adepte+2, Expert+3, Maître+3 */
 function getMaxPrincipales() {
-  const appLvl = getCompData('sec_Apprentissage');
-  const bonus = appLvl >= 3 ? 3 : appLvl; // Novice=1,Adepte=2,Expert=3,Maître=3
+  // Find Apprentissage key — works even if base array still has it, regardless of custom rename
+  const secArr = getCompArray('sec');
+  // Try exact key first, then find the index of Apprentissage in base and map to custom
+  let appLvl = getCompData('sec_Apprentissage');
+  if (!appLvl) {
+    const baseIdx = COMP_SECONDAIRES.indexOf('Apprentissage');
+    if (baseIdx >= 0 && secArr[baseIdx]) appLvl = getCompData('sec_' + secArr[baseIdx]);
+  }
+  const bonus = appLvl >= 3 ? 3 : appLvl;
   return 3 + bonus;
 }
 function countPrincipales() {
-  return COMP_PRINCIPALES.filter(n => getCompData('pri_'+n) > 0).length;
+  return getCompArray('pri').filter(n => getCompData('pri_'+n) > 0).length;
 }
 function getUsedMagiques() {
-  return COMP_MAGIQUES.filter(n => getCompData('mag_'+n) > 0);
+  return getCompArray('mag').filter(n => getCompData('mag_'+n) > 0);
 }
 
 /* Make a dropdown skill row with level boxes */
 function makeDropdownRow(prefix, allOptions, levels, isMagic, container) {
-  const localArr = isMagic ? (I18N[currentLang]?.comp_mag || allOptions)
+  // Use localized names only if using base arrays; custom arrays use their own names
+  const hasCustom = !!(data._customComp && data._customComp[
+    prefix==='pri_'?'pri':prefix==='sec_'?'sec':prefix==='mar_'?'mar':prefix==='mag_'?'mag':''
+  ]);
+  const localArr = hasCustom ? allOptions
+    : isMagic ? (I18N[currentLang]?.comp_mag || allOptions)
     : prefix === 'pri_' ? (I18N[currentLang]?.comp_pri || allOptions)
     : prefix === 'sec_' ? (I18N[currentLang]?.comp_sec || allOptions)
     : prefix === 'mar_' ? (I18N[currentLang]?.comp_mar || allOptions)
@@ -1583,37 +1821,34 @@ function addSkillRow(prefix, selectedName, levels, isMagic, allOptions, localArr
   row.appendChild(sel);
 
   if (selectedName) {
-    const lvlWrap = document.createElement('div');
-    lvlWrap.className = 'level-sel';
-    const cur = getCompData(prefix+selectedName);
-
-    // Color based on highest selected level
-    // STD: 1=Novice(green), 2=Adepte(gold), 3=Expert(cyan), 4=Maître(red)
-    // Magic: 1=Adepte(gold), 2=Expert(cyan), 3=Maître(red)
-    const STD_COLORS   = ['#3aaa3a','#c8922a','#2aaacc','#e02020'];
-    const MAGIC_COLORS = ['#c8922a','#2aaacc','#e02020'];
-    const palette = isMagic ? MAGIC_COLORS : STD_COLORS;
-    const litColor = cur > 0 ? (palette[cur-1] || palette[palette.length-1]) : null;
-
-    levels.forEach((lvlName, i) => {
-      const box = document.createElement('div');
-      box.className = 'lvl-box';
-      box.setAttribute('data-tip', lvlName);
-      const boxIdx = i + 1;
-      if (cur >= boxIdx && litColor) {
-        box.classList.add('lit');
-        box.style.background   = litColor;
-        box.style.borderColor  = litColor;
-      }
-      box.onclick = (e) => {
-        e.stopPropagation();
-        const newLvl = (cur === boxIdx) ? 0 : boxIdx;
-        setCompData(prefix+selectedName, newLvl === 0 ? 1 : newLvl); // min 1 to keep skill selected
-        renderCompetences();
-      };
-      lvlWrap.appendChild(box);
-    });
-    row.appendChild(lvlWrap);
+    const cat = prefix==='pri_'?'pri':prefix==='sec_'?'sec':prefix==='mar_'?'mar':'mag';
+    if (isCustomFree(cat)) {
+      // Free text input
+      const freeInp = document.createElement('input');
+      freeInp.type = 'text'; freeInp.placeholder = '—';
+      freeInp.style.cssText = 'width:80px;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;text-align:center;outline:none;flex-shrink:0;';
+      const freeKey = 'compfree_'+prefix+selectedName;
+      freeInp.value = data._compFree?.[freeKey] || '';
+      freeInp.oninput = (e) => { e.stopPropagation(); if(!data._compFree)data._compFree={}; data._compFree[freeKey]=freeInp.value; persist(); };
+      row.appendChild(freeInp);
+    } else {
+      const lvlWrap = document.createElement('div');
+      lvlWrap.className = 'level-sel';
+      const cur = getCompData(prefix+selectedName);
+      const STD_COLORS   = ['#3aaa3a','#c8922a','#2aaacc','#e02020'];
+      const MAGIC_COLORS = ['#c8922a','#2aaacc','#e02020'];
+      const palette = isMagic ? MAGIC_COLORS : STD_COLORS;
+      const litColor = cur > 0 ? (palette[cur-1] || palette[palette.length-1]) : null;
+      levels.forEach((lvlName, i) => {
+        const box = document.createElement('div');
+        box.className = 'lvl-box'; box.setAttribute('data-tip', lvlName);
+        const boxIdx = i + 1;
+        if (cur >= boxIdx && litColor) { box.classList.add('lit'); box.style.background = litColor; box.style.borderColor = litColor; }
+        box.onclick = (e) => { e.stopPropagation(); const newLvl=(cur===boxIdx)?0:boxIdx; setCompData(prefix+selectedName,newLvl===0?1:newLvl); renderCompetences(); };
+        lvlWrap.appendChild(box);
+      });
+      row.appendChild(lvlWrap);
+    }
   }
   container.appendChild(row);
 }
@@ -1786,17 +2021,45 @@ function renderCompetences() {
   // Update section titles from i18n
   document.querySelectorAll('[data-i18n-comp]').forEach(el => { el.textContent = t(el.dataset.i18nComp); });
 
-  const levels = getLevelsStd();
-  const levelsMagic = getLevelsMagic();
+  const levels      = getLevelsForCat('pri'); // pri/sec/mar may differ
+  const levelsMagic = getLevelsForCat('mag');
 
   const lp   = document.getElementById('list-principales');
   const ls   = document.getElementById('list-secondaires');
   const lm   = document.getElementById('list-martiales');
   const lmag = document.getElementById('list-magiques');
-  if (lp)   makeDropdownRow('pri_',COMP_PRINCIPALES,levels,false,lp);
-  if (ls)   makeDropdownRow('sec_',COMP_SECONDAIRES,levels,false,ls);
-  if (lm)   makeDropdownRow('mar_',COMP_MARTIALES,levels,false,lm);
-  if (lmag) makeDropdownRow('mag_',COMP_MAGIQUES,levelsMagic,true,lmag);
+  if (lp && isShown('pri'))   makeDropdownRow('pri_',getCompArray('pri'),getLevelsForCat('pri'),false,lp);
+  else if (lp) lp.innerHTML = '';
+  if (ls && isShown('sec'))   makeDropdownRow('sec_',getCompArray('sec'),getLevelsForCat('sec'),false,ls);
+  else if (ls) ls.innerHTML = '';
+  if (lm && isShown('mar'))   makeDropdownRow('mar_',getCompArray('mar'),getLevelsForCat('mar'),false,lm);
+  else if (lm) lm.innerHTML = '';
+  if (lmag && isShown('mag')) makeDropdownRow('mag_',getCompArray('mag'),getLevelsForCat('mag'),true,lmag);
+  else if (lmag) lmag.innerHTML = '';
+
+  // Render stats section
+  const statsList = document.getElementById('list-stats');
+  if (statsList && isShown('stats')) {
+    statsList.innerHTML = '';
+    getCompArray('sta').forEach(name => {
+      const box = document.createElement('div');
+      box.style.cssText = 'background:var(--bg3);border:1.5px solid var(--border2);border-radius:3px;padding:6px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px;';
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;';
+      lbl.textContent = name;
+      const inp = document.createElement('input');
+      inp.style.cssText = 'width:60px;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:14px;text-align:center;outline:none;';
+      inp.type = 'text'; inp.placeholder = '—';
+      const statKey = 'stat_'+name;
+      inp.value = data._stats?.[statKey] || '';
+      inp.oninput = () => { if(!data._stats)data._stats={}; data._stats[statKey]=inp.value; persist(); };
+      box.appendChild(lbl); box.appendChild(inp);
+      statsList.appendChild(box);
+    });
+  }
+
+  applyParamShow();
+  applyMagieSetting();
 
   renderCoups();
   renderSavoirs();
@@ -1971,10 +2234,277 @@ function loadLang() {
   document.querySelectorAll('input[name="lang-switch"]').forEach(r => r.checked = r.value === saved);
 }
 
+/* ══ PARAMÈTRES ══ */
+
+// Default stat arrays
+const STA_DEFAULT = ['Force','Endurance','Précision','Mental','Dextérité','Agilité','Charisme','Spirituel'];
+
+// Custom comp arrays
+function getCustomComp(type) { return data._customComp?.[type] || null; }
+function setCustomComp(type, arr) {
+  if (!data._customComp) data._customComp = {};
+  data._customComp[type] = arr; persist();
+}
+function getCompArray(type) {
+  return getCustomComp(type) ||
+    (type==='pri'?COMP_PRINCIPALES:type==='sec'?COMP_SECONDAIRES:
+     type==='mar'?COMP_MARTIALES:type==='mag'?COMP_MAGIQUES:
+     type==='sta'?STA_DEFAULT:[]);
+}
+
+// Category visibility
+function saveParamShow(cat, val) {
+  if (!data._paramShow) data._paramShow = {};
+  data._paramShow[cat] = val; persist();
+  applyParamShow();
+}
+function isShown(cat) {
+  if (!data._paramShow) return cat !== 'stats'; // stats hidden by default
+  return data._paramShow[cat] !== false;
+}
+function applyParamShow() {
+  // Statistiques section in comp page
+  const statsEl = document.getElementById('comp-stats-section');
+  if (statsEl) statsEl.style.display = isShown('stats') ? '' : 'none';
+  // Comp sections
+  const sections = {
+    pri: ['list-principales','cfg-list-pri'],
+    sec: ['list-secondaires','cfg-list-sec'],
+    mar: ['list-martiales','cfg-list-mar'],
+    mag: ['list-magiques','cfg-list-mag'],
+  };
+  // hide/show on comp page
+  Object.entries(sections).forEach(([cat]) => {
+    const listEl = document.getElementById('list-'+
+      (cat==='pri'?'principales':cat==='sec'?'secondaires':cat==='mar'?'martiales':'magiques'));
+    const titleEl = listEl?.previousElementSibling;
+    const show = isShown(cat);
+    if (listEl) listEl.style.display = show ? '' : 'none';
+    if (titleEl) titleEl.style.display = show ? '' : 'none';
+  });
+}
+
+// Category formats
+function getFormat(cat) { return data._paramFormat?.[cat] || (cat==='mag'?'AEM':'NAEM'); }
+function isCustomFree(cat) { return getFormat(cat) === 'CUSTOM'; }
+function getLevelsForCat(cat) {
+  const fmt = getFormat(cat);
+  if (fmt === 'NAEM') return ['Novice','Adepte','Expert','Maître'];
+  if (fmt === 'AEM')  return ['Adepte','Expert','Maître'];
+  // CUSTOM = free text, no level boxes — handled separately
+  return ['Adepte','Expert','Maître'];
+}
+function saveParamFormat(cat, val) {
+  if (!data._paramFormat) data._paramFormat = {};
+  data._paramFormat[cat] = val; persist();
+  if (document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+}
+
+function resetParamFormat(cat) {
+  if (data._paramFormat) delete data._paramFormat[cat]; persist();
+  const sel = document.getElementById('cfg-fmt-'+cat);
+  if (sel) sel.value = cat==='mag'?'AEM':'NAEM';
+  if (document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+}
+
+// Resource labels (long name + abbreviation)
+function getResName(stat) { return data._resNames?.[stat] || {pv:'Points de Vie',pa:"Points d'Armure",pe:"Points d'Endurance",ps:'Points de Sort'}[stat] || ''; }
+function getStatLabel(stat) { return data._statLabels?.[stat] || stat.toUpperCase(); }
+function saveParamRes(stat, field, val) {
+  if (field==='name') { if(!data._resNames)data._resNames={}; data._resNames[stat]=val; }
+  persist();
+}
+function saveParamStat(stat, val) {
+  if (!data._statLabels) data._statLabels = {};
+  data._statLabels[stat] = val || stat.toUpperCase(); persist();
+  applyStatLabels();
+}
+
+function applyStatLabels() {
+  ['pv','pa','pe','ps'].forEach(s => {
+    const lbl = getStatLabel(s);
+    document.querySelectorAll('[data-i18n-char="'+s+'"]').forEach(el => { el.textContent = lbl; });
+    if (s==='ps') {
+      const a = document.getElementById('inv-ps-lbl');
+      const b = document.getElementById('ps-lbl');
+      if(a) a.textContent = lbl; if(b) b.textContent = lbl;
+    }
+    ['char-'+s,'comp-char-'+s].forEach(id => {
+      const el = document.getElementById(id); if(el) el.placeholder = lbl;
+    });
+  });
+}
+
+function saveParamMagie(val) {
+  data._magieEnabled = val; persist(); applyMagieSetting();
+}
+
+function applyMagieSetting() {
+  const enabled = data._magieEnabled !== false; // default true
+
+  // Hide/show the cfg-infusion-row in params
+  const infRow = document.getElementById('cfg-infusion-row');
+  if (infRow) infRow.style.display = enabled ? '' : 'none';
+
+  // PS fields
+  ['inv-ps-lbl','ps-lbl'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.closest('.char-row') && (el.style.display = enabled ? '' : 'none');
+  });
+  ['char-ps','comp-char-ps'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = enabled ? '' : 'none';
+  });
+
+  // Infusé checkbox
+  if (!enabled) {
+    // Force infuse ON internally but hide the toggle
+    data._infuse = true; persist();
+    ['inv-infuse-cb','infuse-cb'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.checked = true; el.style.display = 'none'; }
+      const lbl = el?.previousElementSibling;
+      const sep = lbl?.previousElementSibling;
+      if (lbl) lbl.style.display = 'none';
+      if (sep?.classList?.contains('char-sep')) sep.style.display = 'none';
+    });
+  } else {
+    applyInfusionSetting(); // restore based on infusion setting
+  }
+
+  // Livre de sorts, compétences magiques section visibility
+  const magCol = document.querySelector('.comp-body .comp-col:last-child');
+  const magList = document.getElementById('list-magiques');
+  const livreSorts = document.getElementById('livre-sorts-body');
+  // Find parent comp-section-title of list-magiques
+  if (magCol) magCol.style.display = enabled ? '' : 'none';
+  if (magList) magList.style.display = enabled ? '' : 'none';
+  if (livreSorts) livreSorts.style.display = enabled ? '' : 'none';
+  document.querySelectorAll('[data-i18n-comp="comp_magiques"], [data-i18n-comp="comp_magiques_sub"], [data-i18n-comp="livre_sorts"]').forEach(el => {
+    const parent = el.closest('.comp-section-title');
+    if (parent) parent.style.display = enabled ? '' : 'none';
+  });
+
+  // Cfg magie checkbox sync
+  const cfgMagie = document.getElementById('cfg-magie');
+  if (cfgMagie) cfgMagie.checked = enabled;
+}
+
+function saveParamInfusion(val) {
+  data._infusionRequired = val; persist(); applyInfusionSetting();
+}
+
+function applyInfusionSetting() {
+  const magEnabled = data._magieEnabled !== false;
+  if (!magEnabled) return; // handled by applyMagieSetting
+
+  const req = data._infusionRequired !== false;
+
+  // Infusé checkbox — only hide/show if magie is enabled
+  if (!req) { data._infuse = true; persist(); }
+  ['inv-infuse-cb','infuse-cb'].forEach(id => {
+    const cb = document.getElementById(id); if (!cb) return;
+    const lbl = cb.previousElementSibling;
+    const sep = lbl?.previousElementSibling;
+    cb.style.display = req ? '' : 'none';
+    if (!req) cb.checked = true;
+    if (lbl) lbl.style.display = req ? '' : 'none';
+    if (sep?.classList?.contains('char-sep')) sep.style.display = req ? '' : 'none';
+  });
+
+  // PS stays visible regardless of infusion setting
+  const psRow = document.getElementById('cfg-ps-row');
+  if (psRow) psRow.style.display = '';
+
+  // Magic skills accessibility
+  if (!req) {
+    document.querySelectorAll('#list-magiques .skill-dd-row').forEach(r => r.classList.remove('disabled'));
+  } else {
+    const infuse = data._infuse || false;
+    document.querySelectorAll('#list-magiques .skill-dd-row').forEach(r => r.classList.toggle('disabled', !infuse));
+  }
+}
+
+function resetAllComps() {
+  if (!confirm('Restaurer toutes les listes de compétences par défaut ? Cela supprime vos modifications de noms/ajouts/suppressions, mais pas les données de personnage.')) return;
+  delete data._customComp;
+  persist(); renderParametres();
+  if (document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+  toast('Compétences restaurées !');
+}
+
+function addParamComp(type) {
+  const arr = [...getCompArray(type)]; arr.push('Nouvelle compétence');
+  setCustomComp(type, arr); renderParametres();
+  if(document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+}
+
+function renderParamList(type, containerId) {
+  const container = document.getElementById(containerId); if(!container) return;
+  container.innerHTML = '';
+  getCompArray(type).forEach((name, idx) => {
+    const row = document.createElement('div'); row.className = 'param-comp-row';
+    const inp = document.createElement('input'); inp.className='param-comp-input'; inp.type='text'; inp.value=name;
+    inp.oninput = () => {
+      const cur = [...getCompArray(type)]; const old = cur[idx];
+      cur[idx] = inp.value; setCustomComp(type, cur);
+      const pref = type+'_';
+      if(data._comp?.[pref+old]!==undefined){data._comp[pref+inp.value]=data._comp[pref+old];delete data._comp[pref+old];persist();}
+      if(document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+    };
+    const del = document.createElement('button'); del.className='param-del-btn'; del.textContent='×'; del.title='Supprimer';
+    del.onclick = () => {
+      const cur = [...getCompArray(type)]; cur.splice(idx,1); setCustomComp(type,cur);
+      renderParametres();
+      if(document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+    };
+    row.appendChild(inp); row.appendChild(del); container.appendChild(row);
+  });
+}
+
+function renderParametres() {
+  // Resource labels
+  ['pv','pa','pe','ps'].forEach(s => {
+    const nameEl = document.getElementById('cfg-'+s+'-name');
+    const abbEl  = document.getElementById('cfg-'+s);
+    if(nameEl) nameEl.value = getResName(s);
+    if(abbEl)  abbEl.value  = getStatLabel(s);
+  });
+  // PS row
+  const psRow = document.getElementById('cfg-ps-row');
+  if(psRow) psRow.style.display = data._magieEnabled!==false ? '' : 'none';
+  // Infusion + Magie toggles
+  const infCb = document.getElementById('cfg-infusion');
+  if(infCb) infCb.checked = data._infusionRequired!==false;
+  const magCb = document.getElementById('cfg-magie');
+  if(magCb) magCb.checked = data._magieEnabled!==false;
+  const infRow = document.getElementById('cfg-infusion-row');
+  if(infRow) infRow.style.display = data._magieEnabled!==false?'':'none';
+  // Show/hide toggles
+  ['stats','pri','sec','mar','mag'].forEach(cat => {
+    const cb = document.getElementById('cfg-show-'+cat);
+    if(cb) cb.checked = isShown(cat);
+  });
+  // Formats
+  ['pri','sec','mar','mag'].forEach(cat => {
+    const sel = document.getElementById('cfg-fmt-'+cat);
+    if(sel) sel.value = getFormat(cat);
+  });
+  // Comp lists
+  renderParamList('sta','cfg-list-sta');
+  renderParamList('pri','cfg-list-pri');
+  renderParamList('sec','cfg-list-sec');
+  renderParamList('mar','cfg-list-mar');
+  renderParamList('mag','cfg-list-mag');
+}
+
 loadTheme();
 loadLang();
 loadData();
 applyI18n();
+applyStatLabels();
+applyMagieSetting();
+applyParamShow();
 </script>
 </body>
 </html>
