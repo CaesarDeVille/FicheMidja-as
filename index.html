@@ -9,6 +9,8 @@
   --bg:      #0d0700;
   --bg2:     #1e1008;
   --bg3:     #140c00;
+  --slot-empty: #0a0600;
+  --char-panel: #0a0600;
   --border:  #8b6914;
   --border2: #6a4a10;
   --border3: #3a2808;
@@ -43,9 +45,16 @@ body {
   border: 1.5px solid var(--border2);
   border-radius: 6px;
   padding: 6px 14px;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 14px;
+  position: relative;
 }
-.tb-title { font-size: 13px; color: var(--gold); letter-spacing: 2px; margin-right: auto; }
+.tb-fiche-nom { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 140px; letter-spacing: .3px; }
+.tb-title {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 18px; color: var(--gold); letter-spacing: 4px; white-space: nowrap;
+  pointer-events: none; text-shadow: 0 0 14px rgba(240,192,64,.2);
+}
+.tb-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .tb-group { display: flex; align-items: center; gap: 5px; }
 .tb-group label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
 .tb-group input[type="color"] { width: 26px; height: 20px; border: 1px solid var(--border2); border-radius: 2px; background: none; cursor: pointer; padding: 1px; }
@@ -65,7 +74,7 @@ body {
 }
 /* ══ NAV BAR ══ */
 .slot {
-  background: #0a0600;
+  background: var(--slot-empty);
   border: 1.5px solid var(--border2);
   border-radius: 3px;
   cursor: pointer;
@@ -327,7 +336,7 @@ body {
   flex: 1; min-height: 0; overflow: hidden;
 }
 .comp-char-panel {
-  background: #0a0600; border: 1.5px solid var(--border2); border-radius: 4px;
+  background: var(--char-panel); border: 1.5px solid var(--border2); border-radius: 4px;
   padding: 8px 14px; flex-shrink: 0;
   display: flex; flex-direction: column; gap: 5px;
   align-self: flex-start; width: auto; min-width: 600px; max-width: 100%;
@@ -347,7 +356,7 @@ body {
 /* skill dropdown row */
 .skill-dd-row {
   display: flex; align-items: center; gap: 6px;
-  background: #0a0600; border: 1.5px solid var(--border2);
+  background: var(--slot-empty); border: 1.5px solid var(--border2);
   border-radius: 3px; padding: 4px 8px; min-height: 34px;
   transition: border-color .15s;
 }
@@ -363,7 +372,7 @@ body {
 
 /* coup spécial / savoir — inventory style cells */
 .free-cell {
-  background: #0a0600; border: 1.5px solid var(--border2);
+  background: var(--slot-empty); border: 1.5px solid var(--border2);
   border-radius: 3px; padding: 6px 10px; min-height: 44px;
   cursor: pointer; display: flex; flex-direction: column;
   justify-content: flex-start; overflow: hidden;
@@ -384,7 +393,7 @@ body {
   border-bottom: 1px solid #2a4a5a; padding-bottom: 3px; margin-bottom: 3px;
 }
 .sort-cell {
-  background: #0a0600; border: 1.5px solid #2a4a5a;
+  background: var(--slot-empty); border: 1.5px solid #2a4a5a;
   border-radius: 3px; padding: 4px 8px; min-height: 28px;
   font-size: 12px; color: #5a8a9a; cursor: pointer;
   display: flex; align-items: center;
@@ -397,7 +406,7 @@ body {
 .level-sel { display: flex; gap: 0; flex-shrink: 0; }
 .lvl-box {
   width: 22px; height: 22px;
-  background: #0a0600; border: 1.5px solid var(--border2);
+  background: var(--slot-empty); border: 1.5px solid var(--border2);
   cursor: pointer; transition: background .12s, border-color .12s;
   position: relative;
 }
@@ -428,7 +437,7 @@ body {
 }
 .gender-lbl:has(input:checked) { color: var(--gold); text-shadow: 0 0 6px rgba(240,192,64,.4); }
 .char-panel {
-  background: #0a0600;
+  background: var(--char-panel);
   border: 1.5px solid var(--border2);
   border-radius: 4px;
   padding: 10px 14px;
@@ -456,7 +465,7 @@ body {
 .blessure-cb {
   width: 22px; height: 22px;
   appearance: none; -webkit-appearance: none;
-  background: #0a0600; border: 1.5px solid var(--border2);
+  background: var(--slot-empty); border: 1.5px solid var(--border2);
   border-radius: 3px; cursor: pointer;
   position: relative; flex-shrink: 0;
   transition: border-color .15s;
@@ -501,12 +510,115 @@ body {
 [draggable="true"] { cursor: grab; }
 
 /* ══ TOAST ══ */
+/* ══ FICHE PERSO ══ */
+/* ══ FICHE PERSO ══ */
+.fiche-layout {
+  display: grid; grid-template-columns: 1fr 40% 1fr; gap: 20px;
+  flex: 1; min-height: 0; padding: 2px; overflow: hidden;
+}
+.fiche-left  { display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
+.fiche-right { display: flex; flex-direction: column; gap: 5px; }
+.fiche-center {
+  display: flex; flex-direction: column; gap: 6px;
+  align-items: stretch; min-height: 0;
+}
+
+.fiche-nom {
+  font-size: 20px; color: var(--gold); letter-spacing: 2px;
+  border-bottom: 1px solid var(--border2); padding-bottom: 4px; margin-bottom: 2px;
+}
+.fiche-row {
+  display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; font-size: 12px;
+}
+.fiche-sep { color: var(--border2); flex-shrink: 0; }
+.fiche-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.fiche-field-val { font-size: 12px; color: var(--text); white-space: nowrap; }
+.fiche-main-lbl {
+  display: flex; align-items: center; gap: 4px; font-size: 12px;
+  color: var(--muted); cursor: pointer; user-select: none;
+}
+.fiche-main-lbl:has(input:checked) { color: var(--gold); }
+.fiche-main-lbl input[type="radio"] { accent-color: var(--gold); }
+.fiche-section-title {
+  font-size: 13px; color: var(--gold); letter-spacing: 1px;
+  border-bottom: 1px solid var(--border2); padding-bottom: 3px; margin-top: 6px;
+}
+.fiche-textarea {
+  background: var(--bg2); border: 1.5px solid var(--border2); border-radius: 4px;
+  color: var(--text); font-family: var(--font); font-size: 12px;
+  padding: 8px 10px; resize: none; outline: none; width: 100%; box-sizing: border-box;
+  flex: 1; transition: border-color .15s;
+}
+.fiche-textarea:focus { border-color: var(--gold); }
+.fiche-histoire { flex: 1; min-height: 0; }
+
+/* Photo */
+.fiche-photo-wrap {
+  flex: 1; min-height: 0; position: relative; cursor: pointer;
+}
+.fiche-photo-inner {
+  width: 100%; height: 100%; min-height: 200px;
+  background: var(--bg2); border: 2px solid var(--border2);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; transition: border-color .15s;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+.fiche-photo-wrap:hover .fiche-photo-inner { border-color: var(--gold); }
+.fiche-photo-hint {
+  color: var(--dim); font-size: 12px; text-align: center; font-style: italic;
+  pointer-events: none;
+}
+.fiche-photo-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+}
+.fiche-photo-modal {
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 20px; min-width: 340px;
+}
+
 /* ══ PARAMÈTRES PAGE ══ */
 .param-layout {
-  display: grid; grid-template-columns: 260px 1fr 1fr 1fr; gap: 20px;
+  display: flex; flex-direction: column; gap: 14px;
   flex: 1; min-height: 0; overflow-y: auto; padding: 4px 2px;
 }
+.param-cols {
+  display: grid; grid-template-columns: 260px 1fr 1fr 1fr; gap: 14px;
+  flex: 1; min-height: 0;
+}
 .param-col { display: flex; flex-direction: column; gap: 6px; }
+
+/* Cartouche panel in params — mirrors real char panels */
+.param-char-panel {
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 4px; padding: 10px 16px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.param-char-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.param-char-field {
+  display: flex; align-items: center; gap: 6px;
+}
+.param-char-label {
+  font-size: 11px; color: var(--muted); white-space: nowrap; letter-spacing: .3px;
+}
+.param-char-inp {
+  background: transparent; border: none; border-bottom: 1px solid var(--border2);
+  color: var(--gold); font-family: var(--font); font-size: 13px;
+  outline: none; width: 120px; padding: 2px 4px;
+  transition: border-color .15s;
+}
+.param-char-inp:focus { border-color: var(--gold); }
+.param-char-sep { color: var(--border); font-size: 16px; margin: 0 2px; }
+.param-char-reset {
+  background: none; border: 1px solid var(--border2); color: var(--dim);
+  border-radius: 3px; padding: 2px 7px; font-size: 10px; cursor: pointer;
+  font-family: var(--font); letter-spacing: .3px; white-space: nowrap;
+  transition: border-color .15s, color .15s;
+}
+.param-char-reset:hover { border-color: var(--gold); color: var(--gold); }
 .param-section-title {
   font-size: 14px; color: var(--gold); letter-spacing: 1px;
   border-bottom: 1px solid var(--border2); padding-bottom: 4px;
@@ -566,6 +678,21 @@ body {
 .param-format-sel:focus { outline: none; border-color: var(--gold); }
 .param-custom-fmt { margin-bottom: 4px; }
 
+.param-cat-name-input {
+  flex: 1; background: transparent; border: none;
+  border-bottom: 1px solid var(--border2); color: var(--gold);
+  font-family: var(--font); font-size: 14px; letter-spacing: .5px;
+  outline: none; padding: 2px 4px; min-width: 0;
+  transition: border-color .15s;
+}
+.param-cat-name-input:focus { border-color: var(--gold); }
+.param-max-input {
+  width: 42px; background: var(--bg3); border: 1.5px solid var(--border2);
+  color: var(--gold); font-family: var(--font); font-size: 12px;
+  padding: 2px 4px; border-radius: 3px; text-align: center; outline: none;
+}
+.param-max-input:focus { border-color: var(--gold); }
+
 .param-reset-btn {
   background: #2a1606; border: 1.5px solid #c84040; color: #f08080;
   font-family: var(--font); font-size: 12px; padding: 8px 14px;
@@ -596,46 +723,37 @@ body {
 
 <!-- ══ THEME BAR ══ -->
 <div class="theme-bar">
-  <span class="tb-title">⚔ FICHE PERSO MIDJA'AS</span>
-  <div class="tb-group"><label>Fond</label><input type="color" id="tc-bg" value="#0d0700" oninput="applyTheme()"></div>
-  <div class="tb-group"><label>Panneau</label><input type="color" id="tc-bg2" value="#1e1008" oninput="applyTheme()"></div>
-  <div class="tb-group"><label>Accent</label><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
-  <div class="tb-group"><label>Texte</label><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
-  <div class="tb-group"><label>Bordure</label><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
-  <div class="tb-group">
-    <label>Police</label>
-    <select id="tc-font" onchange="applyTheme()">
-      <option value="'Palatino Linotype','Book Antiqua',Palatino,serif">Palatino</option>
-      <option value="'Times New Roman',Times,serif">Times New Roman</option>
-      <option value="Georgia,serif">Georgia</option>
-      <option value="fantasy">Fantasy</option>
-      <option value="'Courier New',Courier,monospace">Courier</option>
-      <option value="Arial,Helvetica,sans-serif">Arial</option>
-    </select>
+  <span class="tb-fiche-nom" id="tb-fiche-nom">Fiche de —</span>
+  <span class="tb-title">⚔ FICHE PERSO MIDJA'AS ⚔</span>
+  <div class="tb-right">
+    <div class="gender-wrap">
+      <label class="gender-lbl" title="Français">
+        <input type="radio" name="lang-switch" value="fr" onchange="setLang('fr')" checked> FR
+      </label>
+      <label class="gender-lbl" title="English">
+        <input type="radio" name="lang-switch" value="en" onchange="setLang('en')"> EN
+      </label>
+    </div>
+    <button class="btn-sm" onclick="saveData()">💾 Sauvegarder</button>
+    <button class="btn-sm" onclick="exportData()">⬆ Export</button>
+    <label class="btn-sm" style="cursor:pointer;">⬇ Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearAll()">✕ Effacer</button>
   </div>
-  <div class="gender-wrap" style="margin-left:12px;">
-    <label class="gender-lbl" title="Français">
-      <input type="radio" name="lang-switch" value="fr" onchange="setLang('fr')" checked> FR
-    </label>
-    <label class="gender-lbl" title="English">
-      <input type="radio" name="lang-switch" value="en" onchange="setLang('en')"> EN
-    </label>
-  </div>
-  <button class="btn-sm" onclick="resetTheme()">↺ Reset</button>
 </div>
 
 <!-- ══ APP ══ -->
 <div class="aspect-wrap">
 <div class="app">
   <div class="nav-bar">
+    <button class="nav-btn active" id="nav-fiche" onclick="showPage('fiche')">⚬ Fiche Perso</button>
     <button class="nav-btn" id="nav-competences" onclick="showPage('competences')">⚔ Compétences</button>
-    <button class="nav-btn active" id="nav-inventaire" onclick="showPage('inventaire')">🎒 Inventaire</button>
-    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')">💰 Capital</button>
+    <button class="nav-btn" id="nav-inventaire" onclick="showPage('inventaire')">⊞ Inventaire</button>
+    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')">◈ Capital</button>
     <button class="nav-btn" id="nav-parametres" onclick="showPage('parametres')">⚙ Paramètres</button>
   </div>
 
   <!-- PAGE INVENTAIRE -->
-  <div id="page-inventaire" class="page active">
+  <div id="page-inventaire" class="page">
   <div class="main-body">
     <div class="col-equip">
 
@@ -763,7 +881,7 @@ body {
           <span class="char-lbl" data-i18n-char="infuse">Infusé ?</span>
           <input type="checkbox" id="inv-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
           <span class="char-sep">|</span>
-          <input class="char-input" id="inv-minos-lbl" type="text" value="Pièce de Minos" style="width:110px;font-size:11px;" oninput="syncMinosLabel(this.value)">
+          <span class="char-lbl" id="inv-minos-lbl" style="white-space:nowrap;">Pièce de Minos</span>
           <input type="checkbox" id="inv-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
         </div>
       </div>
@@ -855,15 +973,92 @@ body {
     </div>
 
   </div><!-- main-body -->
+</div><!-- end page-inventaire -->
 
-  <div class="bottom-bar">
-    <button class="btn" onclick="saveData()">💾 Sauvegarder</button>
-    <button class="btn" onclick="exportData()">⬆ Exporter JSON</button>
-    <label class="btn" style="cursor:pointer;">⬇ Importer JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    <button class="btn danger" onclick="clearAll()">✕ Effacer tout</button>
-  </div>
+  <!-- PAGE FICHE PERSO -->
+  <div id="page-fiche" class="page active">
+    <div class="fiche-layout">
 
-  </div><!-- end page-inventaire -->
+      <!-- COL GAUCHE -->
+      <div class="fiche-left">
+        <div class="fiche-nom" id="fiche-nom">—</div>
+
+        <div class="fiche-row">
+          <span class="fiche-field-val" id="fiche-race">—</span>
+          <span class="fiche-sep">|</span>
+          <span class="fiche-field-val" id="fiche-genre">—</span>
+          <span class="fiche-sep">|</span>
+          <span class="fiche-field-val" id="fiche-age">—</span>
+        </div>
+
+        <div class="fiche-row">
+          <span class="fiche-lbl" id="fiche-naiss-lbl" data-i18n-char="naissance">Naissance</span>
+          <span class="fiche-sep">:</span>
+          <span class="fiche-field-val" id="fiche-naiss">—</span>
+        </div>
+
+        <div class="fiche-row" style="gap:10px;">
+          <span class="fiche-lbl" id="fiche-pv-lbl" data-i18n-char="pv">PV</span>
+          <span class="fiche-field-val" id="fiche-pv">—</span>
+          <span class="fiche-sep">|</span>
+          <span class="fiche-lbl" id="fiche-pa-lbl" data-i18n-char="pa">PA</span>
+          <span class="fiche-field-val" id="fiche-pa">—</span>
+          <span class="fiche-sep">|</span>
+          <span class="fiche-lbl" id="fiche-pe-lbl" data-i18n-char="pe">PE</span>
+          <span class="fiche-field-val" id="fiche-pe">—</span>
+          <span class="fiche-sep" id="fiche-ps-sep">|</span>
+          <span class="fiche-lbl" id="fiche-ps-lbl" data-i18n-char="ps">PS</span>
+          <span class="fiche-field-val" id="fiche-ps">—</span>
+        </div>
+
+        <div class="fiche-row">
+          <span class="fiche-lbl" id="fiche-infuse-lbl" data-i18n-char="infuse">Infusé ?</span>
+          <input type="checkbox" id="fiche-infuse-cb" class="blessure-cb" disabled style="pointer-events:none;">
+        </div>
+
+        <div class="fiche-row">
+          <label class="fiche-main-lbl">
+            <input type="radio" name="main-dominante" value="droite" onchange="saveFicheMain('droite')" checked> Droitier
+          </label>
+          <label class="fiche-main-lbl">
+            <input type="radio" name="main-dominante" value="gauche" onchange="saveFicheMain('gauche')"> Gaucher
+          </label>
+        </div>
+
+        <div class="fiche-section-title">Caractère</div>
+        <textarea class="fiche-textarea" id="fiche-caractere" placeholder="Personnalité, tempérament, traits de caractère…" oninput="saveFicheField('caractere',this.value)" style="flex:1;"></textarea>
+
+        <div class="fiche-section-title">Physique</div>
+        <textarea class="fiche-textarea" id="fiche-physique" placeholder="Description physique, taille, particularités…" oninput="saveFicheField('physique',this.value)" style="flex:1;"></textarea>
+      </div>
+
+      <!-- COL CENTRE : Photo -->
+      <div class="fiche-center">
+        <div class="fiche-photo-wrap" onclick="openFichePhoto()">
+          <div class="fiche-photo-inner" id="fiche-photo-inner">
+            <span class="fiche-photo-hint">Cliquez pour ajouter une photo<br><span style="font-size:10px;opacity:.6;">(lien URL)</span></span>
+          </div>
+        </div>
+        <div class="fiche-photo-overlay" id="fiche-photo-overlay" style="display:none;">
+          <div class="fiche-photo-modal">
+            <div style="font-size:13px;color:var(--gold);margin-bottom:8px;">Lien de l'image</div>
+            <input type="text" id="fiche-photo-url" class="param-comp-input" placeholder="https://…" style="width:100%;">
+            <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+              <button class="btn" onclick="clearFichePhoto()">Retirer</button>
+              <button class="btn" onclick="saveFichePhoto()">✔ OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COL DROITE : Histoire -->
+      <div class="fiche-right">
+        <div class="fiche-section-title">Histoire</div>
+        <textarea class="fiche-textarea fiche-histoire" id="fiche-histoire" rows="30" placeholder="Histoire, origines, événements marquants…" oninput="saveFicheField('histoire',this.value)"></textarea>
+      </div>
+
+    </div>
+  </div><!-- end page-fiche -->
 
   <!-- PAGE COMPÉTENCES -->
   <div id="page-competences" class="page">
@@ -910,7 +1105,7 @@ body {
           <span class="char-lbl" data-i18n-char="infuse">Infusé ?</span>
           <input type="checkbox" id="infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
           <span class="char-sep">|</span>
-          <input class="char-input" id="comp-minos-lbl" type="text" value="Pièce de Minos" style="width:110px;font-size:11px;" oninput="syncMinosLabel(this.value)">
+          <span class="char-lbl" id="comp-minos-lbl" style="white-space:nowrap;">Pièce de Minos</span>
           <input type="checkbox" id="comp-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
         </div>
       </div>
@@ -939,7 +1134,7 @@ body {
           <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="comp_secondaires">Compétences Secondaires</span></div>
           <div class="comp-list" id="list-secondaires"></div>
 
-          <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="savoirs">Savoirs &amp; Connaissances</span></div>
+          <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="savoirs">Connaissances et Statut</span></div>
           <div id="list-savoirs"></div>
         </div>
 
@@ -966,165 +1161,266 @@ body {
 
       </div>
     </div>
-  </div><!-- end page-competences -->
+</div><!-- end page-competences -->
 
   <!-- PAGE CAPITAL -->
   <div id="page-capital" class="page">
     <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:20px;letter-spacing:2px;">
       💰 Capital — à venir
     </div>
-  </div><!-- end page-capital -->
+</div><!-- end page-capital -->
 
   <!-- PAGE PARAMÈTRES -->
   <div id="page-parametres" class="page">
     <div class="param-layout">
 
-      <!-- COL 1: Ressources + Magie -->
-      <div class="param-col">
-        <div class="param-section-title">📊 Ressources</div>
-        <div class="param-info">Renomme les étiquettes et abréviations.</div>
-        <div class="param-fields">
-          <div class="param-row">
-            <input class="param-input param-input-wide" id="cfg-pv-name" type="text" placeholder="Points de Vie" oninput="saveParamRes('pv','name',this.value)">
-            <input class="param-input" id="cfg-pv" type="text" placeholder="PV" oninput="saveParamStat('pv',this.value)">
+      <!-- ROW 1: Cartouche Joueur (full width) -->
+      <div class="param-char-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;color:var(--gold);letter-spacing:1px;">🧑 Cartouche Joueur</span>
+          <button class="param-char-reset" onclick="resetCharLabels()">↺ Défaut</button>
+        </div>
+        <div class="param-char-row">
+          <div class="param-char-field">
+            <input class="param-char-inp" id="cfg-label-nom" type="text" placeholder="Nom" oninput="saveCharLabel('nom',this.value)">
           </div>
-          <div class="param-row">
-            <input class="param-input param-input-wide" id="cfg-pa-name" type="text" placeholder="Points d'Armure" oninput="saveParamRes('pa','name',this.value)">
-            <input class="param-input" id="cfg-pa" type="text" placeholder="PA" oninput="saveParamStat('pa',this.value)">
-          </div>
-          <div class="param-row">
-            <input class="param-input param-input-wide" id="cfg-pe-name" type="text" placeholder="Points d'Endurance" oninput="saveParamRes('pe','name',this.value)">
-            <input class="param-input" id="cfg-pe" type="text" placeholder="PE" oninput="saveParamStat('pe',this.value)">
-          </div>
-          <div class="param-row" id="cfg-ps-row">
-            <input class="param-input param-input-wide" id="cfg-ps-name" type="text" placeholder="Points de Sort" oninput="saveParamRes('ps','name',this.value)">
-            <input class="param-input" id="cfg-ps" type="text" placeholder="PS" oninput="saveParamStat('ps',this.value)">
+          <span class="param-char-sep">|</span>
+          <span class="param-char-label">♂ / ♀</span>
+          <span class="param-char-sep">|</span>
+          <div class="param-char-field">
+            <input class="param-char-inp" id="cfg-label-race" type="text" placeholder="Race" oninput="saveCharLabel('race',this.value)">
           </div>
         </div>
+        <div class="param-char-row">
+          <div class="param-char-field">
+            <input class="param-char-inp" style="width:80px;" id="cfg-label-age" type="text" placeholder="Âge Bio" oninput="saveCharLabel('age',this.value)">
+          </div>
+          <span class="param-char-sep">|</span>
+          <div class="param-char-field">
+            <input class="param-char-inp" style="width:90px;" id="cfg-label-naiss" type="text" placeholder="Naissance" oninput="saveCharLabel('naiss',this.value)">
+          </div>
+          <span class="param-char-sep">|</span>
+          <span class="param-char-label" style="color:var(--muted);">PV / PA / PE / PS — via Ressources</span>
+        </div>
+        <div class="param-char-row">
+          <div class="param-char-field">
+            <input class="param-char-inp" style="width:90px;" id="cfg-label-blessures" type="text" placeholder="Blessures" oninput="saveCharLabel('blessures',this.value)">
+            <span class="param-char-label" style="color:var(--dim);">☐☐☐</span>
+          </div>
+          <span class="param-char-sep">|</span>
+          <div class="param-char-field">
+            <input class="param-char-inp" style="width:90px;" id="cfg-label-infuse" type="text" placeholder="Infusé ?" oninput="saveCharLabel('infuse',this.value)">
+            <span class="param-char-label" style="color:var(--dim);">☐</span>
+          </div>
+          <span class="param-char-sep">|</span>
+          <div class="param-char-field">
+            <input class="param-char-inp" style="width:120px;" id="cfg-label-minos" type="text" placeholder="Pièce de Minos" oninput="saveCharLabel('minos',this.value)">
+            <span class="param-char-label" style="color:var(--dim);">☐</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="param-section-title" style="margin-top:20px;">🔮 Magie</div>
-        <div class="param-row" style="margin-top:8px;">
-          <label class="param-toggle-lbl">
-            <input type="checkbox" id="cfg-magie" class="blessure-cb" onchange="saveParamMagie(this.checked)" style="accent-color:#7ab8d4;" checked>
-            Ce JDR utilise de la magie ?
-          </label>
-        </div>
-        <div class="param-info" style="margin-top:2px;margin-bottom:8px;">Si décoché, Infusion, PS, Livre de Sorts et Compétences Magiques disparaissent.</div>
-        <div id="cfg-infusion-row">
-          <div class="param-row">
+      <!-- ROW 2: 4 columns -->
+      <div class="param-cols">
+
+        <!-- COL 1: Apparence + Ressources + Magie + Statistiques -->
+        <div class="param-col">
+          <div class="param-section-title">🎨 Apparence</div>
+          <div class="param-fields" style="margin-top:4px;">
+            <div class="param-row"><span class="param-lbl">Fond</span><input type="color" id="tc-bg" value="#0d0700" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Panneau</span><input type="color" id="tc-bg2" value="#1e1008" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Accent</span><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Texte</span><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Bordure</span><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Case vide</span><input type="color" id="tc-slot-empty" value="#0a0600" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Cartouche joueur</span><input type="color" id="tc-char-panel" value="#0a0600" oninput="applyTheme()"></div>
+            <div class="param-row">
+              <span class="param-lbl">Police</span>
+              <select id="tc-font" onchange="applyTheme()" style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:11px;padding:2px 4px;border-radius:2px;">
+                <option value="'Palatino Linotype','Book Antiqua',Palatino,serif">Palatino</option>
+                <option value="'Times New Roman',Times,serif">Times New Roman</option>
+                <option value="Georgia,serif">Georgia</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="'Courier New',Courier,monospace">Courier</option>
+                <option value="Arial,Helvetica,sans-serif">Arial</option>
+              </select>
+            </div>
+            <div class="param-row">
+              <button class="param-add-btn" onclick="resetTheme()">↺ Réinitialiser le thème</button>
+            </div>
+          </div>
+
+          <div class="param-section-title" style="margin-top:14px;">🔷 Niveaux de Compétences</div>
+          <div class="param-info">Renomme et colore les 4 niveaux.</div>
+          <div class="param-fields" style="margin-top:4px;" id="cfg-levels-list"></div>
+          <button class="param-add-btn" style="margin-top:4px;" onclick="resetLevelDefaults()">↺ Défaut</button>
+
+          <div class="param-section-title" style="margin-top:14px;">📊 Ressources</div>
+          <div class="param-info">Nom complet et abréviation.</div>
+          <div class="param-fields" style="margin-top:4px;">
+            <div class="param-row">
+              <input class="param-input param-input-wide" id="cfg-pv-name" type="text" placeholder="Points de Vie" oninput="saveParamRes('pv','name',this.value)">
+              <input class="param-input" id="cfg-pv" type="text" placeholder="PV" oninput="saveParamStat('pv',this.value)">
+            </div>
+            <div class="param-row">
+              <input class="param-input param-input-wide" id="cfg-pa-name" type="text" placeholder="Points d'Armure" oninput="saveParamRes('pa','name',this.value)">
+              <input class="param-input" id="cfg-pa" type="text" placeholder="PA" oninput="saveParamStat('pa',this.value)">
+            </div>
+            <div class="param-row">
+              <input class="param-input param-input-wide" id="cfg-pe-name" type="text" placeholder="Points d'Endurance" oninput="saveParamRes('pe','name',this.value)">
+              <input class="param-input" id="cfg-pe" type="text" placeholder="PE" oninput="saveParamStat('pe',this.value)">
+            </div>
+            <div class="param-row" id="cfg-ps-row">
+              <input class="param-input param-input-wide" id="cfg-ps-name" type="text" placeholder="Points de Sort" oninput="saveParamRes('ps','name',this.value)">
+              <input class="param-input" id="cfg-ps" type="text" placeholder="PS" oninput="saveParamStat('ps',this.value)">
+            </div>
+          </div>
+
+          <div class="param-section-title" style="margin-top:14px;">🔮 Magie</div>
+          <div class="param-row" style="margin-top:6px;">
             <label class="param-toggle-lbl">
-              <input type="checkbox" id="cfg-infusion" class="blessure-cb" onchange="saveParamInfusion(this.checked)" style="accent-color:#7ab8d4;" checked>
-              Infusion nécessaire à la magie
+              <input type="checkbox" id="cfg-magie" class="blessure-cb" onchange="saveParamMagie(this.checked)" style="accent-color:#7ab8d4;" checked>
+              Ce JDR utilise de la magie ?
             </label>
           </div>
-          <div class="param-info" style="margin-top:2px;">Si décoché, la magie est libre et "Infusé ?" disparaît (mais reste coché en interne).</div>
-        </div>
+          <div class="param-info">Si décoché, PS, Infusion, Sorts et Compétences Magiques disparaissent.</div>
+          <div id="cfg-infusion-row">
+            <div class="param-row" style="margin-top:6px;">
+              <label class="param-toggle-lbl">
+                <input type="checkbox" id="cfg-infusion" class="blessure-cb" onchange="saveParamInfusion(this.checked)" style="accent-color:#7ab8d4;" checked>
+                Infusion nécessaire à la magie
+              </label>
+            </div>
+            <div class="param-info">Si décoché, "Infusé ?" disparaît (reste coché en interne).</div>
+          </div>
 
-        <div style="margin-top:20px;">
-          <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer toutes les compétences par défaut</button>
-          <div class="param-info" style="margin-top:4px;">Remet les listes de compétences d'origine. Les données de personnage ne sont pas effacées.</div>
-        </div>
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-stats" type="text" value="Statistiques" oninput="saveParamCatLabel('stats',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-stats" class="blessure-cb" onchange="saveParamShow('stats',this.checked)">
+            </div>
+          </div>
+          <div id="cfg-list-sta" class="param-list"></div>
+          <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
 
-      </div>
-
-      <!-- COL 2: Statistiques + Principales + Secondaires -->
-      <div class="param-col">
-
-        <!-- Statistiques -->
-        <div class="param-cat-header">
-          <span class="param-section-title" style="margin:0;">Statistiques</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-            <span class="param-info" style="font-style:normal;">Afficher</span>
-            <input type="checkbox" id="cfg-show-stats" class="blessure-cb" onchange="saveParamShow('stats',this.checked)">
+          <div style="margin-top:14px;">
+            <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer compétences par défaut</button>
           </div>
         </div>
-        <div id="cfg-list-sta" class="param-list"></div>
-        <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
 
-        <!-- Principales -->
-        <div class="param-cat-header" style="margin-top:14px;">
-          <span class="param-section-title" style="margin:0;">Compétences Principales</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-            <span class="param-info" style="font-style:normal;">Afficher</span>
-            <input type="checkbox" id="cfg-show-pri" class="blessure-cb" onchange="saveParamShow('pri',this.checked)" checked>
+        <!-- COL 2: Principales + Secondaires -->
+        <div class="param-col">
+          <div class="param-cat-header">
+            <input class="param-cat-name-input" id="cfg-name-pri" type="text" value="Compétences Principales" oninput="saveParamCatLabel('pri',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-pri" type="number" min="0" value="3" title="0 = illimité" oninput="saveParamMax('pri',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-pri" class="blessure-cb" onchange="saveParamShow('pri',this.checked)" checked>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+            <select class="param-format-sel" style="flex:1;" id="cfg-fmt-pri" onchange="saveParamFormat('pri',this.value)">
+              <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+              <option value="AEM">AEM — Adepte, Expert, Maître</option>
+              <option value="CUSTOM">Personnalisé (texte libre)</option>
+            </select>
+            <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('pri')">↺ Défaut</button>
+          </div>
+          <div id="cfg-list-pri" class="param-list"></div>
+          <button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button>
+
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-sec" type="text" value="Compétences Secondaires" oninput="saveParamCatLabel('sec',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-sec" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('sec',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-sec" class="blessure-cb" onchange="saveParamShow('sec',this.checked)" checked>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+            <select class="param-format-sel" style="flex:1;" id="cfg-fmt-sec" onchange="saveParamFormat('sec',this.value)">
+              <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+              <option value="AEM">AEM — Adepte, Expert, Maître</option>
+              <option value="CUSTOM">Personnalisé (texte libre)</option>
+            </select>
+            <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('sec')">↺ Défaut</button>
+          </div>
+          <div id="cfg-list-sec" class="param-list"></div>
+          <button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button>
+
+          <!-- Savoirs + Coups labels -->
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-savoirs" type="text" value="Connaissances et Statut" oninput="saveParamCatLabel('savoirs',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-savoirs" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('savoirs',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-savoirs" class="blessure-cb" onchange="saveParamShow('savoirs',this.checked)" checked>
+            </div>
+          </div>
+          <div class="param-cat-header" style="margin-top:8px;">
+            <input class="param-cat-name-input" id="cfg-name-coups" type="text" value="Coups Spéciaux" oninput="saveParamCatLabel('coups',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-coups" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('coups',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-coups" class="blessure-cb" onchange="saveParamShow('coups',this.checked)" checked>
+            </div>
           </div>
         </div>
-        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
-          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-pri" onchange="saveParamFormat('pri',this.value)">
-            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
-            <option value="AEM">AEM — Adepte, Expert, Maître</option>
-            <option value="CUSTOM">Personnalisé (texte libre)</option>
-          </select>
-          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('pri')">↺ Défaut</button>
-        </div>
-        <div id="cfg-list-pri" class="param-list"></div>
-        <button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button>
 
-        <!-- Secondaires -->
-        <div class="param-cat-header" style="margin-top:14px;">
-          <span class="param-section-title" style="margin:0;">Compétences Secondaires</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-            <span class="param-info" style="font-style:normal;">Afficher</span>
-            <input type="checkbox" id="cfg-show-sec" class="blessure-cb" onchange="saveParamShow('sec',this.checked)" checked>
+        <!-- COL 3: Martiales -->
+        <div class="param-col">
+          <div class="param-cat-header">
+            <input class="param-cat-name-input" id="cfg-name-mar" type="text" value="Compétences Martiales" oninput="saveParamCatLabel('mar',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-mar" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mar',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-mar" class="blessure-cb" onchange="saveParamShow('mar',this.checked)" checked>
+            </div>
           </div>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
-          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-sec" onchange="saveParamFormat('sec',this.value)">
-            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
-            <option value="AEM">AEM — Adepte, Expert, Maître</option>
-            <option value="CUSTOM">Personnalisé (texte libre)</option>
-          </select>
-          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('sec')">↺ Défaut</button>
-        </div>
-        <div id="cfg-list-sec" class="param-list"></div>
-        <button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button>
-
-      </div>
-
-      <!-- COL 3: Martiales -->
-      <div class="param-col">
-        <div class="param-cat-header">
-          <span class="param-section-title" style="margin:0;">Compétences Martiales</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-            <span class="param-info" style="font-style:normal;">Afficher</span>
-            <input type="checkbox" id="cfg-show-mar" class="blessure-cb" onchange="saveParamShow('mar',this.checked)" checked>
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+            <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mar" onchange="saveParamFormat('mar',this.value)">
+              <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+              <option value="AEM">AEM — Adepte, Expert, Maître</option>
+              <option value="CUSTOM">Personnalisé (texte libre)</option>
+            </select>
+            <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mar')">↺ Défaut</button>
           </div>
+          <div id="cfg-list-mar" class="param-list"></div>
+          <button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button>
         </div>
-        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
-          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mar" onchange="saveParamFormat('mar',this.value)">
-            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
-            <option value="AEM">AEM — Adepte, Expert, Maître</option>
-            <option value="CUSTOM">Personnalisé (texte libre)</option>
-          </select>
-          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mar')">↺ Défaut</button>
-        </div>
-        <div id="cfg-list-mar" class="param-list"></div>
-        <button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button>
-      </div>
 
-      <!-- COL 4: Magiques -->
-      <div class="param-col">
-        <div class="param-cat-header">
-          <span class="param-section-title" style="margin:0;">Compétences Magiques</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-            <span class="param-info" style="font-style:normal;">Afficher</span>
-            <input type="checkbox" id="cfg-show-mag" class="blessure-cb" onchange="saveParamShow('mag',this.checked)" checked>
+        <!-- COL 4: Magiques -->
+        <div class="param-col">
+          <div class="param-cat-header">
+            <input class="param-cat-name-input" id="cfg-name-mag" type="text" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-mag" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mag',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-mag" class="blessure-cb" onchange="saveParamShow('mag',this.checked)" checked>
+            </div>
           </div>
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+            <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mag" onchange="saveParamFormat('mag',this.value)">
+              <option value="AEM">AEM — Adepte, Expert, Maître</option>
+              <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
+              <option value="CUSTOM">Personnalisé (texte libre)</option>
+            </select>
+            <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺ Défaut</button>
+          </div>
+          <div id="cfg-list-mag" class="param-list"></div>
+          <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
         </div>
-        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
-          <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mag" onchange="saveParamFormat('mag',this.value)">
-            <option value="AEM">AEM — Adepte, Expert, Maître</option>
-            <option value="NAEM">NAEM — Novice, Adepte, Expert, Maître</option>
-            <option value="CUSTOM">Personnalisé (texte libre)</option>
-          </select>
-          <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺ Défaut</button>
-        </div>
-        <div id="cfg-list-mag" class="param-list"></div>
-        <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
-      </div>
 
-    </div>
-  </div><!-- end page-parametres -->
+      </div><!-- end param-cols -->
+    </div><!-- end param-layout -->
+</div><!-- end page-parametres -->
 
 </div><!-- end app -->
 </div><!-- end aspect-wrap -->
@@ -1149,7 +1445,7 @@ body {
 
 <script>
 /* ── THEME ── */
-const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif"};
+const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif",slotEmpty:'#0a0600',charPanel:'#0a0600'};
 
 function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
 function dk(h,f=.5){const[r,g,b]=hexToRgb(h);return`rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;}
@@ -1163,6 +1459,10 @@ function applyTheme(){
   const text=document.getElementById('tc-text').value;
   const border=document.getElementById('tc-border').value;
   const font=document.getElementById('tc-font').value;
+  const slotEl=document.getElementById('tc-slot-empty');
+  const slotEmpty=slotEl?slotEl.value:DEFAULTS.slotEmpty;
+  const charEl=document.getElementById('tc-char-panel');
+  const charPanel=charEl?charEl.value:DEFAULTS.charPanel;
   const s=document.documentElement.style;
   s.setProperty('--bg',bg);
   s.setProperty('--bg2',bg2);
@@ -1177,8 +1477,10 @@ function applyTheme(){
   s.setProperty('--filled',lt(dk(gold,.9),1.1));
   s.setProperty('--hover',bl(border,.3));
   s.setProperty('--font',font);
+  s.setProperty('--slot-empty',slotEmpty);
+  s.setProperty('--char-panel',charPanel);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font}));
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,charPanel}));
 }
 
 function resetTheme(){
@@ -1188,6 +1490,8 @@ function resetTheme(){
   document.getElementById('tc-text').value=DEFAULTS.text;
   document.getElementById('tc-border').value=DEFAULTS.border;
   document.getElementById('tc-font').value=DEFAULTS.font;
+  const se=document.getElementById('tc-slot-empty'); if(se) se.value=DEFAULTS.slotEmpty;
+  const cp=document.getElementById('tc-char-panel'); if(cp) cp.value=DEFAULTS.charPanel;
   applyTheme();
 }
 
@@ -1201,6 +1505,8 @@ function loadTheme(){
       if(t.text)document.getElementById('tc-text').value=t.text;
       if(t.border)document.getElementById('tc-border').value=t.border;
       if(t.font)document.getElementById('tc-font').value=t.font;
+      const se=document.getElementById('tc-slot-empty'); if(se&&t.slotEmpty) se.value=t.slotEmpty;
+      const cp=document.getElementById('tc-char-panel'); if(cp&&t.charPanel) cp.value=t.charPanel;
     }
   }catch(e){}
   applyTheme();
@@ -1272,7 +1578,7 @@ function importData(e) {
       data = JSON.parse(ev.target.result);
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-      applyStatLabels(); applyMagieSetting(); applyParamShow();
+      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow();
       persist(); toast('Importé !');
     } catch { toast('Erreur JSON'); }
   };
@@ -1284,7 +1590,7 @@ function clearAll() {
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-  applyStatLabels(); applyMagieSetting(); applyParamShow(); persist();
+  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); persist();
 }
 
 /* ── bag normal slots ── */
@@ -1463,7 +1769,7 @@ function setSlotDisplay(key) {
   if (sl) {
     const hasSomething = !!(d.nom);
     sl.classList.toggle('filled', hasSomething);
-    sl.style.background = hasSomething ? 'var(--bg3)' : '#0a0600';
+    sl.style.background = hasSomething ? 'var(--bg3)' : 'var(--slot-empty)';
     // background image
     let bg = sl.querySelector('.slot-img-bg');
     if (d.img) {
@@ -1554,6 +1860,13 @@ function closeModal() {
   document.getElementById('fCoutField').style.display  = 'none';
   document.getElementById('fImgField').style.display   = '';
   document.getElementById('fImg').value = '';
+  // Restore default modal labels
+  const nomLabel   = document.querySelector('.modal .mfield:first-of-type label');
+  const typeLabel  = document.querySelector('#fTypeField label');
+  const effetLabel = document.querySelector('#fEffetField label');
+  if (nomLabel)   nomLabel.textContent  = 'Nom';
+  if (typeLabel)  typeLabel.textContent = 'Type';
+  if (effetLabel) effetLabel.textContent = 'Effet / Description';
   curSlot = null; curSortKey = null; curSortIdx = null;
   curFreeType = null; curFreeIdx = null;
 }
@@ -1571,13 +1884,101 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
-function syncMinosLabel(val) {
-  data._minosLabel = val;
-  ['inv-minos-lbl','comp-minos-lbl'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && el !== document.activeElement) el.value = val;
+/* ══ CHAR LABELS ══ */
+const CHAR_LABEL_DEFAULTS = {
+  nom: 'Nom', race: 'Race', age: 'Âge Bio', naiss: 'Naissance',
+  blessures: 'Blessures', minos: 'Pièce de Minos', infuse: 'Infusé ?'
+};
+function getCharLabel(key) { return data._charLabels?.[key] || CHAR_LABEL_DEFAULTS[key] || key; }
+function saveCharLabel(key, val) {
+  if (!data._charLabels) data._charLabels = {};
+  data._charLabels[key] = val || CHAR_LABEL_DEFAULTS[key];
+  persist(); applyCharLabels();
+}
+function applyCharLabels() {
+  const map = {
+    nom:      '[data-i18n-char="nom"]',
+    race:     '[data-i18n-char="race"]',
+    age:      '[data-i18n-char="age_bio"]',
+    naiss:    '[data-i18n-char="naissance"]',
+    blessures:'[data-i18n-char="blessures"]',
+    infuse:   '[data-i18n-char="infuse"]',
+  };
+  Object.entries(map).forEach(([key, sel]) => {
+    document.querySelectorAll(sel).forEach(el => { el.textContent = getCharLabel(key); });
   });
-  persist();
+  // Minos labels (now spans)
+  document.querySelectorAll('#inv-minos-lbl, #comp-minos-lbl').forEach(el => {
+    el.textContent = getCharLabel('minos');
+  });
+}
+
+function renderLevelParams() {
+  const container = document.getElementById('cfg-levels-list');
+  if (!container) return;
+  container.innerHTML = '';
+  const names = getLevelNames();
+  const COLORS = LEVEL_COLORS_DEFAULT;
+  names.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.className = 'param-row';
+    row.style.gap = '6px';
+
+    const colorInp = document.createElement('input');
+    colorInp.type = 'color';
+    colorInp.value = data._levelColors?.[i] || COLORS[i];
+    colorInp.style.cssText = 'width:28px;height:22px;border:1px solid var(--border2);border-radius:2px;cursor:pointer;padding:1px;flex-shrink:0;';
+    colorInp.oninput = () => saveParamLevelColor(i, colorInp.value);
+
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-comp-input';
+    nameInp.type = 'text';
+    nameInp.value = name;
+    nameInp.oninput = () => saveParamLevelName(i, nameInp.value);
+
+    row.appendChild(colorInp);
+    row.appendChild(nameInp);
+    container.appendChild(row);
+  });
+}
+
+function resetCharLabels() {
+  delete data._charLabels; persist();
+  renderParametres(); applyCharLabels();
+}
+
+/* ══ LEVEL CONFIG ══ */
+const LEVEL_NAMES_DEFAULT = ['Novice','Adepte','Expert','Maître'];
+const LEVEL_COLORS_DEFAULT = ['#3aaa3a','#c8922a','#2aaacc','#e02020'];
+// Magic levels start at Adepte (index 1)
+const MAGIC_COLORS_DEFAULT = ['#c8922a','#2aaacc','#e02020'];
+
+function getLevelNames() {
+  const names = data._levelNames || {};
+  return LEVEL_NAMES_DEFAULT.map((d,i) => names[i] || d);
+}
+function getLevelColors(type) {
+  const colors = data._levelColors || {};
+  if (type === 'magic') {
+    // magic = indices 1,2,3 of the full 4-level palette
+    return [1,2,3].map(i => colors[i] || LEVEL_COLORS_DEFAULT[i]);
+  }
+  return LEVEL_COLORS_DEFAULT.map((d,i) => colors[i] || d);
+}
+function saveParamLevelName(idx, val) {
+  if (!data._levelNames) data._levelNames = {};
+  data._levelNames[idx] = val || LEVEL_NAMES_DEFAULT[idx]; persist();
+  if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
+}
+function saveParamLevelColor(idx, val) {
+  if (!data._levelColors) data._levelColors = {};
+  data._levelColors[idx] = val; persist();
+  if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
+}
+function resetLevelDefaults() {
+  delete data._levelNames; delete data._levelColors; persist();
+  renderParametres();
+  if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
 }
 
 function syncMinos(val) {
@@ -1616,21 +2017,23 @@ function loadChar() {
   if (c.gender) {
     document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
   }
-  // minos
+  // minos (now a span)
   const ml = document.getElementById('inv-minos-lbl');
-  if (ml) ml.value = data._minosLabel || 'Pièce de Minos';
+  if (ml) ml.textContent = getCharLabel('minos');
   const mc2 = document.getElementById('inv-minos-cb');
   if (mc2) mc2.checked = data._minos || false;
+  updateTbNom();
 }
 
 /* ══ PAGE NAVIGATION ══ */
 function showPage(name) {
-  ['inventaire','competences','capital','parametres'].forEach(p => {
+  ['fiche','inventaire','competences','capital','parametres'].forEach(p => {
     document.getElementById('page-'+p).classList.toggle('active', p===name);
     document.getElementById('nav-'+p).classList.toggle('active', p===name);
   });
   if (name === 'competences') renderCompetences();
   if (name === 'parametres') renderParametres();
+  if (name === 'fiche') renderFiche();
 }
 
 /* ══ SYNC CHAR ══ */
@@ -1642,7 +2045,15 @@ function syncChar(field, val) {
     const el = document.getElementById(id);
     if (el && el !== document.activeElement) el.value = val;
   });
+  if (field === 'nom') updateTbNom();
+  if (document.getElementById('page-fiche')?.classList.contains('active')) renderFiche();
   persist();
+}
+
+function updateTbNom() {
+  const nom = data._char?.nom || '—';
+  const el = document.getElementById('tb-fiche-nom');
+  if (el) el.textContent = 'Fiche de ' + nom;
 }
 
 function syncGender(val) {
@@ -1711,13 +2122,11 @@ function toggleInfuse(val) {
 const COMP_PRINCIPALES = ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'];
 const COMP_SECONDAIRES = ['Équitation','Navigation','Ambidextrie','Musculation','Athlétisme','Apprentissage'];
 const COMP_MARTIALES   = ['Dagues','Pugilat','Escrime','Hache','Contondant','Bâton','Hast','Fouet','Armes de lancer','Archerie','Armes à feu','Frondes','Armes à Énergie','Bouclier'];
-const COMP_MAGIQUES    = ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Le Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'];
+const COMP_MAGIQUES    = ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Magie du Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'];
 const LEVELS_STD   = ['Novice','Adepte','Expert','Maître'];
 const LEVELS_MAGIC = ['Adepte','Expert','Maître'];
 
 // Get localized arrays — keys stay FR-based (for data storage), labels are localized
-function getLevelsStd()   { return I18N[currentLang]?.levels_std   || LEVELS_STD; }
-function getLevelsMagic() { return I18N[currentLang]?.levels_magic || LEVELS_MAGIC; }
 // Localized display names — index matches base arrays
 function getLocalizedName(baseArr, localArr, frName) {
   const idx = baseArr.indexOf(frName);
@@ -1729,16 +2138,16 @@ function setCompData(key, val) { if(!data._comp)data._comp={}; data._comp[key]=v
 
 /* Apprentissage level → extra principale slots: Novice+1, Adepte+2, Expert+3, Maître+3 */
 function getMaxPrincipales() {
-  // Find Apprentissage key — works even if base array still has it, regardless of custom rename
+  const base = getMaxForCat('pri'); // 0 = unlimited
   const secArr = getCompArray('sec');
-  // Try exact key first, then find the index of Apprentissage in base and map to custom
   let appLvl = getCompData('sec_Apprentissage');
   if (!appLvl) {
     const baseIdx = COMP_SECONDAIRES.indexOf('Apprentissage');
     if (baseIdx >= 0 && secArr[baseIdx]) appLvl = getCompData('sec_' + secArr[baseIdx]);
   }
   const bonus = appLvl >= 3 ? 3 : appLvl;
-  return 3 + bonus;
+  if (base === 0) return 9999; // unlimited
+  return base + bonus;
 }
 function countPrincipales() {
   return getCompArray('pri').filter(n => getCompData('pri_'+n) > 0).length;
@@ -1762,10 +2171,11 @@ function makeDropdownRow(prefix, allOptions, levels, isMagic, container) {
 
   const used = allOptions.filter(n => getCompData(prefix+n) > 0);
   const isMain = (prefix === 'pri_');
-  const maxMain = getMaxPrincipales();
-  const remaining = isMain ? (maxMain - used.length) : (allOptions.length - used.length);
+  const cat = prefix==='pri_'?'pri':prefix==='sec_'?'sec':prefix==='mar_'?'mar':'mag';
+  const catMax = getMaxForCat(cat); // 0 = unlimited
+  const hardMax = isMain ? getMaxPrincipales() : (catMax > 0 ? catMax : allOptions.length);
+  const remaining = hardMax - used.length;
 
-  // Show used rows + 1 empty if slots remain, min 3 total when nothing selected yet
   const baseEmpty = used.length === 0 ? Math.min(3, remaining) : (remaining > 0 ? 1 : 0);
   const emptyCount = Math.max(0, baseEmpty);
 
@@ -1835,9 +2245,7 @@ function addSkillRow(prefix, selectedName, levels, isMagic, allOptions, localArr
       const lvlWrap = document.createElement('div');
       lvlWrap.className = 'level-sel';
       const cur = getCompData(prefix+selectedName);
-      const STD_COLORS   = ['#3aaa3a','#c8922a','#2aaacc','#e02020'];
-      const MAGIC_COLORS = ['#c8922a','#2aaacc','#e02020'];
-      const palette = isMagic ? MAGIC_COLORS : STD_COLORS;
+      const palette = isMagic ? getLevelColors('magic') : getLevelColors('std');
       const litColor = cur > 0 ? (palette[cur-1] || palette[palette.length-1]) : null;
       levels.forEach((lvlName, i) => {
         const box = document.createElement('div');
@@ -1873,49 +2281,75 @@ function renderLivreSorts() {
 
     const sec = document.createElement('div');
     sec.className = 'sort-section';
-
     const title = document.createElement('div');
     title.className = 'sort-section-title';
     title.textContent = magie;
     sec.appendChild(title);
 
     const sorts = data._sorts[key];
-    const filledSorts = sorts.filter(s => s);
-    const showCount = Math.max(3, filledSorts.length + 1); // always at least 3, +1 empty at end
+    const filled = sorts.filter(s => s && s.nom);
+    const showCount = Math.max(3, filled.length + 1);
 
     for (let i = 0; i < showCount; i++) {
+      const s = sorts[i] || {};
       const cell = document.createElement('div');
-      cell.className = 'sort-cell' + (sorts[i] ? ' filled' : '');
-      cell.textContent = sorts[i] || t('sort_placeholder') || 'Emplacement sort';
-      cell.onclick = () => openSortModal(key, i, sorts[i] || '');
+      cell.className = 'free-cell' + (s.nom ? ' filled' : '');
+      if (s.nom) {
+        cell.innerHTML = `
+          <span class="fc-nom">${s.nom}</span>
+          ${s.type  ? `<span class="fc-type">${s.type}</span>`  : ''}
+          ${s.effet ? `<span class="fc-effet">${s.effet}</span>` : ''}
+          ${s.cout  ? `<span class="fc-cout">Coût : ${s.cout}</span>` : ''}
+        `;
+      } else {
+        cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">Emplacement sort…</span>';
+      }
+      cell.onclick = () => openSortModal(key, i, s);
       sec.appendChild(cell);
     }
     body.appendChild(sec);
   });
 }
 
-/* Sort modal */
+/* Sort modal — full Sort/Niveau/Effet */
 function openSortModal(key, idx, current) {
   curSortKey = key; curSortIdx = idx; curSlot = null; curFreeType = null;
   document.getElementById('modalTitle').textContent = 'Sort';
-  document.getElementById('fNom').value = current;
-  document.getElementById('fTypeField').style.display  = 'none';
-  document.getElementById('fEffetField').style.display = 'none';
-  document.getElementById('fCoutField').style.display  = 'none';
+  // Relabel fields for sort context
+  const fNomLabel = document.querySelector('#fTypeField')?.previousElementSibling;
+  document.getElementById('fNom').value   = current.nom   || '';
+  document.getElementById('fTypeField').style.display  = '';
+  document.getElementById('fEffetField').style.display = '';
+  document.getElementById('fCoutField').style.display  = '';
   document.getElementById('fImgField').style.display   = 'none';
+  document.getElementById('fType').value  = current.type  || '';
+  document.getElementById('fEffet').value = current.effet || '';
+  document.getElementById('fCout').value  = current.cout  || '';
+  // Update labels for sort context
+  const typeLabel = document.querySelector('#fTypeField label');
+  const effetLabel = document.querySelector('#fEffetField label');
+  const coutLabel  = document.querySelector('#fCoutField label');
+  const nomLabel = document.querySelector('.modal .mfield:first-of-type label');
+  if (nomLabel)   nomLabel.textContent  = 'Sort';
+  if (typeLabel)  typeLabel.textContent = 'Niveau du sort';
+  if (effetLabel) effetLabel.textContent = 'Effet';
+  if (coutLabel)  coutLabel.textContent  = 'Coût';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
 
 function saveSortSlot() {
   if (curSortKey === null) return;
-  const nom = document.getElementById('fNom').value.trim();
+  const nom   = document.getElementById('fNom').value.trim();
+  const type  = document.getElementById('fType').value.trim();
+  const effet = document.getElementById('fEffet').value.trim();
+  const cout  = document.getElementById('fCout').value.trim();
   if (!data._sorts) data._sorts = {};
   if (!data._sorts[curSortKey]) data._sorts[curSortKey] = [];
-  data._sorts[curSortKey][curSortIdx] = nom;
+  data._sorts[curSortKey][curSortIdx] = (nom||type||effet||cout) ? { nom, type, effet, cout } : null;
   persist();
   renderLivreSorts();
-  closeModal(); // closeModal already resets curSortKey/curSortIdx and restores fields
+  closeModal();
 }
 
 /* ── Coups Spéciaux ── */
@@ -1924,49 +2358,51 @@ function renderCoups() {
   if (!container) return;
   if (!data._coups) data._coups = [];
   container.innerHTML = '';
+  const maxCoups = getMaxForCat('coups');
   const filled = data._coups.filter(c => c && c.nom);
-  const showCount = Math.max(3, filled.length + 1);
+  const hardMax = maxCoups > 0 ? maxCoups : 9999;
+  const showCount = Math.max(3, Math.min(filled.length + 1, hardMax + 1));
   for (let i = 0; i < showCount; i++) {
     const coup = data._coups[i] || {};
     const cell = document.createElement('div');
     cell.className = 'free-cell' + (coup.nom ? ' filled' : '');
     if (coup.nom) {
       cell.innerHTML = `
-        <span class="fc-lbl">Coup Spécial</span>
         <span class="fc-nom">${coup.nom}</span>
         ${coup.type  ? `<span class="fc-type">${coup.type}</span>`  : ''}
         ${coup.effet ? `<span class="fc-effet">${coup.effet}</span>` : ''}
         ${coup.cout  ? `<span class="fc-cout">Coût : ${coup.cout}</span>` : ''}
       `;
     } else {
-      cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (t('coup_placeholder')||'Coup spécial…') + '</span>';
+      cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (getCatLabel('coups') || 'Coup spécial…') + '</span>';
     }
     cell.onclick = () => openFreeModal('coup', i, coup);
     container.appendChild(cell);
   }
 }
 
-/* ── Savoirs & Connaissances ── */
+/* ── Connaissances et Statut ── */
 function renderSavoirs() {
   const container = document.getElementById('list-savoirs');
   if (!container) return;
   if (!data._savoirs) data._savoirs = [];
   container.innerHTML = '';
+  const maxSav = getMaxForCat('savoirs');
   const filled = data._savoirs.filter(s => s && s.nom);
-  const showCount = Math.max(3, filled.length + 1);
+  const hardMaxS = maxSav > 0 ? maxSav : 9999;
+  const showCount = Math.max(3, Math.min(filled.length + 1, hardMaxS + 1));
   for (let i = 0; i < showCount; i++) {
     const sav = data._savoirs[i] || {};
     const cell = document.createElement('div');
     cell.className = 'free-cell' + (sav.nom ? ' filled' : '');
     if (sav.nom) {
       cell.innerHTML = `
-        <span class="fc-lbl">Savoir</span>
         <span class="fc-nom">${sav.nom}</span>
         ${sav.type  ? `<span class="fc-type">${sav.type}</span>`  : ''}
         ${sav.effet ? `<span class="fc-effet">${sav.effet}</span>` : ''}
       `;
     } else {
-      cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (t('savoir_placeholder')||'Savoir ou connaissance…') + '</span>';
+      cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (getCatLabel('savoirs') || 'Connaissance…') + '</span>';
     }
     cell.onclick = () => openFreeModal('savoir', i, sav);
     container.appendChild(cell);
@@ -1976,16 +2412,17 @@ function renderSavoirs() {
 /* ── Free modal (coup / savoir) ── */
 function openFreeModal(type, idx, current) {
   curFreeType = type; curFreeIdx = idx; curSlot = null; curSortKey = null;
-  document.getElementById('modalTitle').textContent = type === 'coup' ? 'Coup Spécial' : 'Savoir & Connaissance';
+  document.getElementById('modalTitle').textContent = type === 'coup' ? getCatLabel('coups') : getCatLabel('savoirs');
   document.getElementById('fNom').value   = current.nom   || '';
   document.getElementById('fType').value  = current.type  || '';
   document.getElementById('fEffet').value = current.effet || '';
   document.getElementById('fTypeField').style.display  = '';
   document.getElementById('fEffetField').style.display = '';
-  // show cout only for coups
   const coutField = document.getElementById('fCoutField');
   coutField.style.display = type === 'coup' ? '' : 'none';
   if (type === 'coup') document.getElementById('fCout').value = current.cout || '';
+  // No image for coups/savoirs
+  document.getElementById('fImgField').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -2132,7 +2569,7 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
-    nav_competences: '⚔ Compétences', nav_inventaire: '🎒 Inventaire', nav_capital: '💰 Capital',
+    nav_competences: '⚔ Compétences', nav_inventaire: '⊞ Inventaire', nav_capital: '◈ Capital',
     amulette: 'Amulette', 'couvre-chef': 'Couvre-Chef', gants: 'Gants',
     bracelet: 'Bracelet', armure: 'Armure', cape: 'Cape / Manteau',
     anneau1: 'Anneau', anneau2: 'Anneau',
@@ -2147,7 +2584,7 @@ const I18N = {
     comp_principales: 'Compétences Principales', comp_secondaires: 'Compétences Secondaires',
     comp_martiales: 'Compétences Martiales', comp_magiques: 'Compétences Magiques',
     comp_magiques_sub: '(Infusé requis)', coups: 'Coups Spéciaux',
-    savoirs: 'Savoirs & Connaissances', livre_sorts: '📖 Livre de Sorts',
+    savoirs: 'Connaissances et Statut', livre_sorts: '📖 Livre de Sorts',
     sacoche: 'Sacoche (6 empl.)', petit_sac: 'Petit sac (9 empl. + 1 spé)',
     sac_moyen: 'Sac moyen (11 empl. + 2 spé)', grand_sac: 'Grand sac (13 empl. + 3 spé)',
     capital_wip: '💰 Capital — à venir', choisir: '— Choisir —',
@@ -2156,13 +2593,13 @@ const I18N = {
     comp_pri: ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'],
     comp_sec: ['Équitation','Navigation','Ambidextrie','Musculation','Athlétisme','Apprentissage'],
     comp_mar: ['Dagues','Pugilat','Escrime','Hache','Contondant','Bâton','Hast','Fouet','Armes de lancer','Archerie','Armes à feu','Frondes','Armes à Énergie','Bouclier'],
-    comp_mag: ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Le Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'],
+    comp_mag: ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Magie du Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'],
     choisir_comp: '— Choisir —',
     coup_placeholder: 'Coup spécial…', savoir_placeholder: 'Savoir ou connaissance…',
     sort_placeholder: 'Emplacement sort',
   },
   en: {
-    nav_competences: '⚔ Skills', nav_inventaire: '🎒 Inventory', nav_capital: '💰 Capital',
+    nav_competences: '⚔ Skills', nav_inventaire: '⊞ Inventory', nav_capital: '◈ Capital',
     amulette: 'Amulet', 'couvre-chef': 'Headgear', gants: 'Gloves',
     bracelet: 'Bracelet', armure: 'Armor', cape: 'Cape / Cloak',
     anneau1: 'Ring', anneau2: 'Ring',
@@ -2177,7 +2614,7 @@ const I18N = {
     comp_principales: 'Main Skills', comp_secondaires: 'Secondary Skills',
     comp_martiales: 'Martial Skills', comp_magiques: 'Magic Skills',
     comp_magiques_sub: '(Infused required)', coups: 'Special Moves',
-    savoirs: 'Lore & Knowledge', livre_sorts: '📖 Spellbook',
+    savoirs: 'Lore & Status', livre_sorts: '📖 Spellbook',
     sacoche: 'Pouch (6 slots)', petit_sac: 'Small bag (9 slots + 1 sp.)',
     sac_moyen: 'Medium bag (11 slots + 2 sp.)', grand_sac: 'Large bag (13 slots + 3 sp.)',
     capital_wip: '💰 Capital — coming soon', choisir: '— Choose —',
@@ -2186,7 +2623,7 @@ const I18N = {
     comp_pri: ['Identification','Bargaining','Disarming','Pickpocket','Medicine','Alchemy','Hunting / Tracking','Taming','Acrobatics','Cooking'],
     comp_sec: ['Riding','Navigation','Ambidexterity','Strength Training','Athletics','Apprenticeship'],
     comp_mar: ['Daggers','Brawling','Fencing','Axe','Blunt','Staff','Polearm','Whip','Throwing Weapons','Archery','Firearms','Slings','Energy Weapons','Shield'],
-    comp_mag: ['Fire Magic','Air Magic','Water Magic','Earth Magic','Soul Magic','Spirit Magic','Body Magic','Psionics','Light Magic','Shadow Magic','Void Magic','Creation Magic'],
+    comp_mag: ['Fire Magic','Air Magic','Water Magic','Earth Magic','Soul Magic','Spirit Magic','Body Magic','Psionic Magic','Light Magic','Shadow Magic','Void Magic','Creation Magic'],
     choisir_comp: '— Choose —',
     coup_placeholder: 'Special move…', savoir_placeholder: 'Lore or knowledge…',
     sort_placeholder: 'Spell slot',
@@ -2252,6 +2689,46 @@ function getCompArray(type) {
      type==='sta'?STA_DEFAULT:[]);
 }
 
+// Category labels (renaming)
+const CAT_DEFAULTS = {
+  stats:'Statistiques', pri:'Compétences Principales', sec:'Compétences Secondaires',
+  mar:'Compétences Martiales', mag:'Compétences Magiques',
+  savoirs:'Connaissances et Statut', coups:'Coups Spéciaux'
+};
+function getCatLabel(cat) { return data._catLabels?.[cat] || CAT_DEFAULTS[cat] || cat; }
+function saveParamCatLabel(cat, val) {
+  if (!data._catLabels) data._catLabels = {};
+  data._catLabels[cat] = val; persist();
+  applyCatLabels();
+}
+function applyCatLabels() {
+  // Update comp section titles
+  const map = {
+    pri: '[data-i18n-comp="comp_principales"]',
+    sec: '[data-i18n-comp="comp_secondaires"]',
+    mar: '[data-i18n-comp="comp_martiales"]',
+    mag: '[data-i18n-comp="comp_magiques"]',
+    savoirs: '[data-i18n-comp="savoirs"]',
+    coups: '[data-i18n-comp="coups"]',
+  };
+  Object.entries(map).forEach(([cat, sel]) => {
+    document.querySelectorAll(sel).forEach(el => { el.textContent = getCatLabel(cat); });
+  });
+  document.querySelectorAll('[data-i18n-comp="savoirs"]').forEach(el => { el.textContent = getCatLabel('savoirs') || el.textContent; });
+}
+
+// Category max (0 = unlimited)
+function getMaxForCat(cat) {
+  const v = data._catMax?.[cat];
+  if (v !== undefined && v !== null) return parseInt(v);
+  return cat === 'pri' ? 3 : 0; // Principales default 3, others unlimited
+}
+function saveParamMax(cat, val) {
+  if (!data._catMax) data._catMax = {};
+  data._catMax[cat] = parseInt(val) || 0; persist();
+  if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
+}
+
 // Category visibility
 function saveParamShow(cat, val) {
   if (!data._paramShow) data._paramShow = {};
@@ -2268,18 +2745,15 @@ function applyParamShow() {
   if (statsEl) statsEl.style.display = isShown('stats') ? '' : 'none';
   // Comp sections
   const sections = {
-    pri: ['list-principales','cfg-list-pri'],
-    sec: ['list-secondaires','cfg-list-sec'],
-    mar: ['list-martiales','cfg-list-mar'],
-    mag: ['list-magiques','cfg-list-mag'],
+    pri: 'list-principales', sec: 'list-secondaires',
+    mar: 'list-martiales',   mag: 'list-magiques',
+    savoirs: 'list-savoirs', coups: 'list-coups',
   };
-  // hide/show on comp page
-  Object.entries(sections).forEach(([cat]) => {
-    const listEl = document.getElementById('list-'+
-      (cat==='pri'?'principales':cat==='sec'?'secondaires':cat==='mar'?'martiales':'magiques'));
+  Object.entries(sections).forEach(([cat, listId]) => {
+    const listEl = document.getElementById(listId);
     const titleEl = listEl?.previousElementSibling;
     const show = isShown(cat);
-    if (listEl) listEl.style.display = show ? '' : 'none';
+    if (listEl)  listEl.style.display  = show ? '' : 'none';
     if (titleEl) titleEl.style.display = show ? '' : 'none';
   });
 }
@@ -2289,10 +2763,10 @@ function getFormat(cat) { return data._paramFormat?.[cat] || (cat==='mag'?'AEM':
 function isCustomFree(cat) { return getFormat(cat) === 'CUSTOM'; }
 function getLevelsForCat(cat) {
   const fmt = getFormat(cat);
-  if (fmt === 'NAEM') return ['Novice','Adepte','Expert','Maître'];
-  if (fmt === 'AEM')  return ['Adepte','Expert','Maître'];
-  // CUSTOM = free text, no level boxes — handled separately
-  return ['Adepte','Expert','Maître'];
+  const names = getLevelNames(); // [Novice, Adepte, Expert, Maître]
+  if (fmt === 'NAEM') return names;             // all 4
+  if (fmt === 'AEM')  return names.slice(1);    // Adepte, Expert, Maître
+  return names.slice(1); // default AEM
 }
 function saveParamFormat(cat, val) {
   if (!data._paramFormat) data._paramFormat = {};
@@ -2470,6 +2944,23 @@ function renderParametres() {
     if(nameEl) nameEl.value = getResName(s);
     if(abbEl)  abbEl.value  = getStatLabel(s);
   });
+  // Level names & colors
+  renderLevelParams();
+  // Char labels
+  ['nom','race','age','naiss','blessures','minos','infuse'].forEach(key => {
+    const el = document.getElementById('cfg-label-'+key);
+    if (el) el.value = getCharLabel(key);
+  });
+  // Cat labels
+  ['stats','pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
+    const el = document.getElementById('cfg-name-'+cat);
+    if (el) el.value = getCatLabel(cat);
+  });
+  // Cat max
+  ['pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
+    const el = document.getElementById('cfg-max-'+cat);
+    if (el) el.value = getMaxForCat(cat);
+  });
   // PS row
   const psRow = document.getElementById('cfg-ps-row');
   if(psRow) psRow.style.display = data._magieEnabled!==false ? '' : 'none';
@@ -2481,7 +2972,7 @@ function renderParametres() {
   const infRow = document.getElementById('cfg-infusion-row');
   if(infRow) infRow.style.display = data._magieEnabled!==false?'':'none';
   // Show/hide toggles
-  ['stats','pri','sec','mar','mag'].forEach(cat => {
+  ['stats','pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
     const cb = document.getElementById('cfg-show-'+cat);
     if(cb) cb.checked = isShown(cat);
   });
@@ -2498,13 +2989,162 @@ function renderParametres() {
   renderParamList('mag','cfg-list-mag');
 }
 
+/* ══ FICHE PERSO ══ */
+function renderFiche() {
+  const c = data._char || {};
+  const f = data._fiche || {};
+
+  const setT = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val||'—'; };
+
+  setT('fiche-nom', c.nom);
+  setT('fiche-race', c.race);
+  setT('fiche-genre', c.gender==='m'?'♂':c.gender==='f'?'♀':'—');
+  setT('fiche-age', c.age);
+  setT('fiche-naiss', c.naiss);
+  setT('fiche-pv', c.pv); setT('fiche-pa', c.pa);
+  setT('fiche-pe', c.pe); setT('fiche-ps', c.ps);
+
+  // Apply stat labels from params
+  ['pv','pa','pe'].forEach(s => {
+    const el = document.getElementById('fiche-'+s+'-lbl');
+    if (el) el.textContent = getStatLabel(s);
+  });
+  const psLblEl = document.getElementById('fiche-ps-lbl');
+  if (psLblEl) psLblEl.textContent = getStatLabel('ps');
+
+  // Apply char labels from params
+  const naissLblEl = document.getElementById('fiche-naiss-lbl');
+  if (naissLblEl) naissLblEl.textContent = getCharLabel('naiss') || 'Naissance';
+  const infuseLblEl = document.getElementById('fiche-infuse-lbl');
+  if (infuseLblEl) infuseLblEl.textContent = (getCharLabel('infuse') || 'Infusé ?').replace('?','').trim();
+
+  // Infusé checkbox
+  const infuseCb = document.getElementById('fiche-infuse-cb');
+  if (infuseCb) infuseCb.checked = data._infuse || !data._infusionRequired || false;
+
+  // PS visibility
+  const psLbl = document.getElementById('fiche-ps-lbl');
+  const psSep = document.getElementById('fiche-ps-sep');
+  const psEl  = document.getElementById('fiche-ps');
+  const psVisible = data._magieEnabled !== false;
+  [psLbl, psSep, psEl].forEach(el => { if(el) el.style.display = psVisible ? '' : 'none'; });
+
+  // Main dominante
+  const main = f.mainDominante || 'droite';
+  document.querySelectorAll('input[name="main-dominante"]').forEach(r => r.checked = r.value === main);
+
+  // Textareas
+  const setTA = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
+  setTA('fiche-caractere', f.caractere);
+  setTA('fiche-physique', f.physique);
+  setTA('fiche-histoire', f.histoire);
+
+  // Photo
+  const photoEl = document.getElementById('fiche-photo-inner');
+  if (photoEl) {
+    if (f.photoUrl) {
+      photoEl.style.backgroundImage = `url('${f.photoUrl}')`;
+      const hint = photoEl.querySelector('.fiche-photo-hint');
+      if (hint) hint.style.display = 'none';
+      // Set aspect-ratio to match image natural dimensions
+      const img = new Image();
+      img.onload = () => {
+        const ar = img.naturalWidth / img.naturalHeight;
+        photoEl.style.aspectRatio = ar.toFixed(4);
+        photoEl.style.width = 'auto';
+        photoEl.style.maxWidth = '100%';
+        photoEl.style.height = 'auto';
+        photoEl.style.maxHeight = '100%';
+      };
+      img.src = f.photoUrl;
+    } else {
+      photoEl.style.backgroundImage = '';
+      photoEl.style.aspectRatio = '';
+      photoEl.style.width = '100%';
+      photoEl.style.height = '100%';
+      const hint = photoEl.querySelector('.fiche-photo-hint');
+      if (hint) hint.style.display = '';
+    }
+  }
+
+  // Ratio slider
+  const slider = document.getElementById('fiche-ratio-slider');
+  if (slider) { slider.value = f.ratioSlider ?? 0; updateFicheRatio(slider.value, false); }
+}
+
+function updateFicheRatio(val, save=true) {
+  // 0 = 1:2 (tall/portrait), 100 = 1:1 (square)
+  const ratio = 2 - (val / 100); // 2.0→1.0
+  const photoWrap = document.getElementById('fiche-photo-inner');
+  if (photoWrap) photoWrap.style.aspectRatio = '1 / ' + ratio.toFixed(2);
+  const lbl = document.getElementById('fiche-ratio-label');
+  if (lbl) lbl.textContent = '1:' + ratio.toFixed(1).replace('.0','');
+  if (save) {
+    if (!data._fiche) data._fiche = {};
+    data._fiche.ratioSlider = parseInt(val); persist();
+  }
+}
+
+function saveFicheField(field, val) {
+  if (!data._fiche) data._fiche = {};
+  data._fiche[field] = val; persist();
+}
+
+function saveFicheMain(val) {
+  if (!data._fiche) data._fiche = {};
+  data._fiche.mainDominante = val; persist();
+}
+
+function openFichePhoto() {
+  const overlay = document.getElementById('fiche-photo-overlay');
+  if (!overlay) return;
+  document.getElementById('fiche-photo-url').value = data._fiche?.photoUrl || '';
+  overlay.style.display = 'flex';
+}
+
+function saveFichePhoto() {
+  const url = document.getElementById('fiche-photo-url')?.value.trim();
+  if (!data._fiche) data._fiche = {};
+  data._fiche.photoUrl = url || ''; persist();
+  document.getElementById('fiche-photo-overlay').style.display = 'none';
+  if (url) {
+    // Auto-detect ratio from image dimensions
+    const img = new Image();
+    img.onload = () => {
+      const ratio = img.naturalHeight / img.naturalWidth;
+      const clamped = Math.min(2, Math.max(1, ratio)); // clamp 1:1 to 1:2
+      const sliderVal = Math.round((2 - clamped) * 100); // 0=tall(1:2) 100=square(1:1)
+      data._fiche.ratioSlider = sliderVal; persist();
+      const slider = document.getElementById('fiche-ratio-slider');
+      if (slider) { slider.value = sliderVal; updateFicheRatio(sliderVal, false); }
+      renderFiche();
+    };
+    img.onerror = () => renderFiche();
+    img.src = url;
+  } else {
+    renderFiche();
+  }
+}
+
+function clearFichePhoto() {
+  if (!data._fiche) data._fiche = {};
+  data._fiche.photoUrl = ''; persist();
+  document.getElementById('fiche-photo-overlay').style.display = 'none';
+  renderFiche();
+}
+
 loadTheme();
 loadLang();
 loadData();
 applyI18n();
 applyStatLabels();
+applyCharLabels();
+applyCatLabels();
 applyMagieSetting();
 applyParamShow();
+// Restore PS enabled/disabled state based on saved infuse value
+toggleInfuse(data._infuse || false);
+renderFiche();
 </script>
 </body>
 </html>
