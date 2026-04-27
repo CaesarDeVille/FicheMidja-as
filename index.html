@@ -21,6 +21,9 @@
   --filled:  #c8922a;
   --hover:   #2e1a06;
   --font:    'Palatino Linotype','Book Antiqua',Palatino,serif;
+  --fs-item-nom: 14px;
+  --fs-item-type: 12px;
+  --fs-item-effet: 12px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -29,7 +32,7 @@ body {
   font-family: var(--font);
   color: var(--text);
   width: 1920px;
-  min-height: 1080px;
+  min-height: 800px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,8 +65,8 @@ body {
 .btn-sm { background: var(--bg3); border: 1px solid var(--border2); color: var(--muted); font-family: var(--font); font-size: 10px; padding: 3px 8px; border-radius: 2px; cursor: pointer; }
 .btn-sm:hover { border-color: var(--gold); color: var(--gold); }
 
-/* ══ FIXED 1920×1080 ══ */
-.aspect-wrap { width: 1920px; height: 1032px; }
+/* ══ LAYOUT ══ */
+.aspect-wrap { width: 1920px; min-height: 800px; display: flex; flex-direction: column; flex: 1; }
 .app {
   width: 100%; height: 100%;
   display: flex; flex-direction: column;
@@ -90,23 +93,26 @@ body {
 .slot.filled { border-color: var(--filled); background: var(--bg3); }
 .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; line-height: 1.3; }
 .val {
-  font-size: 16px; color: var(--gold); margin-top: 4px; font-weight: 500;
+  font-size: var(--fs-item-nom); color: var(--gold); margin-top: 4px; font-weight: 500;
   width: 100%; overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   word-break: break-word;
 }
 .val-type {
-  font-size: 12px; color: #9a9a9a; margin-top: 3px;
+  font-size: var(--fs-item-type); color: #9a9a9a; margin-top: 3px;
   width: 100%; overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
   word-break: break-word;
 }
 .val-effet {
-  font-size: 12px; color: #7ab8d4; margin-top: 3px; font-style: italic;
+  font-size: var(--fs-item-effet); color: #7ab8d4; margin-top: 3px; font-style: italic;
   width: 100%; overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   word-break: break-word;
 }
+.fc-nom  { font-size: var(--fs-item-nom); color: var(--gold); margin-top: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.fc-type { font-size: var(--fs-item-type); color: #9a9a9a; margin-top: 1px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.fc-effet{ font-size: var(--fs-item-effet); color: #7ab8d4; margin-top: 1px; font-style: italic; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
 
 /* Anneau : tout sur 1 ligne max */
 #sl-anneau1 .val, #sl-anneau2 .val { -webkit-line-clamp: 1; }
@@ -382,10 +388,6 @@ body {
 .free-cell:hover  { border-color: var(--gold); background: var(--hover); }
 .free-cell.filled { border-color: var(--filled); background: var(--bg3); }
 .free-cell .fc-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.free-cell .fc-nom  { font-size: 14px; color: var(--gold); margin-top: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
-.free-cell .fc-type { font-size: 11px; color: #9a9a9a; margin-top: 1px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
-.free-cell .fc-effet{ font-size: 11px; color: #7ab8d4; margin-top: 1px; font-style: italic; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
-/* coup: cout badge */
 .free-cell .fc-cout { font-size: 10px; color: var(--muted); margin-top: 2px; }
 .sort-section { display: flex; flex-direction: column; gap: 4px; }
 .sort-section-title {
@@ -540,16 +542,23 @@ body {
 .fiche-main-lbl:has(input:checked) { color: var(--gold); }
 .fiche-main-lbl input[type="radio"] { accent-color: var(--gold); }
 .fiche-section-title {
-  font-size: 13px; color: var(--gold); letter-spacing: 1px;
-  border-bottom: 1px solid var(--border2); padding-bottom: 3px; margin-top: 6px;
+  font-size: 19px; color: var(--gold); letter-spacing: 1px;
+  border-bottom: 1px solid var(--border2); padding-bottom: 3px; margin-top: 2px;
 }
 .fiche-textarea {
   background: var(--bg2); border: 1.5px solid var(--border2); border-radius: 4px;
-  color: var(--text); font-family: var(--font); font-size: 12px;
+  color: var(--text); font-family: var(--font); font-size: 18px;
   padding: 8px 10px; resize: none; outline: none; width: 100%; box-sizing: border-box;
   flex: 1; transition: border-color .15s;
 }
 .fiche-textarea:focus { border-color: var(--gold); }
+.fiche-stat-inp {
+  background: transparent; border: none; border-bottom: 1px solid var(--border2);
+  color: var(--text); font-family: var(--font); font-size: 13px;
+  outline: none; padding: 1px 4px; min-width: 0; width: 60px;
+  transition: border-color .15s;
+}
+.fiche-stat-inp:focus { border-color: var(--gold); }
 .fiche-histoire { flex: 1; min-height: 0; }
 
 /* Photo */
@@ -580,12 +589,12 @@ body {
 
 /* ══ PARAMÈTRES PAGE ══ */
 .param-layout {
-  display: flex; flex-direction: column; gap: 14px;
+  display: flex; flex-direction: column; gap: 10px;
   flex: 1; min-height: 0; overflow-y: auto; padding: 4px 2px;
 }
 .param-cols {
-  display: grid; grid-template-columns: 260px 1fr 1fr 1fr; gap: 14px;
-  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: 240px 1fr 1fr 1fr 200px; gap: 10px;
+  flex: 1; min-height: 0; overflow-y: auto;
 }
 .param-col { display: flex; flex-direction: column; gap: 6px; }
 
@@ -864,8 +873,15 @@ body {
           <span class="char-lbl" data-i18n-char="pa">PA</span>
           <input class="char-input narrow" id="char-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
           <span class="char-sep">|</span>
+          <span class="char-lbl" id="inv-ps-lbl" style="opacity:.4;">PS</span>
+          <input class="char-input narrow" id="char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
+        </div>
+        <div class="char-row">
           <span class="char-lbl" data-i18n-char="pe">PE</span>
           <input class="char-input narrow" id="char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="char-sep">|</span>
+          <span class="char-lbl" id="inv-dsnc-lbl">DSNC</span>
+          <input class="char-input narrow" id="char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
         </div>
         <div class="char-row">
           <span class="char-lbl" data-i18n-char="blessures">Blessures</span>
@@ -875,9 +891,6 @@ body {
             <input class="blessure-cb" type="checkbox" id="bl3" onchange="syncBl(3,this.checked)">
           </div>
           <span class="char-sep" style="margin-left:16px;">|</span>
-          <span class="char-lbl" id="inv-ps-lbl" style="opacity:.4;">PS</span>
-          <input class="char-input narrow" id="char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
-          <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="infuse">Infusé ?</span>
           <input type="checkbox" id="inv-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
           <span class="char-sep">|</span>
@@ -981,39 +994,46 @@ body {
 
       <!-- COL GAUCHE -->
       <div class="fiche-left">
-        <div class="fiche-nom" id="fiche-nom">—</div>
+        <input class="fiche-stat-inp" id="fiche-nom-inp" type="text" placeholder="Nom du personnage"
+          style="font-size:20px;width:100%;border:none;border-bottom:2px solid var(--border2);background:transparent;color:var(--gold);font-family:var(--font);padding:2px 4px;outline:none;letter-spacing:1px;margin-bottom:4px;"
+          oninput="syncChar('nom',this.value)">
 
         <div class="fiche-row">
-          <span class="fiche-field-val" id="fiche-race">—</span>
+          <input class="fiche-stat-inp" id="fiche-race-inp" type="text" placeholder="Race" style="width:80px;" oninput="syncChar('race',this.value)">
           <span class="fiche-sep">|</span>
           <span class="fiche-field-val" id="fiche-genre">—</span>
           <span class="fiche-sep">|</span>
-          <span class="fiche-field-val" id="fiche-age">—</span>
+          <input class="fiche-stat-inp" id="fiche-age-inp" type="text" placeholder="Âge" style="width:50px;" oninput="syncChar('age',this.value)">
         </div>
 
         <div class="fiche-row">
           <span class="fiche-lbl" id="fiche-naiss-lbl" data-i18n-char="naissance">Naissance</span>
           <span class="fiche-sep">:</span>
-          <span class="fiche-field-val" id="fiche-naiss">—</span>
+          <input class="fiche-stat-inp" id="fiche-naiss-inp" type="text" placeholder="—" style="width:80px;" oninput="syncChar('naiss',this.value)">
         </div>
 
-        <div class="fiche-row" style="gap:10px;">
-          <span class="fiche-lbl" id="fiche-pv-lbl" data-i18n-char="pv">PV</span>
-          <span class="fiche-field-val" id="fiche-pv">—</span>
+        <div class="fiche-row" style="gap:8px;">
+          <span class="fiche-lbl" id="fiche-pv-lbl" style="font-size:13px;">PV</span>
+          <input class="fiche-stat-inp" id="fiche-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
           <span class="fiche-sep">|</span>
-          <span class="fiche-lbl" id="fiche-pa-lbl" data-i18n-char="pa">PA</span>
-          <span class="fiche-field-val" id="fiche-pa">—</span>
+          <span class="fiche-lbl" id="fiche-pa-lbl" style="font-size:13px;">PA</span>
+          <input class="fiche-stat-inp" id="fiche-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
           <span class="fiche-sep">|</span>
-          <span class="fiche-lbl" id="fiche-pe-lbl" data-i18n-char="pe">PE</span>
-          <span class="fiche-field-val" id="fiche-pe">—</span>
-          <span class="fiche-sep" id="fiche-ps-sep">|</span>
-          <span class="fiche-lbl" id="fiche-ps-lbl" data-i18n-char="ps">PS</span>
-          <span class="fiche-field-val" id="fiche-ps">—</span>
+          <span class="fiche-lbl" id="fiche-ps-lbl" style="font-size:13px;opacity:.4;">PS</span>
+          <input class="fiche-stat-inp" id="fiche-ps" type="text" placeholder="—" disabled style="opacity:.4;" oninput="syncChar('ps',this.value)">
+        </div>
+
+        <div class="fiche-row" style="gap:8px;">
+          <span class="fiche-lbl" id="fiche-pe-lbl" style="font-size:13px;">PE</span>
+          <input class="fiche-stat-inp" id="fiche-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="fiche-sep">|</span>
+          <span class="fiche-lbl" id="fiche-dsnc-lbl" style="font-size:13px;">DSNC</span>
+          <input class="fiche-stat-inp" id="fiche-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
         </div>
 
         <div class="fiche-row">
           <span class="fiche-lbl" id="fiche-infuse-lbl" data-i18n-char="infuse">Infusé ?</span>
-          <input type="checkbox" id="fiche-infuse-cb" class="blessure-cb" disabled style="pointer-events:none;">
+          <input type="checkbox" id="fiche-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
         </div>
 
         <div class="fiche-row">
@@ -1065,7 +1085,7 @@ body {
     <div class="comp-layout">
 
       <!-- FICHE PERSO compacte -->
-      <div class="comp-char-panel">
+      <div class="comp-char-panel" style="align-self:center;max-width:1400px;width:100%;">
         <div class="char-row">
           <span class="char-lbl" data-i18n-char="nom">Nom</span>
           <input class="char-input wide" id="comp-char-nom" type="text" placeholder="Nom du personnage" oninput="syncChar('nom',this.value)">
@@ -1094,6 +1114,8 @@ body {
           <input class="char-input narrow" id="comp-char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="pe">PE</span><input class="char-input narrow" id="comp-char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="char-sep">|</span>
+          <span class="char-lbl" id="comp-dsnc-lbl">DSNC</span><input class="char-input narrow" id="comp-char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="blessures">Blessures</span>
           <div class="blessure-wrap">
@@ -1155,7 +1177,7 @@ body {
           </div>
           <div class="comp-list" id="list-magiques"></div>
 
-          <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="livre_sorts">📖 Livre de Sorts</span></div>
+          <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="livre_sorts">Livre de Sorts</span></div>
           <div id="livre-sorts-body" style="display:flex;flex-direction:column;gap:10px;"></div>
         </div>
 
@@ -1223,39 +1245,9 @@ body {
       <!-- ROW 2: 4 columns -->
       <div class="param-cols">
 
-        <!-- COL 1: Apparence + Ressources + Magie + Statistiques -->
+        <!-- COL 1: Ressources + Magie + Statistiques -->
         <div class="param-col">
-          <div class="param-section-title">🎨 Apparence</div>
-          <div class="param-fields" style="margin-top:4px;">
-            <div class="param-row"><span class="param-lbl">Fond</span><input type="color" id="tc-bg" value="#0d0700" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Panneau</span><input type="color" id="tc-bg2" value="#1e1008" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Accent</span><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Texte</span><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Bordure</span><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Case vide</span><input type="color" id="tc-slot-empty" value="#0a0600" oninput="applyTheme()"></div>
-            <div class="param-row"><span class="param-lbl">Cartouche joueur</span><input type="color" id="tc-char-panel" value="#0a0600" oninput="applyTheme()"></div>
-            <div class="param-row">
-              <span class="param-lbl">Police</span>
-              <select id="tc-font" onchange="applyTheme()" style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:11px;padding:2px 4px;border-radius:2px;">
-                <option value="'Palatino Linotype','Book Antiqua',Palatino,serif">Palatino</option>
-                <option value="'Times New Roman',Times,serif">Times New Roman</option>
-                <option value="Georgia,serif">Georgia</option>
-                <option value="fantasy">Fantasy</option>
-                <option value="'Courier New',Courier,monospace">Courier</option>
-                <option value="Arial,Helvetica,sans-serif">Arial</option>
-              </select>
-            </div>
-            <div class="param-row">
-              <button class="param-add-btn" onclick="resetTheme()">↺ Réinitialiser le thème</button>
-            </div>
-          </div>
-
-          <div class="param-section-title" style="margin-top:14px;">🔷 Niveaux de Compétences</div>
-          <div class="param-info">Renomme et colore les 4 niveaux.</div>
-          <div class="param-fields" style="margin-top:4px;" id="cfg-levels-list"></div>
-          <button class="param-add-btn" style="margin-top:4px;" onclick="resetLevelDefaults()">↺ Défaut</button>
-
-          <div class="param-section-title" style="margin-top:14px;">📊 Ressources</div>
+          <div class="param-section-title">📊 Ressources</div>
           <div class="param-info">Nom complet et abréviation.</div>
           <div class="param-fields" style="margin-top:4px;">
             <div class="param-row">
@@ -1350,29 +1342,9 @@ body {
           </div>
           <div id="cfg-list-sec" class="param-list"></div>
           <button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button>
-
-          <!-- Savoirs + Coups labels -->
-          <div class="param-cat-header" style="margin-top:14px;">
-            <input class="param-cat-name-input" id="cfg-name-savoirs" type="text" value="Connaissances et Statut" oninput="saveParamCatLabel('savoirs',this.value)">
-            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
-              <span class="param-info" style="font-style:normal;">Max</span>
-              <input class="param-max-input" id="cfg-max-savoirs" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('savoirs',this.value)">
-              <span class="param-info" style="font-style:normal;">Afficher</span>
-              <input type="checkbox" id="cfg-show-savoirs" class="blessure-cb" onchange="saveParamShow('savoirs',this.checked)" checked>
-            </div>
-          </div>
-          <div class="param-cat-header" style="margin-top:8px;">
-            <input class="param-cat-name-input" id="cfg-name-coups" type="text" value="Coups Spéciaux" oninput="saveParamCatLabel('coups',this.value)">
-            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
-              <span class="param-info" style="font-style:normal;">Max</span>
-              <input class="param-max-input" id="cfg-max-coups" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('coups',this.value)">
-              <span class="param-info" style="font-style:normal;">Afficher</span>
-              <input type="checkbox" id="cfg-show-coups" class="blessure-cb" onchange="saveParamShow('coups',this.checked)" checked>
-            </div>
-          </div>
         </div>
 
-        <!-- COL 3: Martiales -->
+        <!-- COL 3: Martiales + Coups Spéciaux -->
         <div class="param-col">
           <div class="param-cat-header">
             <input class="param-cat-name-input" id="cfg-name-mar" type="text" value="Compétences Martiales" oninput="saveParamCatLabel('mar',this.value)">
@@ -1393,9 +1365,20 @@ body {
           </div>
           <div id="cfg-list-mar" class="param-list"></div>
           <button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button>
+
+          <!-- Coups Spéciaux sous Martiales -->
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-coups" type="text" value="Coups Spéciaux" oninput="saveParamCatLabel('coups',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-coups" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('coups',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-coups" class="blessure-cb" onchange="saveParamShow('coups',this.checked)" checked>
+            </div>
+          </div>
         </div>
 
-        <!-- COL 4: Magiques -->
+        <!-- COL 4: Magiques + Connaissances et Statut -->
         <div class="param-col">
           <div class="param-cat-header">
             <input class="param-cat-name-input" id="cfg-name-mag" type="text" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
@@ -1416,9 +1399,87 @@ body {
           </div>
           <div id="cfg-list-mag" class="param-list"></div>
           <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
+
+          <!-- Livre de Sorts -->
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-livre" type="text" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max/magie</span>
+              <input class="param-max-input" id="cfg-max-livre" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('livre',this.value)">
+            </div>
+          </div>
+
+          <!-- Connaissances et Statut sous Magiques -->
+          <div class="param-cat-header" style="margin-top:14px;">
+            <input class="param-cat-name-input" id="cfg-name-savoirs" type="text" value="Connaissances et Statut" oninput="saveParamCatLabel('savoirs',this.value)">
+            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+              <span class="param-info" style="font-style:normal;">Max</span>
+              <input class="param-max-input" id="cfg-max-savoirs" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('savoirs',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-savoirs" class="blessure-cb" onchange="saveParamShow('savoirs',this.checked)" checked>
+            </div>
+          </div>
+        </div>
+
+        <!-- COL 5: Apparence + Niveaux + Taille textes -->
+        <div class="param-col">
+          <div class="param-section-title">🎨 Apparence</div>
+          <div class="param-fields" style="margin-top:4px;">
+            <div class="param-row"><span class="param-lbl">Fond</span><input type="color" id="tc-bg" value="#0d0700" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Panneau</span><input type="color" id="tc-bg2" value="#1e1008" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Accent</span><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Texte</span><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
+            <div class="param-row"><span class="param-lbl">Bordure</span><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
+            <div class="param-row">
+              <span class="param-lbl">Police</span>
+              <select id="tc-font" onchange="applyTheme()" style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:11px;padding:2px 4px;border-radius:2px;">
+                <option value="'Palatino Linotype','Book Antiqua',Palatino,serif">Palatino</option>
+                <option value="'Times New Roman',Times,serif">Times New Roman</option>
+                <option value="Georgia,serif">Georgia</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="'Courier New',Courier,monospace">Courier</option>
+                <option value="Arial,Helvetica,sans-serif">Arial</option>
+              </select>
+            </div>
+            <button class="param-add-btn" style="margin-top:4px;" onclick="resetTheme()">↺ Reset thème</button>
+          </div>
+
+          <div class="param-section-title" style="margin-top:12px;">📐 Taille des textes</div>
+          <div class="param-fields" style="margin-top:4px;">
+            <div class="param-row"><span class="param-lbl">Nom objet</span><input class="param-max-input" style="width:52px;" id="cfg-fs-nom" type="number" min="8" max="24" value="14" oninput="saveFontSize('nom',this.value)"><span class="param-info">px</span></div>
+            <div class="param-row"><span class="param-lbl">Type objet</span><input class="param-max-input" style="width:52px;" id="cfg-fs-type" type="number" min="8" max="24" value="12" oninput="saveFontSize('type',this.value)"><span class="param-info">px</span></div>
+            <div class="param-row"><span class="param-lbl">Effet/Desc.</span><input class="param-max-input" style="width:52px;" id="cfg-fs-effet" type="number" min="8" max="24" value="12" oninput="saveFontSize('effet',this.value)"><span class="param-info">px</span></div>
+            <button class="param-add-btn" style="margin-top:4px;" onclick="resetFontSizes()">↺ Défaut</button>
+          </div>
+
+          <div class="param-section-title" style="margin-top:12px;">🔷 Niveaux de Compétences</div>
+          <div class="param-info">Renomme et colore les 4 niveaux.</div>
+          <div class="param-fields" style="margin-top:4px;" id="cfg-levels-list"></div>
+          <button class="param-add-btn" style="margin-top:4px;" onclick="resetLevelDefaults()">↺ Défaut</button>
         </div>
 
       </div><!-- end param-cols -->
+
+      <!-- SECTION SACS & EMPLACEMENTS (full width below) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:8px;">
+
+        <!-- SACS -->
+        <div class="param-col">
+          <div class="param-section-title">🎒 Types de Sacs</div>
+          <div class="param-info">Renomme, modifie les emplacements, ou ajoute un nouveau type.</div>
+          <div id="cfg-bags-list" class="param-list" style="margin-top:6px;"></div>
+          <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomBag()">+ Ajouter un type de sac</button>
+        </div>
+
+        <!-- EMPLACEMENTS SPÉCIAUX -->
+        <div class="param-col">
+          <div class="param-section-title">✦ Emplacements Spéciaux</div>
+          <div class="param-info">Configure chaque emplacement spécial et son nombre de cases.</div>
+          <div id="cfg-spe-list" class="param-list" style="margin-top:6px;"></div>
+          <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomSpe()">+ Ajouter un emplacement</button>
+        </div>
+
+      </div>
     </div><!-- end param-layout -->
 </div><!-- end page-parametres -->
 
@@ -1459,10 +1520,8 @@ function applyTheme(){
   const text=document.getElementById('tc-text').value;
   const border=document.getElementById('tc-border').value;
   const font=document.getElementById('tc-font').value;
-  const slotEl=document.getElementById('tc-slot-empty');
-  const slotEmpty=slotEl?slotEl.value:DEFAULTS.slotEmpty;
-  const charEl=document.getElementById('tc-char-panel');
-  const charPanel=charEl?charEl.value:DEFAULTS.charPanel;
+  const slotEmpty=DEFAULTS.slotEmpty;
+  const charPanel=DEFAULTS.charPanel;
   const s=document.documentElement.style;
   s.setProperty('--bg',bg);
   s.setProperty('--bg2',bg2);
@@ -1480,7 +1539,7 @@ function applyTheme(){
   s.setProperty('--slot-empty',slotEmpty);
   s.setProperty('--char-panel',charPanel);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,charPanel}));
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font}));
 }
 
 function resetTheme(){
@@ -1490,8 +1549,6 @@ function resetTheme(){
   document.getElementById('tc-text').value=DEFAULTS.text;
   document.getElementById('tc-border').value=DEFAULTS.border;
   document.getElementById('tc-font').value=DEFAULTS.font;
-  const se=document.getElementById('tc-slot-empty'); if(se) se.value=DEFAULTS.slotEmpty;
-  const cp=document.getElementById('tc-char-panel'); if(cp) cp.value=DEFAULTS.charPanel;
   applyTheme();
 }
 
@@ -1505,8 +1562,6 @@ function loadTheme(){
       if(t.text)document.getElementById('tc-text').value=t.text;
       if(t.border)document.getElementById('tc-border').value=t.border;
       if(t.font)document.getElementById('tc-font').value=t.font;
-      const se=document.getElementById('tc-slot-empty'); if(se&&t.slotEmpty) se.value=t.slotEmpty;
-      const cp=document.getElementById('tc-char-panel'); if(cp&&t.charPanel) cp.value=t.charPanel;
     }
   }catch(e){}
   applyTheme();
@@ -1596,27 +1651,29 @@ function clearAll() {
 /* ── bag normal slots ── */
 function getBagConfig() {
   const sz = document.getElementById('bagSize').value;
-  const cfg = BAG_CONFIG[sz] || BAG_CONFIG.moyen;
-  const speCount = cfg.spe;
+  const bags = getCustomBags();
+  const bag = bags.find(b=>b.key===sz) || { norm:6, spe:0 };
+  const speCount = bag.spe;
+  const customSpe = getCustomSpe();
   let extraNorm = 0;
   const speSlots = [];
   const livreRanges = [];
   for (let i = 0; i < speCount; i++) {
     const v = data['_spe' + i] || '';
-    if (!v) continue;
-    if (v.startsWith('Livre')) {
+    if (!v || v === '— Vide —') continue;
+    // find the spe config
+    const speCfg = customSpe.find(s=>s.label===v) || {};
+    if (speCfg.isLivre) {
       const bonus = Math.min(7, Math.max(4, parseInt(data['_livreBonus' + i]) || 4));
-      livreRanges.push({ start: cfg.norm + extraNorm, count: bonus });
+      livreRanges.push({ start: bag.norm + extraNorm, count: bonus });
       extraNorm += bonus;
-    } else if (v === 'Autre') {
-      speSlots.push({ label: 'Autre', index: i, count: 1 });
-    } else if (v === 'Tente' || v === 'Sac de couchage' || v === 'Échelle Pliable') {
-      // Ces accessoires n'ajoutent pas d'emplacement de stockage
+    } else if (speCfg.noStorage || speCfg.slots === 0) {
+      // no storage
     } else {
-      speSlots.push({ label: v, index: i, count: 3 });
+      speSlots.push({ label: v, index: i, count: speCfg.slots || 3 });
     }
   }
-  return { norm: cfg.norm + extraNorm, baseNorm: cfg.norm, speSlots, livreRanges };
+  return { norm: bag.norm + extraNorm, baseNorm: bag.norm, speSlots, livreRanges };
 }
 
 function isLivreSlot(idx, livreRanges) {
@@ -1690,9 +1747,12 @@ function buildPoche() {
 /* ── spe slots ── */
 function buildSpe() {
   const sz = document.getElementById('bagSize').value;
-  const speCount = (BAG_CONFIG[sz] || BAG_CONFIG.moyen).spe;
-  const container = document.getElementById('speDynamic');
+  const bags = getCustomBags();
+  const bag = bags.find(b=>b.key===sz) || { spe:0 };
+  const speCount = bag.spe;
+  const container = document.getElementById('speDynamic'); if(!container) return;
   container.innerHTML = '';
+  const customSpe = getCustomSpe();
   for (let i = 0; i < speCount; i++) {
     const key = '_spe' + i;
     const val = data[key] || '';
@@ -1700,53 +1760,38 @@ function buildSpe() {
     row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:8px;';
     const lbl = document.createElement('span');
     lbl.style.cssText = 'font-size:11px;color:var(--muted);white-space:nowrap;min-width:48px;';
-    lbl.textContent = 'Spé ' + (i + 1);
+    lbl.textContent = 'Spé ' + (i+1);
     const sel = document.createElement('select');
     sel.className = 'spe-select-dd';
     sel.style.cssText = 'flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;padding:6px 8px;border-radius:3px;cursor:pointer;height:36px;';
-    SPE_OPTIONS.forEach(opt => {
+    const blank = document.createElement('option');
+    blank.value=''; blank.textContent='— Vide —'; if(!val) blank.selected=true; sel.appendChild(blank);
+    customSpe.forEach(s => {
       const o = document.createElement('option');
-      o.value = opt === '— Vide —' ? '' : opt;
-      o.textContent = opt;
-      if ((val === '' && opt === '— Vide —') || val === o.value) o.selected = true;
+      o.value=s.label; o.textContent=s.label;
+      if (s.label===val) o.selected=true;
       sel.appendChild(o);
     });
-    sel.onchange = () => {
-      data[key] = sel.value;
-      buildBag(); buildSpe(); persist();
-    };
+    sel.onchange = () => { data[key]=sel.value; buildBag(); buildSpe(); persist(); };
     row.appendChild(lbl); row.appendChild(sel);
-
-    // Si Livre Inventaire : champ bonus
-    if (val.startsWith('Livre')) {
+    const speCfg = customSpe.find(s=>s.label===val);
+    if (speCfg?.isLivre) {
       const livreKey = '_livreBonus' + i;
       const bonusVal = data[livreKey] ?? 4;
-      const bonusLbl = document.createElement('span');
-      bonusLbl.style.cssText = 'font-size:11px;color:var(--muted);white-space:nowrap;';
-      bonusLbl.textContent = '+';
-      const bonusInp = document.createElement('input');
-      bonusInp.type = 'number'; bonusInp.min = 4; bonusInp.max = 7;
-      bonusInp.value = bonusVal;
-      bonusInp.style.cssText = 'width:46px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:4px 6px;border-radius:3px;text-align:center;outline:none;';
-      bonusInp.title = 'Bonus emplacements (4 à 7)';
-      bonusInp.oninput = () => {
-        let v = parseInt(bonusInp.value) || 4;
-        v = Math.min(7, Math.max(4, v));
-        data[livreKey] = v;
-        buildBag(); persist();
-      };
-      const bonusSuffix = document.createElement('span');
-      bonusSuffix.style.cssText = 'font-size:11px;color:var(--dim);white-space:nowrap;';
-      bonusSuffix.textContent = 'empl.';
-      row.appendChild(bonusLbl); row.appendChild(bonusInp); row.appendChild(bonusSuffix);
+      const bLbl = document.createElement('span'); bLbl.style.cssText='font-size:11px;color:var(--muted);'; bLbl.textContent='+';
+      const bInp = document.createElement('input');
+      bInp.type='number'; bInp.min=4; bInp.max=7; bInp.value=bonusVal;
+      bInp.style.cssText='width:46px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:4px 6px;border-radius:3px;text-align:center;outline:none;';
+      bInp.oninput = () => { let v=Math.min(7,Math.max(4,parseInt(bInp.value)||4)); data[livreKey]=v; buildBag(); persist(); };
+      const bSuf = document.createElement('span'); bSuf.style.cssText='font-size:11px;color:var(--dim);'; bSuf.textContent='empl.';
+      row.appendChild(bLbl); row.appendChild(bInp); row.appendChild(bSuf);
     }
-
     container.appendChild(row);
   }
-  if (speCount === 0) {
+  if (speCount===0) {
     const none = document.createElement('div');
-    none.style.cssText = 'font-size:11px;color:var(--dim);margin-top:6px;font-style:italic;';
-    none.textContent = 'Cette sacoche n\'a pas d\'emplacement spécial.';
+    none.style.cssText='font-size:11px;color:var(--dim);margin-top:6px;font-style:italic;';
+    none.textContent="Cette sacoche n'a pas d'emplacement spécial.";
     container.appendChild(none);
   }
 }
@@ -1796,7 +1841,16 @@ function refresh() {
 
   // mun
   const munEl = document.getElementById('sl-mun');
-  if (munEl) { munEl.textContent = data.mun?.nom || 'Munitions'; munEl.classList.toggle('filled', !!(data.mun?.nom)); }
+  if (munEl) {
+    const mun = data.mun || {};
+    const hasMun = !!(mun.nom);
+    munEl.classList.toggle('filled', hasMun);
+    if (hasMun) {
+      munEl.innerHTML = `<span style="font-size:var(--fs-item-nom);color:var(--gold);">${mun.nom}</span>${mun.effet?`<span style="font-size:var(--fs-item-effet);color:#7ab8d4;font-style:italic;display:block;margin-top:4px;">${mun.effet}</span>`:''}`;
+    } else {
+      munEl.textContent = 'Munitions';
+    }
+  }
   const mc = data._munCur, mm = data._munMax;
   const ci = document.getElementById('mun-cur'), mi = document.getElementById('mun-max');
   if (ci && mc != null) ci.value = mc; if (mi && mm != null) mi.value = mm;
@@ -1840,6 +1894,12 @@ function saveSlot() {
 }
 
 function clearSlot() {
+  if (curSortKey !== null) {
+    if (!data._sorts) data._sorts = {};
+    if (!data._sorts[curSortKey]) data._sorts[curSortKey] = [];
+    data._sorts[curSortKey][curSortIdx] = null;
+    persist(); renderLivreSorts(); closeModal(); return;
+  }
   if (curFreeType !== null) {
     if (curFreeType === 'coup') { if(data._coups) data._coups[curFreeIdx]=null; persist(); renderCoups(); }
     else { if(data._savoirs) data._savoirs[curFreeIdx]=null; persist(); renderSavoirs(); }
@@ -1942,6 +2002,133 @@ function renderLevelParams() {
   });
 }
 
+/* ══ FONT SIZES ══ */
+const FS_DEFAULTS = { nom: 14, type: 12, effet: 12 };
+function saveFontSize(key, val) {
+  if (!data._fontSizes) data._fontSizes = {};
+  data._fontSizes[key] = Math.min(24, Math.max(8, parseInt(val)||FS_DEFAULTS[key]));
+  persist(); applyFontSizes();
+}
+function applyFontSizes() {
+  const fs = data._fontSizes || {};
+  document.documentElement.style.setProperty('--fs-item-nom',   (fs.nom   || 14)+'px');
+  document.documentElement.style.setProperty('--fs-item-type',  (fs.type  || 12)+'px');
+  document.documentElement.style.setProperty('--fs-item-effet', (fs.effet || 12)+'px');
+}
+function resetFontSizes() {
+  delete data._fontSizes; persist(); applyFontSizes();
+  ['nom','type','effet'].forEach(k => {
+    const el = document.getElementById('cfg-fs-'+k);
+    if (el) el.value = FS_DEFAULTS[k];
+  });
+}
+
+/* ══ BAG PARAMS ══ */
+function getCustomBags() {
+  return data._customBags || Object.entries(BAG_CONFIG).map(([key,cfg]) => ({
+    key, label: { sacoche:'Sacoche', petit:'Petit sac', moyen:'Sac moyen', grand:'Grand sac' }[key] || key,
+    norm: cfg.norm, spe: cfg.spe
+  }));
+}
+function saveCustomBags(bags) { data._customBags = bags; persist(); updateBagSelect(); }
+function getBagConfigDynamic() {
+  const bags = getCustomBags();
+  const sz = document.getElementById('bagSize')?.value;
+  return bags.find(b=>b.key===sz) || bags[0] || { key:'sacoche', label:'Sacoche', norm:6, spe:0 };
+}
+
+function renderBagParams() {
+  const container = document.getElementById('cfg-bags-list'); if(!container) return;
+  container.innerHTML = '';
+  const bags = getCustomBags();
+  bags.forEach((bag, idx) => {
+    const row = document.createElement('div');
+    row.className = 'param-comp-row'; row.style.gap = '6px'; row.style.flexWrap = 'wrap';
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-comp-input'; nameInp.type='text'; nameInp.value=bag.label; nameInp.style.flex='1';
+    nameInp.oninput = () => { bags[idx].label=nameInp.value; saveCustomBags(bags); };
+    const normLbl = document.createElement('span'); normLbl.className='param-info'; normLbl.textContent='Empl.';
+    const normInp = document.createElement('input');
+    normInp.className='param-max-input'; normInp.type='number'; normInp.min='0'; normInp.value=bag.norm;
+    normInp.oninput = () => { bags[idx].norm=parseInt(normInp.value)||0; saveCustomBags(bags); };
+    const speLbl = document.createElement('span'); speLbl.className='param-info'; speLbl.textContent='Spé.';
+    const speInp = document.createElement('input');
+    speInp.className='param-max-input'; speInp.type='number'; speInp.min='0'; speInp.value=bag.spe;
+    speInp.oninput = () => { bags[idx].spe=parseInt(speInp.value)||0; saveCustomBags(bags); };
+    const del = document.createElement('button'); del.className='param-del-btn'; del.textContent='×';
+    del.onclick = () => { bags.splice(idx,1); saveCustomBags(bags); renderBagParams(); };
+    row.appendChild(nameInp); row.appendChild(normLbl); row.appendChild(normInp);
+    row.appendChild(speLbl); row.appendChild(speInp); row.appendChild(del);
+    container.appendChild(row);
+  });
+}
+
+function addCustomBag() {
+  const bags = getCustomBags();
+  bags.push({ key: 'custom_'+Date.now(), label: 'Nouveau sac', norm: 8, spe: 1 });
+  saveCustomBags(bags); renderBagParams(); updateBagSelect();
+}
+
+function updateBagSelect() {
+  const sel = document.getElementById('bagSize'); if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '';
+  getCustomBags().forEach(bag => {
+    const o = document.createElement('option');
+    o.value = bag.key;
+    o.textContent = bag.label + ' (' + bag.norm + ' empl.' + (bag.spe>0?', '+bag.spe+' spé':'') + ')';
+    if (bag.key === cur) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+/* ══ SPE PARAMS ══ */
+const SPE_DEFAULTS = [
+  { label:'Tente', slots:0, noStorage:true },
+  { label:'Sac de couchage', slots:0, noStorage:true },
+  { label:'Marmite', slots:3, noStorage:false },
+  { label:'Séchoir', slots:3, noStorage:false },
+  { label:'Échelle Pliable', slots:0, noStorage:true },
+  { label:'Porte Fioles', slots:3, noStorage:false },
+  { label:'Porte Parchemins', slots:3, noStorage:false },
+  { label:'Trousse de Soin', slots:3, noStorage:false },
+  { label:'Sac de Rations', slots:3, noStorage:false },
+  { label:"Sac d'Outils", slots:3, noStorage:false },
+  { label:'Livre Inventaire', slots:0, isLivre:true },
+  { label:'Autre', slots:1, noStorage:false },
+];
+function getCustomSpe() { return data._customSpe || SPE_DEFAULTS.map(s=>({...s})); }
+function saveCustomSpe(spe) { data._customSpe = spe; persist(); }
+function getSpeLabelList() { return getCustomSpe().map(s=>s.label); }
+
+function renderSpeParams() {
+  const container = document.getElementById('cfg-spe-list'); if(!container) return;
+  container.innerHTML = '';
+  const spe = getCustomSpe();
+  spe.forEach((s, idx) => {
+    const row = document.createElement('div');
+    row.className='param-comp-row'; row.style.gap='6px'; row.style.flexWrap='wrap';
+    const nameInp = document.createElement('input');
+    nameInp.className='param-comp-input'; nameInp.type='text'; nameInp.value=s.label; nameInp.style.flex='1';
+    nameInp.oninput = () => { spe[idx].label=nameInp.value; saveCustomSpe(spe); };
+    const slotsLbl = document.createElement('span'); slotsLbl.className='param-info'; slotsLbl.textContent='+empl.';
+    const slotsInp = document.createElement('input');
+    slotsInp.className='param-max-input'; slotsInp.type='number'; slotsInp.min='0'; slotsInp.value=s.slots||0;
+    slotsInp.title = '0 = pas de stockage';
+    slotsInp.oninput = () => { spe[idx].slots=parseInt(slotsInp.value)||0; spe[idx].noStorage=spe[idx].slots===0&&!spe[idx].isLivre; saveCustomSpe(spe); };
+    const del = document.createElement('button'); del.className='param-del-btn'; del.textContent='×';
+    del.onclick = () => { spe.splice(idx,1); saveCustomSpe(spe); renderSpeParams(); };
+    row.appendChild(nameInp); row.appendChild(slotsLbl); row.appendChild(slotsInp); row.appendChild(del);
+    container.appendChild(row);
+  });
+}
+
+function addCustomSpe() {
+  const spe = getCustomSpe();
+  spe.push({ label:'Nouvel emplacement', slots:3, noStorage:false });
+  saveCustomSpe(spe); renderSpeParams();
+}
+
 function resetCharLabels() {
   delete data._charLabels; persist();
   renderParametres(); applyCharLabels();
@@ -2012,7 +2199,7 @@ function loadChar() {
   const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
   f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
   f('char-pv', c.pv); f('char-pa', c.pa); f('char-ps', c.ps); f('char-pe', c.pe);
-  f('char-race', c.race);
+  f('char-race', c.race); f('char-dsnc', c.dsnc);
   fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
   if (c.gender) {
     document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
@@ -2037,16 +2224,29 @@ function showPage(name) {
 }
 
 /* ══ SYNC CHAR ══ */
-const CHAR_FIELDS = ['nom','age','naiss','pv','pa','ps','pe','race'];
+const CHAR_FIELDS = ['nom','age','naiss','pv','pa','ps','pe','race','dsnc'];
 function syncChar(field, val) {
   if (!data._char) data._char = {};
   data._char[field] = val;
+  // Sync cartouche panels
   ['char-'+field, 'comp-char-'+field].forEach(id => {
     const el = document.getElementById(id);
     if (el && el !== document.activeElement) el.value = val;
   });
-  if (field === 'nom') updateTbNom();
-  if (document.getElementById('page-fiche')?.classList.contains('active')) renderFiche();
+  // Sync fiche perso inputs
+  const ficheMap = { nom:'fiche-nom-inp', race:'fiche-race-inp', age:'fiche-age-inp', naiss:'fiche-naiss-inp', pv:'fiche-pv', pa:'fiche-pa', pe:'fiche-pe', ps:'fiche-ps', dsnc:'fiche-dsnc' };
+  if (ficheMap[field]) {
+    const el = document.getElementById(ficheMap[field]);
+    if (el && el !== document.activeElement) el.value = val || '';
+  }
+  if (field === 'nom') {
+    updateTbNom();
+  }
+  if (document.getElementById('page-fiche')?.classList.contains('active')) {
+    // only re-render non-input parts
+    const infCb = document.getElementById('fiche-infuse-cb');
+    if (infCb) infCb.checked = data._infuse || false;
+  }
   persist();
 }
 
@@ -2099,19 +2299,24 @@ function loadCompChar() {
 function toggleInfuse(val) {
   data._infuse = val;
   persist();
-  // sync both checkboxes without triggering onchange
-  ['infuse-cb','inv-infuse-cb'].forEach(id => {
+  // sync all checkboxes
+  ['infuse-cb','inv-infuse-cb','fiche-infuse-cb'].forEach(id => {
     const el = document.getElementById(id);
     if (el && el !== document.activeElement) el.checked = val;
   });
-  // PS fields
+  // PS fields — cartouches
   [['comp-char-ps','ps-lbl'],['char-ps','inv-ps-lbl']].forEach(([inp,lbl]) => {
     const i = document.getElementById(inp);
     const l = document.getElementById(lbl);
     if (i) { i.disabled = !val; i.style.opacity = val?'1':'.4'; }
     if (l) l.style.opacity = val?'1':'.4';
   });
-  // update magic rows visibility directly without full re-render
+  // PS field — fiche perso
+  const fichePsInp = document.getElementById('fiche-ps');
+  const fichePsLbl = document.getElementById('fiche-ps-lbl');
+  if (fichePsInp) { fichePsInp.disabled = !val; fichePsInp.style.opacity = val?'1':'.4'; }
+  if (fichePsLbl) fichePsLbl.style.opacity = val?'1':'.4';
+  // magic rows
   document.querySelectorAll('#list-magiques .skill-dd-row').forEach(row => {
     row.classList.toggle('disabled', !val);
   });
@@ -2119,8 +2324,8 @@ function toggleInfuse(val) {
 
 /* ══ COMPETENCES DATA ══ */
 // Base arrays (FR) — actual rendering uses t() versions
-const COMP_PRINCIPALES = ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'];
-const COMP_SECONDAIRES = ['Équitation','Navigation','Ambidextrie','Musculation','Athlétisme','Apprentissage'];
+const COMP_PRINCIPALES = ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Artisanat / Réparation','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'];
+const COMP_SECONDAIRES = ['Équitation','Navigation','Ambidextrie','Musculation','Méditation','Athlétisme','Apprentissage'];
 const COMP_MARTIALES   = ['Dagues','Pugilat','Escrime','Hache','Contondant','Bâton','Hast','Fouet','Armes de lancer','Archerie','Armes à feu','Frondes','Armes à Énergie','Bouclier'];
 const COMP_MAGIQUES    = ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Magie du Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'];
 const LEVELS_STD   = ['Novice','Adepte','Expert','Maître'];
@@ -2288,7 +2493,9 @@ function renderLivreSorts() {
 
     const sorts = data._sorts[key];
     const filled = sorts.filter(s => s && s.nom);
-    const showCount = Math.max(3, filled.length + 1);
+    const maxSorts = getMaxForCat('livre'); // 0 = unlimited
+    const hard = maxSorts > 0 ? maxSorts : 9999;
+    const showCount = Math.max(3, Math.min(filled.length + 1, hard + 1));
 
     for (let i = 0; i < showCount; i++) {
       const s = sorts[i] || {};
@@ -2584,14 +2791,14 @@ const I18N = {
     comp_principales: 'Compétences Principales', comp_secondaires: 'Compétences Secondaires',
     comp_martiales: 'Compétences Martiales', comp_magiques: 'Compétences Magiques',
     comp_magiques_sub: '(Infusé requis)', coups: 'Coups Spéciaux',
-    savoirs: 'Connaissances et Statut', livre_sorts: '📖 Livre de Sorts',
+    savoirs: 'Connaissances et Statut', livre_sorts: 'Livre de Sorts',
     sacoche: 'Sacoche (6 empl.)', petit_sac: 'Petit sac (9 empl. + 1 spé)',
     sac_moyen: 'Sac moyen (11 empl. + 2 spé)', grand_sac: 'Grand sac (13 empl. + 3 spé)',
     capital_wip: '💰 Capital — à venir', choisir: '— Choisir —',
     levels_std: ['Novice','Adepte','Expert','Maître'],
     levels_magic: ['Adepte','Expert','Maître'],
-    comp_pri: ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'],
-    comp_sec: ['Équitation','Navigation','Ambidextrie','Musculation','Athlétisme','Apprentissage'],
+    comp_pri: ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Artisanat / Réparation','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'],
+    comp_sec: ['Équitation','Navigation','Ambidextrie','Musculation','Méditation','Athlétisme','Apprentissage'],
     comp_mar: ['Dagues','Pugilat','Escrime','Hache','Contondant','Bâton','Hast','Fouet','Armes de lancer','Archerie','Armes à feu','Frondes','Armes à Énergie','Bouclier'],
     comp_mag: ['Magie du Feu','Magie de l\'Air','Magie de l\'Eau','Magie de la Terre','Magie de l\'Âme','Magie de l\'Esprit','Magie du Corps','Magie du Psionisme','Magie de la Lumière','Magie de l\'Ombre','Magie du Vide','Magie de la Création'],
     choisir_comp: '— Choisir —',
@@ -2614,14 +2821,14 @@ const I18N = {
     comp_principales: 'Main Skills', comp_secondaires: 'Secondary Skills',
     comp_martiales: 'Martial Skills', comp_magiques: 'Magic Skills',
     comp_magiques_sub: '(Infused required)', coups: 'Special Moves',
-    savoirs: 'Lore & Status', livre_sorts: '📖 Spellbook',
+    savoirs: 'Lore & Status', livre_sorts: 'Spellbook',
     sacoche: 'Pouch (6 slots)', petit_sac: 'Small bag (9 slots + 1 sp.)',
     sac_moyen: 'Medium bag (11 slots + 2 sp.)', grand_sac: 'Large bag (13 slots + 3 sp.)',
     capital_wip: '💰 Capital — coming soon', choisir: '— Choose —',
     levels_std: ['Novice','Adept','Expert','Master'],
     levels_magic: ['Adept','Expert','Master'],
-    comp_pri: ['Identification','Bargaining','Disarming','Pickpocket','Medicine','Alchemy','Hunting / Tracking','Taming','Acrobatics','Cooking'],
-    comp_sec: ['Riding','Navigation','Ambidexterity','Strength Training','Athletics','Apprenticeship'],
+    comp_pri: ['Identification','Bargaining','Disarming','Pickpocket','Medicine','Crafting / Repair','Alchemy','Hunting / Tracking','Taming','Acrobatics','Cooking'],
+    comp_sec: ['Riding','Navigation','Ambidexterity','Strength Training','Meditation','Athletics','Apprenticeship'],
     comp_mar: ['Daggers','Brawling','Fencing','Axe','Blunt','Staff','Polearm','Whip','Throwing Weapons','Archery','Firearms','Slings','Energy Weapons','Shield'],
     comp_mag: ['Fire Magic','Air Magic','Water Magic','Earth Magic','Soul Magic','Spirit Magic','Body Magic','Psionic Magic','Light Magic','Shadow Magic','Void Magic','Creation Magic'],
     choisir_comp: '— Choose —',
@@ -2693,7 +2900,7 @@ function getCompArray(type) {
 const CAT_DEFAULTS = {
   stats:'Statistiques', pri:'Compétences Principales', sec:'Compétences Secondaires',
   mar:'Compétences Martiales', mag:'Compétences Magiques',
-  savoirs:'Connaissances et Statut', coups:'Coups Spéciaux'
+  savoirs:'Connaissances et Statut', coups:'Coups Spéciaux', livre:'Livre de Sorts'
 };
 function getCatLabel(cat) { return data._catLabels?.[cat] || CAT_DEFAULTS[cat] || cat; }
 function saveParamCatLabel(cat, val) {
@@ -2710,6 +2917,7 @@ function applyCatLabels() {
     mag: '[data-i18n-comp="comp_magiques"]',
     savoirs: '[data-i18n-comp="savoirs"]',
     coups: '[data-i18n-comp="coups"]',
+    livre: '[data-i18n-comp="livre_sorts"]',
   };
   Object.entries(map).forEach(([cat, sel]) => {
     document.querySelectorAll(sel).forEach(el => { el.textContent = getCatLabel(cat); });
@@ -2946,18 +3154,27 @@ function renderParametres() {
   });
   // Level names & colors
   renderLevelParams();
+  // Bags & spe
+  renderBagParams();
+  renderSpeParams();
+  // Font sizes
+  const fs = data._fontSizes || {};
+  ['nom','type','effet'].forEach(k => {
+    const el = document.getElementById('cfg-fs-'+k);
+    if (el) el.value = fs[k] || FS_DEFAULTS[k];
+  });
   // Char labels
   ['nom','race','age','naiss','blessures','minos','infuse'].forEach(key => {
     const el = document.getElementById('cfg-label-'+key);
     if (el) el.value = getCharLabel(key);
   });
   // Cat labels
-  ['stats','pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
+  ['stats','pri','sec','mar','mag','savoirs','coups','livre'].forEach(cat => {
     const el = document.getElementById('cfg-name-'+cat);
     if (el) el.value = getCatLabel(cat);
   });
   // Cat max
-  ['pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
+  ['pri','sec','mar','mag','savoirs','coups','livre'].forEach(cat => {
     const el = document.getElementById('cfg-max-'+cat);
     if (el) el.value = getMaxForCat(cat);
   });
@@ -2995,14 +3212,16 @@ function renderFiche() {
   const f = data._fiche || {};
 
   const setT = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val||'—'; };
+  const setV = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
 
-  setT('fiche-nom', c.nom);
-  setT('fiche-race', c.race);
+  setV('fiche-nom-inp', c.nom);
+  setV('fiche-race-inp', c.race);
+  setV('fiche-age-inp', c.age);
+  setV('fiche-naiss-inp', c.naiss);
   setT('fiche-genre', c.gender==='m'?'♂':c.gender==='f'?'♀':'—');
-  setT('fiche-age', c.age);
-  setT('fiche-naiss', c.naiss);
-  setT('fiche-pv', c.pv); setT('fiche-pa', c.pa);
-  setT('fiche-pe', c.pe); setT('fiche-ps', c.ps);
+  setV('fiche-pv', c.pv); setV('fiche-pa', c.pa);
+  setV('fiche-pe', c.pe); setV('fiche-ps', c.ps);
+  setV('fiche-dsnc', c.dsnc);
 
   // Apply stat labels from params
   ['pv','pa','pe'].forEach(s => {
@@ -3020,14 +3239,13 @@ function renderFiche() {
 
   // Infusé checkbox
   const infuseCb = document.getElementById('fiche-infuse-cb');
-  if (infuseCb) infuseCb.checked = data._infuse || !data._infusionRequired || false;
+  if (infuseCb) { infuseCb.checked = data._infuse || (!data._infusionRequired) || false; }
 
   // PS visibility
   const psLbl = document.getElementById('fiche-ps-lbl');
-  const psSep = document.getElementById('fiche-ps-sep');
   const psEl  = document.getElementById('fiche-ps');
   const psVisible = data._magieEnabled !== false;
-  [psLbl, psSep, psEl].forEach(el => { if(el) el.style.display = psVisible ? '' : 'none'; });
+  [psLbl, psEl].forEach(el => { if(el) el.style.display = psVisible ? '' : 'none'; });
 
   // Main dominante
   const main = f.mainDominante || 'droite';
@@ -3067,9 +3285,7 @@ function renderFiche() {
     }
   }
 
-  // Ratio slider
-  const slider = document.getElementById('fiche-ratio-slider');
-  if (slider) { slider.value = f.ratioSlider ?? 0; updateFicheRatio(slider.value, false); }
+  // Ratio — auto-applied when photo loads, nothing to do here
 }
 
 function updateFicheRatio(val, save=true) {
@@ -3077,7 +3293,6 @@ function updateFicheRatio(val, save=true) {
   const ratio = 2 - (val / 100); // 2.0→1.0
   const photoWrap = document.getElementById('fiche-photo-inner');
   if (photoWrap) photoWrap.style.aspectRatio = '1 / ' + ratio.toFixed(2);
-  const lbl = document.getElementById('fiche-ratio-label');
   if (lbl) lbl.textContent = '1:' + ratio.toFixed(1).replace('.0','');
   if (save) {
     if (!data._fiche) data._fiche = {};
@@ -3115,8 +3330,7 @@ function saveFichePhoto() {
       const clamped = Math.min(2, Math.max(1, ratio)); // clamp 1:1 to 1:2
       const sliderVal = Math.round((2 - clamped) * 100); // 0=tall(1:2) 100=square(1:1)
       data._fiche.ratioSlider = sliderVal; persist();
-      const slider = document.getElementById('fiche-ratio-slider');
-      if (slider) { slider.value = sliderVal; updateFicheRatio(sliderVal, false); }
+      updateFicheRatio(sliderVal, false);
       renderFiche();
     };
     img.onerror = () => renderFiche();
@@ -3142,6 +3356,8 @@ applyCharLabels();
 applyCatLabels();
 applyMagieSetting();
 applyParamShow();
+applyFontSizes();
+updateBagSelect();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
 renderFiche();
