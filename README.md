@@ -26,6 +26,7 @@ L’objectif est de proposer un outil :
 - Création de fiches de personnage
 - Gestion des caractéristiques
 - Suivi de l’équipement et de l’inventaire
+  - Système Drag and Drop (si c'est pas kiffant ça)
 - Interface simple et intuitive
 - Utilisation directe dans le navigateur et sauvegarde locale
 - Import et Export, de fiche et de système.
