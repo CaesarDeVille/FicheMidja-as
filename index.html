@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventaire D&D</title>
+<title>Fiche Midjaas</title>
 <style>
 :root {
   --bg:      #0d0700;
@@ -169,27 +169,29 @@ body {
   width: 100%; min-height: 0; height: 100%;
 }
 
-/* Row 1: Amulette(v) | Couvre-Chef */
+/* Row 1: Amulette(v) 30% | Couvre-Chef reste */
 .eq-r1 { display: flex; gap: 8px; min-height: clamp(80px,10vh,120px); flex-shrink: 0; }
-.eq-r1 .vband { width: clamp(80px,7%,140px); }
+.eq-r1 .vband { width: 30%; flex-shrink: 0; }
 .eq-r1 .slot  { flex: 1; }
 
-/* Row 2: [Gants/Bracelet] | Armure | Cape(v) */
+/* Row 2: Gants+Bracelet 30% | Armure 45% | Cape reste */
 .eq-r2 { display: flex; gap: 8px; flex-shrink: 0; min-height: clamp(160px,25vh,280px); }
-.eq-r2-left  { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.eq-r2-left  { display: flex; flex-direction: column; gap: 8px; width: 30%; flex-shrink: 0; }
 .eq-r2-left .slot { width: 100%; }
 .slot-gants    { min-height: clamp(90px,14vh,160px); flex: 2; }
 .slot-bracelet { min-height: clamp(60px,9vh,110px); flex: 1; }
-.slot-armure   { flex: 1; min-height: clamp(160px,25vh,280px); }
-.eq-r2 .vband  { width: clamp(80px,7%,140px); }
+.slot-armure   { width: 45%; flex-shrink: 0; min-height: clamp(160px,25vh,280px); }
+.eq-r2 .vband  { flex: 1; min-width: 0; }
 
-/* Row 3: Anneau G | Anneau D | Ceinture — même hauteur que Bracelet/Bottes */
+/* Row 3: Anneaux le reste | Ceinture 65% */
 .eq-r3 { display: flex; gap: 8px; min-height: clamp(70px,9vh,110px); flex-shrink: 0; align-items: stretch; }
-.slot-anneau  { width: clamp(50px,5vw,101px); max-width: 101px; flex-shrink: 0; flex-grow: 0; }
-.slot-ceinture { flex: 1; min-width: 0; }
+.slot-anneau  { flex: 1; min-width: 0; }
+.slot-ceinture { width: 65%; flex-shrink: 0; }
 
-/* Row 4: Bottes */
-.slot-bottes { width: 100%; min-height: clamp(70px,9vh,110px); flex-shrink: 0; }
+/* Row 4: Divers reste | Bottes 65% */
+.eq-r4 { display: flex; gap: 8px; min-height: clamp(70px,9vh,110px); flex-shrink: 0; }
+.slot-divers { flex: 1; min-width: 0; }
+.slot-bottes { width: 65%; flex-shrink: 0; }
 
 /* ══════════════════════════════════
    COL 2 — ARMES / CENTRE
@@ -271,10 +273,18 @@ body {
 
 /* Munitions split cell */
 .mun-cell {
-  display: flex; align-items: stretch; height: 36px;
+  display: flex; align-items: stretch; min-height: 36px;
   border: 1.5px solid var(--border2); border-radius: 3px; overflow: hidden;
 }
-.mun-cell .mun-name { border: none; border-radius: 0; }
+.mun-cell .mun-name {
+  border: none; border-radius: 0;
+  overflow: hidden; min-width: 0; flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4px 0;
+}
+.mun-cell .mun-name span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+}
 .mun-counter {
   display: flex; align-items: center; gap: 2px;
   background: var(--bg3); border-left: 1px solid var(--border2);
@@ -391,6 +401,7 @@ body {
 }
 .free-cell:hover  { border-color: var(--gold); background: var(--hover); }
 .free-cell.filled { border-color: var(--filled); background: var(--bg3); }
+.free-cell.drag-over { border-color: var(--gold); background: var(--hover); outline: 2px dashed var(--gold); }
 .free-cell .fc-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .free-cell .fc-cout { font-size: 10px; color: var(--muted); margin-top: 2px; }
 .sort-section { display: flex; flex-direction: column; gap: 4px; }
@@ -451,6 +462,10 @@ body {
   display: flex; flex-direction: column; gap: 7px;
   margin-top: 8px;
 }
+.stat-split { display: inline-flex; align-items: center; gap: 0; }
+.stat-split .char-input.narrow { width: 30px; }
+.stat-slash { font-size: 12px; color: var(--border2); padding: 0 1px; flex-shrink: 0; }
+.stat-max { color: var(--muted) !important; }
 .char-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
 .char-lbl {
   font-size: 11px; color: var(--muted); text-transform: uppercase;
@@ -464,8 +479,8 @@ body {
   transition: border-color .15s;
 }
 .char-input:focus { border-color: var(--gold); }
-.char-input.wide { flex: 1; min-width: 80px; }
-.char-input.narrow { width: 65px; }
+.char-input.wide { max-width: clamp(120px, 12vw, 220px); min-width: 60px; width: 12vw; }
+.char-input.narrow { width: 55px; }
 .char-sep { color: var(--border2); font-size: 13px; flex-shrink: 0; }
 .blessure-wrap { display: flex; align-items: center; gap: 6px; }
 .blessure-cb {
@@ -516,11 +531,18 @@ body {
 [draggable="true"] { cursor: grab; }
 
 /* ══ TOAST ══ */
+/* ══ ARMOR STATS ══ */
+.armure-stats { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 5px; border-top: 1px solid var(--border3); padding-top: 4px; }
+.armure-stat { display: flex; align-items: center; gap: 3px; font-size: 11px; }
+.armure-stat-lbl { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: .3px; }
+.armure-stat-val { color: var(--gold); font-size: 12px; }
+.armor-stat-cartouche { display: inline-flex; align-items: center; gap: 3px; margin-right: 8px; }
+#inv-armor-stats, #comp-armor-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 3px; }
 /* ══ FICHE PERSO ══ */
 /* ══ FICHE PERSO ══ */
 .fiche-layout {
   display: grid; grid-template-columns: 1fr 40% 1fr; gap: clamp(8px,1%,20px);
-  flex: 1; min-height: 0; padding: 2px; overflow: hidden;
+  flex: 1; min-height: 0; padding: 2px; overflow: visible;
 }
 .fiche-left  { display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
 .fiche-right { display: flex; flex-direction: column; gap: 5px; }
@@ -559,10 +581,12 @@ body {
 .fiche-stat-inp {
   background: transparent; border: none; border-bottom: 1px solid var(--border2);
   color: var(--text); font-family: var(--font); font-size: 13px;
-  outline: none; padding: 1px 4px; min-width: 0; width: 60px;
+  outline: none; padding: 1px 4px; min-width: 0; width: 42px;
   transition: border-color .15s;
 }
 .fiche-stat-inp:focus { border-color: var(--gold); }
+.fiche-stat-max { color: var(--muted); }
+.fiche-stat-slash { font-size: 12px; color: var(--border2); padding: 0 1px; flex-shrink: 0; }
 .fiche-histoire { flex: 1; min-height: 0; }
 
 /* Photo */
@@ -839,11 +863,19 @@ body {
       </div>
 
       <!-- R4: Bottes -->
-      <div class="slot slot-bottes" id="sl-bottes" onclick="open_('bottes')">
-        <span class="lbl" data-i18n="bottes">Bottes</span>
-        <span class="val" id="dsp-bottes-nom">—</span>
-        <span class="val-type" id="dsp-bottes-type"></span>
-        <span class="val-effet" id="dsp-bottes-effet"></span>
+      <div class="eq-r4">
+        <div class="slot slot-divers" id="sl-divers" onclick="open_('divers')">
+          <span class="lbl" data-i18n="divers">Divers</span>
+          <span class="val" id="dsp-divers-nom">—</span>
+          <span class="val-type" id="dsp-divers-type"></span>
+          <span class="val-effet" id="dsp-divers-effet"></span>
+        </div>
+        <div class="slot slot-bottes" id="sl-bottes" onclick="open_('bottes')">
+          <span class="lbl" data-i18n="bottes">Bottes</span>
+          <span class="val" id="dsp-bottes-nom">—</span>
+          <span class="val-type" id="dsp-bottes-type"></span>
+          <span class="val-effet" id="dsp-bottes-effet"></span>
+        </div>
       </div>
 
       <!-- PANNEAU PERSONNAGE -->
@@ -872,20 +904,40 @@ body {
         </div>
         <div class="char-row">
           <span class="char-lbl" data-i18n-char="pv">PV</span>
-          <input class="char-input narrow" id="char-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
+          <span class="stat-split" id="stat-wrap-pv">
+            <input class="char-input narrow stat-cur" id="char-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
+            <span class="stat-slash" id="stat-slash-pv">/</span>
+            <input class="char-input narrow stat-max" id="char-pv-max" type="text" placeholder="—" oninput="syncCharMax('pv',this.value)">
+          </span>
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="pa">PA</span>
-          <input class="char-input narrow" id="char-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
+          <span class="stat-split" id="stat-wrap-pa">
+            <input class="char-input narrow stat-cur" id="char-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
+            <span class="stat-slash" id="stat-slash-pa">/</span>
+            <input class="char-input narrow stat-max" id="char-pa-max" type="text" placeholder="—" oninput="syncCharMax('pa',this.value)">
+          </span>
           <span class="char-sep">|</span>
           <span class="char-lbl" id="inv-ps-lbl" style="opacity:.4;">PS</span>
-          <input class="char-input narrow" id="char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
+          <span class="stat-split" id="stat-wrap-ps">
+            <input class="char-input narrow stat-cur" id="char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
+            <span class="stat-slash" id="stat-slash-ps" style="opacity:.4;">/</span>
+            <input class="char-input narrow stat-max" id="char-ps-max" type="text" placeholder="—" disabled oninput="syncCharMax('ps',this.value)" style="opacity:.4;">
+          </span>
         </div>
         <div class="char-row">
           <span class="char-lbl" data-i18n-char="pe">PE</span>
-          <input class="char-input narrow" id="char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="stat-split" id="stat-wrap-pe">
+            <input class="char-input narrow stat-cur" id="char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+            <span class="stat-slash" id="stat-slash-pe">/</span>
+            <input class="char-input narrow stat-max" id="char-pe-max" type="text" placeholder="—" oninput="syncCharMax('pe',this.value)">
+          </span>
           <span class="char-sep">|</span>
           <span class="char-lbl" id="inv-dsnc-lbl">DSNC</span>
-          <input class="char-input narrow" id="char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
+          <span class="stat-split" id="stat-wrap-dsnc">
+            <input class="char-input narrow stat-cur" id="char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
+            <span class="stat-slash" id="stat-slash-dsnc">/</span>
+            <input class="char-input narrow stat-max" id="char-dsnc-max" type="text" placeholder="—" oninput="syncCharMax('dsnc',this.value)">
+          </span>
         </div>
         <div class="char-row">
           <span class="char-lbl" data-i18n-char="blessures">Blessures</span>
@@ -900,6 +952,9 @@ body {
           <span class="char-sep">|</span>
           <span class="char-lbl" id="inv-minos-lbl" style="white-space:nowrap;">Pièce de Minos</span>
           <input type="checkbox" id="inv-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
+        </div>
+        <div class="char-row" id="inv-armor-row" style="flex-wrap:wrap;">
+          <div id="inv-armor-stats" style="width:100%;"></div>
         </div>
       </div>
 
@@ -1019,21 +1074,34 @@ body {
         <div class="fiche-row" style="gap:8px;">
           <span class="fiche-lbl" id="fiche-pv-lbl" style="font-size:13px;">PV</span>
           <input class="fiche-stat-inp" id="fiche-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
+          <span class="fiche-stat-slash" id="fiche-pv-slash">/</span>
+          <input class="fiche-stat-inp fiche-stat-max" id="fiche-pv-max" type="text" placeholder="—" oninput="syncCharMax('pv',this.value)">
           <span class="fiche-sep">|</span>
           <span class="fiche-lbl" id="fiche-pa-lbl" style="font-size:13px;">PA</span>
           <input class="fiche-stat-inp" id="fiche-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
+          <span class="fiche-stat-slash" id="fiche-pa-slash">/</span>
+          <input class="fiche-stat-inp fiche-stat-max" id="fiche-pa-max" type="text" placeholder="—" oninput="syncCharMax('pa',this.value)">
           <span class="fiche-sep">|</span>
           <span class="fiche-lbl" id="fiche-ps-lbl" style="font-size:13px;opacity:.4;">PS</span>
           <input class="fiche-stat-inp" id="fiche-ps" type="text" placeholder="—" disabled style="opacity:.4;" oninput="syncChar('ps',this.value)">
+          <span class="fiche-stat-slash" id="fiche-ps-slash" style="opacity:.4;">/</span>
+          <input class="fiche-stat-inp fiche-stat-max" id="fiche-ps-max" type="text" placeholder="—" disabled style="opacity:.4;" oninput="syncCharMax('ps',this.value)">
         </div>
 
         <div class="fiche-row" style="gap:8px;">
           <span class="fiche-lbl" id="fiche-pe-lbl" style="font-size:13px;">PE</span>
           <input class="fiche-stat-inp" id="fiche-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="fiche-stat-slash" id="fiche-pe-slash">/</span>
+          <input class="fiche-stat-inp fiche-stat-max" id="fiche-pe-max" type="text" placeholder="—" oninput="syncCharMax('pe',this.value)">
           <span class="fiche-sep">|</span>
           <span class="fiche-lbl" id="fiche-dsnc-lbl" style="font-size:13px;">DSNC</span>
           <input class="fiche-stat-inp" id="fiche-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
+          <span class="fiche-stat-slash" id="fiche-dsnc-slash">/</span>
+          <input class="fiche-stat-inp fiche-stat-max" id="fiche-dsnc-max" type="text" placeholder="—" oninput="syncCharMax('dsnc',this.value)">
         </div>
+
+        <div class="fiche-section-title" style="margin-top:4px;">Armure</div>
+        <div id="fiche-armor-stats"></div>
 
         <div class="fiche-row">
           <span class="fiche-lbl" id="fiche-infuse-lbl" data-i18n-char="infuse">Infusé ?</span>
@@ -1063,16 +1131,6 @@ body {
             <span class="fiche-photo-hint">Cliquez pour ajouter une photo<br><span style="font-size:10px;opacity:.6;">(lien URL)</span></span>
           </div>
         </div>
-        <div class="fiche-photo-overlay" id="fiche-photo-overlay" style="display:none;">
-          <div class="fiche-photo-modal">
-            <div style="font-size:13px;color:var(--gold);margin-bottom:8px;">Lien de l'image</div>
-            <input type="text" id="fiche-photo-url" class="param-comp-input" placeholder="https://…" style="width:100%;">
-            <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
-              <button class="btn" onclick="clearFichePhoto()">Retirer</button>
-              <button class="btn" onclick="saveFichePhoto()">✔ OK</button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- COL DROITE : Histoire -->
@@ -1083,6 +1141,18 @@ body {
 
     </div>
   </div><!-- end page-fiche -->
+
+  <!-- Photo overlay — outside fiche-layout to avoid clipping -->
+  <div class="fiche-photo-overlay" id="fiche-photo-overlay" style="display:none;" onclick="if(event.target===this)clearFichePhoto()">
+    <div class="fiche-photo-modal">
+      <div style="font-size:13px;color:var(--gold);margin-bottom:8px;">Lien de l'image</div>
+      <input type="text" id="fiche-photo-url" class="param-comp-input" placeholder="https://…" style="width:100%;" onkeydown="if(event.key==='Enter')saveFichePhoto()">
+      <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+        <button class="btn" onclick="clearFichePhoto()">Retirer</button>
+        <button class="btn" onclick="saveFichePhoto()">✔ OK</button>
+      </div>
+    </div>
+  </div>
 
   <!-- PAGE COMPÉTENCES -->
   <div id="page-competences" class="page">
@@ -1104,22 +1174,48 @@ body {
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="race">Race</span>
           <input class="char-input wide" id="comp-char-race" type="text" placeholder="—" oninput="syncChar('race',this.value)">
+          <span class="char-sep">|</span>
+          <span class="char-lbl" data-i18n-char="age_bio">Âge Bio</span>
+          <input class="char-input narrow" id="comp-char-age" type="text" placeholder="—" oninput="syncChar('age',this.value)">
+          <span class="char-sep">|</span>
+          <span class="char-lbl" data-i18n-char="naissance">Naissance</span>
+          <input class="char-input wide" id="comp-char-naiss" type="text" placeholder="—" oninput="syncChar('naiss',this.value)">
         </div>
         <div class="char-row">
-          <span class="char-lbl" data-i18n-char="age_bio">Âge Bio</span><input class="char-input narrow" id="comp-char-age" type="text" placeholder="—" oninput="syncChar('age',this.value)">
+          <span class="char-lbl" data-i18n-char="pv">PV</span>
+          <span class="stat-split" id="stat-wrap-pv2">
+            <input class="char-input narrow stat-cur" id="comp-char-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
+            <span class="stat-slash" id="stat-slash-pv2">/</span>
+            <input class="char-input narrow stat-max" id="comp-char-pv-max" type="text" placeholder="—" oninput="syncCharMax('pv',this.value)">
+          </span>
           <span class="char-sep">|</span>
-          <span class="char-lbl" data-i18n-char="naissance">Naissance</span><input class="char-input wide" id="comp-char-naiss" type="text" placeholder="—" oninput="syncChar('naiss',this.value)">
-          <span class="char-sep">|</span>
-          <span class="char-lbl" data-i18n-char="pv">PV</span><input class="char-input narrow" id="comp-char-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
-          <span class="char-sep">|</span>
-          <span class="char-lbl" data-i18n-char="pa">PA</span><input class="char-input narrow" id="comp-char-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
+          <span class="char-lbl" data-i18n-char="pa">PA</span>
+          <span class="stat-split" id="stat-wrap-pa2">
+            <input class="char-input narrow stat-cur" id="comp-char-pa" type="text" placeholder="—" oninput="syncChar('pa',this.value)">
+            <span class="stat-slash" id="stat-slash-pa2">/</span>
+            <input class="char-input narrow stat-max" id="comp-char-pa-max" type="text" placeholder="—" oninput="syncCharMax('pa',this.value)">
+          </span>
           <span class="char-sep">|</span>
           <span class="char-lbl" id="ps-lbl" style="opacity:.4;">PS</span>
-          <input class="char-input narrow" id="comp-char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
+          <span class="stat-split">
+            <input class="char-input narrow stat-cur" id="comp-char-ps" type="text" placeholder="—" disabled oninput="syncChar('ps',this.value)" style="opacity:.4;">
+            <span class="stat-slash" id="stat-slash-ps2" style="opacity:.4;">/</span>
+            <input class="char-input narrow stat-max" id="comp-char-ps-max" type="text" placeholder="—" disabled oninput="syncCharMax('ps',this.value)" style="opacity:.4;">
+          </span>
           <span class="char-sep">|</span>
-          <span class="char-lbl" data-i18n-char="pe">PE</span><input class="char-input narrow" id="comp-char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+          <span class="char-lbl" data-i18n-char="pe">PE</span>
+          <span class="stat-split" id="stat-wrap-pe2">
+            <input class="char-input narrow stat-cur" id="comp-char-pe" type="text" placeholder="—" oninput="syncChar('pe',this.value)">
+            <span class="stat-slash" id="stat-slash-pe2">/</span>
+            <input class="char-input narrow stat-max" id="comp-char-pe-max" type="text" placeholder="—" oninput="syncCharMax('pe',this.value)">
+          </span>
           <span class="char-sep">|</span>
-          <span class="char-lbl" id="comp-dsnc-lbl">DSNC</span><input class="char-input narrow" id="comp-char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
+          <span class="char-lbl" id="comp-dsnc-lbl">DSNC</span>
+          <span class="stat-split" id="stat-wrap-dsnc2">
+            <input class="char-input narrow stat-cur" id="comp-char-dsnc" type="text" placeholder="—" oninput="syncChar('dsnc',this.value)">
+            <span class="stat-slash" id="stat-slash-dsnc2">/</span>
+            <input class="char-input narrow stat-max" id="comp-char-dsnc-max" type="text" placeholder="—" oninput="syncCharMax('dsnc',this.value)">
+          </span>
           <span class="char-sep">|</span>
           <span class="char-lbl" data-i18n-char="blessures">Blessures</span>
           <div class="blessure-wrap">
@@ -1133,6 +1229,9 @@ body {
           <span class="char-sep">|</span>
           <span class="char-lbl" id="comp-minos-lbl" style="white-space:nowrap;">Pièce de Minos</span>
           <input type="checkbox" id="comp-minos-cb" class="blessure-cb" onchange="syncMinos(this.checked)" style="accent-color:#c8922a;">
+        </div>
+        <div class="char-row" style="width:100%;">
+          <div id="comp-armor-stats"></div>
         </div>
       </div>
 
@@ -1252,23 +1351,32 @@ body {
         <!-- COL 1: Ressources + Magie + Statistiques -->
         <div class="param-col">
           <div class="param-section-title">📊 Ressources</div>
-          <div class="param-info">Nom complet et abréviation.</div>
+          <div class="param-info">Nom complet, abréviation, et format X/X.</div>
           <div class="param-fields" style="margin-top:4px;">
             <div class="param-row">
               <input class="param-input param-input-wide" id="cfg-pv-name" type="text" placeholder="Points de Vie" oninput="saveParamRes('pv','name',this.value)">
               <input class="param-input" id="cfg-pv" type="text" placeholder="PV" oninput="saveParamStat('pv',this.value)">
+              <input type="checkbox" id="cfg-pv-split" class="blessure-cb" title="Format X/X" checked onchange="saveParamResSplit('pv',this.checked)">
             </div>
             <div class="param-row">
               <input class="param-input param-input-wide" id="cfg-pa-name" type="text" placeholder="Points d'Armure" oninput="saveParamRes('pa','name',this.value)">
               <input class="param-input" id="cfg-pa" type="text" placeholder="PA" oninput="saveParamStat('pa',this.value)">
+              <input type="checkbox" id="cfg-pa-split" class="blessure-cb" title="Format X/X" checked onchange="saveParamResSplit('pa',this.checked)">
             </div>
             <div class="param-row">
               <input class="param-input param-input-wide" id="cfg-pe-name" type="text" placeholder="Points d'Endurance" oninput="saveParamRes('pe','name',this.value)">
               <input class="param-input" id="cfg-pe" type="text" placeholder="PE" oninput="saveParamStat('pe',this.value)">
+              <input type="checkbox" id="cfg-pe-split" class="blessure-cb" title="Format X/X" checked onchange="saveParamResSplit('pe',this.checked)">
             </div>
             <div class="param-row" id="cfg-ps-row">
               <input class="param-input param-input-wide" id="cfg-ps-name" type="text" placeholder="Points de Sort" oninput="saveParamRes('ps','name',this.value)">
               <input class="param-input" id="cfg-ps" type="text" placeholder="PS" oninput="saveParamStat('ps',this.value)">
+              <input type="checkbox" id="cfg-ps-split" class="blessure-cb" title="Format X/X" checked onchange="saveParamResSplit('ps',this.checked)">
+            </div>
+            <div class="param-row">
+              <input class="param-input param-input-wide" id="cfg-dsnc-name" type="text" placeholder="Dissonance" oninput="saveParamRes('dsnc','name',this.value)">
+              <input class="param-input" id="cfg-dsnc" type="text" placeholder="DSNC" oninput="saveParamStat('dsnc',this.value)">
+              <input type="checkbox" id="cfg-dsnc-split" class="blessure-cb" title="Format X/X" onchange="saveParamResSplit('dsnc',this.checked)">
             </div>
           </div>
 
@@ -1299,6 +1407,10 @@ body {
           </div>
           <div id="cfg-list-sta" class="param-list"></div>
           <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
+
+          <div class="param-section-title" style="margin-top:14px;">🛡 Stats d'Armure</div>
+          <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
+          <div id="cfg-armor-stats" style="margin-top:6px;"></div>
 
           <div style="margin-top:14px;">
             <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer compétences par défaut</button>
@@ -1499,6 +1611,10 @@ body {
     <div class="mfield" id="fEffetField"><label>Effet / Description</label><textarea id="fEffet" placeholder="Bonus, effets, notes..."></textarea></div>
     <div class="mfield" id="fCoutField" style="display:none;"><label>Coût</label><input type="text" id="fCout" placeholder="ex: 2 PE"></div>
     <div class="mfield" id="fImgField"><label>Lien d'image (optionnel)</label><input type="text" id="fImg" placeholder="https://..."></div>
+    <div id="fArmorStats" style="display:none;border-top:1px solid var(--border2);padding-top:8px;margin-top:4px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Stats d'Armure</div>
+      <div id="fArmorStatsList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;"></div>
+    </div>
     <div class="modal-btns">
       <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>
       <button class="btn" onclick="closeModal()">Annuler</button>
@@ -1600,13 +1716,13 @@ const LABELS = {
   cape:'Cape / Manteau', amulette:'Amulette', 'couvre-chef':'Couvre-Chef',
   arme:'Arme en Main', armure:'Armure', dos:'Dos', epaule:'Épaule',
   ceintureGauche:'Ceinture Gauche', ceintureDroite:'Ceinture Droite',
-  ceinture:'Ceinture', bottes:'Bottes', gants:'Gants', bracelet:'Bracelet',
+  ceinture:'Ceinture', bottes:'Bottes', divers:'Divers', gants:'Gants', bracelet:'Bracelet',
   anneau1:'Anneau — Gauche', anneau2:'Anneau — Droit', mun:'Munitions',
 };
 
 // Named equip slots that use nom/type/effet display
 const NAMED_SLOTS = ['couvre-chef','arme','armure','dos','epaule',
-  'ceintureGauche','ceintureDroite','ceinture','bottes','gants','bracelet',
+  'ceintureGauche','ceintureDroite','ceinture','bottes','divers','gants','bracelet',
   'amulette','cape','anneau1','anneau2'];
 
 let data = {}, curSlot = null;
@@ -1625,8 +1741,9 @@ function saveData() { persist(); toast('Sauvegardé !'); }
 function exportData() {
   const out = Object.assign({}, data, { _bagSize: document.getElementById('bagSize').value });
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const nom = (data._char?.nom || '').trim().replace(/[^a-zA-Z0-9_\-\. ]/g,'').trim() || 'Personnage';
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'inventaire-dnd.json'; a.click();
+  a.download = nom + ' - Midjaas.json'; a.click();
 }
 
 function importData(e) {
@@ -1637,7 +1754,7 @@ function importData(e) {
       data = JSON.parse(ev.target.result);
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow();
+      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); refreshArmorStats();
       persist(); toast('Importé !');
     } catch { toast('Erreur JSON'); }
   };
@@ -1649,7 +1766,7 @@ function clearAll() {
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); persist();
+  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); persist();
 }
 
 /* ── bag normal slots ── */
@@ -1876,6 +1993,23 @@ function open_(key, speLabel) {
   document.getElementById('fType').value = d.type || '';
   document.getElementById('fEffet').value = d.effet || '';
   document.getElementById('fImg').value = d.img || '';
+  // Armor stats fields — show only for armure slot
+  const armorSection = document.getElementById('fArmorStats');
+  if (key === 'armure') {
+    armorSection.style.display = '';
+    const list = document.getElementById('fArmorStatsList');
+    list.innerHTML = '';
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key: sk }) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+      wrap.innerHTML = `<label style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:42px;">${getArmorStatLabel(sk)}</label>
+        <input type="text" id="farmor-${sk}" value="${data._armorStats?.[sk]||''}" placeholder="—"
+          style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
+      list.appendChild(wrap);
+    });
+  } else {
+    armorSection.style.display = 'none';
+  }
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -1889,12 +2023,21 @@ function saveSlot() {
   const effet = document.getElementById('fEffet').value.trim();
   const img   = document.getElementById('fImg').value.trim();
   if (nom || type || effet || img) data[curSlot] = { nom, type, effet, img }; else delete data[curSlot];
+  // Save armor stats if armure slot
+  if (curSlot === 'armure') {
+    if (!data._armorStats) data._armorStats = {};
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
+      const inp = document.getElementById('farmor-'+key);
+      if (inp) data._armorStats[key] = inp.value.trim();
+    });
+  }
   persist();
   const k = curSlot;
   closeModal();
   if (k.startsWith('bag_') || k.startsWith('spe_')) buildBag();
   else if (k.startsWith('poche_')) buildPoche();
   else refresh();
+  if (k === 'armure') refreshArmorStats();
 }
 
 function clearSlot() {
@@ -2204,6 +2347,10 @@ function loadChar() {
   f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
   f('char-pv', c.pv); f('char-pa', c.pa); f('char-ps', c.ps); f('char-pe', c.pe);
   f('char-race', c.race); f('char-dsnc', c.dsnc);
+  f('char-pv-max', c['pv-max']); f('char-pa-max', c['pa-max']);
+  f('char-ps-max', c['ps-max']); f('char-pe-max', c['pe-max']);
+  f('char-dsnc-max', c['dsnc-max']);
+  applyStatSplits();
   fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
   if (c.gender) {
     document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
@@ -2228,7 +2375,218 @@ function showPage(name) {
 }
 
 /* ══ SYNC CHAR ══ */
-const CHAR_FIELDS = ['nom','age','naiss','pv','pa','ps','pe','race','dsnc'];
+const CHAR_FIELDS = ['nom','age','naiss','pv','pa','ps','pe','race','dsnc','pv-max','pa-max','ps-max','pe-max','dsnc-max'];
+
+// X/X split support
+function syncCharMax(stat, val) {
+  if (!data._char) data._char = {};
+  data._char[stat+'-max'] = val;
+  ['char-'+stat+'-max','comp-char-'+stat+'-max'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el !== document.activeElement) el.value = val || '';
+  });
+  const ficheEl = document.getElementById('fiche-'+stat+'-max');
+  if (ficheEl && ficheEl !== document.activeElement) ficheEl.value = val || '';
+  persist();
+}
+
+function saveParamResSplit(stat, enabled) {
+  if (!data._resSplit) data._resSplit = {};
+  data._resSplit[stat] = enabled; persist();
+  applyStatSplits();
+}
+
+function getResSplit(stat) {
+  if (!data._resSplit || data._resSplit[stat] === undefined) return true; // all split by default
+  return data._resSplit[stat];
+}
+
+function applyStatSplits() {
+  ['pv','pa','ps','pe','dsnc'].forEach(stat => {
+    const split = getResSplit(stat);
+    // Cartouche inventaire
+    const sl1 = document.getElementById('stat-slash-'+stat);
+    const mx1 = document.getElementById('char-'+stat+'-max');
+    if (sl1) sl1.style.display = split ? '' : 'none';
+    if (mx1) mx1.style.display = split ? '' : 'none';
+    // Cartouche compétences
+    const sl2 = document.getElementById('stat-slash-'+stat+'2');
+    const mx2 = document.getElementById('comp-char-'+stat+'-max');
+    if (sl2) sl2.style.display = split ? '' : 'none';
+    if (mx2) mx2.style.display = split ? '' : 'none';
+    // Fiche perso
+    const sl3 = document.getElementById('fiche-'+stat+'-slash');
+    const mx3 = document.getElementById('fiche-'+stat+'-max');
+    if (sl3) sl3.style.display = split ? '' : 'none';
+    if (mx3) mx3.style.display = split ? '' : 'none';
+    // Param checkbox
+    const cb = document.getElementById('cfg-'+stat+'-split');
+    if (cb) cb.checked = split;
+  });
+}
+
+
+/* ══ ARMOR STATS ══ */
+const ARMOR_STATS = [
+  { key: 'poids',  defaultLabel: 'Poids',  defaultName: 'Poids' },
+  { key: 'def',   defaultLabel: 'DEF',   defaultName: 'Défense' },
+  { key: 'res',   defaultLabel: 'RES',   defaultName: 'Résistance' },
+  { key: 'edpn',  defaultLabel: 'EDP-N', defaultName: 'EDP Normal' },
+  { key: 'edpp',  defaultLabel: 'EDP-P', defaultName: 'EDP Perçant' },
+  { key: 'edpm',  defaultLabel: 'EDP-M', defaultName: 'EDP Magique' },
+  { key: 'edpl',  defaultLabel: 'EDP-L', defaultName: 'EDP Laser' },
+];
+
+function getArmorStatLabel(key) {
+  return data._armorLabels?.[key] || ARMOR_STATS.find(s=>s.key===key)?.defaultLabel || key.toUpperCase();
+}
+function getArmorStatName(key) {
+  return data._armorNames?.[key] || ARMOR_STATS.find(s=>s.key===key)?.defaultName || key;
+}
+function isArmorStatEnabled(key) {
+  if (!data._armorEnabled || data._armorEnabled[key] === undefined) {
+    return key !== 'edpl'; // EDP-L disabled by default
+  }
+  return data._armorEnabled[key];
+}
+function saveArmorStatLabel(key, val) {
+  if (!data._armorLabels) data._armorLabels = {};
+  data._armorLabels[key] = val || ARMOR_STATS.find(s=>s.key===key)?.defaultLabel;
+  persist(); applyArmorStatLabels();
+}
+function saveArmorStatName(key, val) {
+  if (!data._armorNames) data._armorNames = {};
+  data._armorNames[key] = val;
+  persist();
+}
+function saveArmorStatEnabled(key, val) {
+  if (!data._armorEnabled) data._armorEnabled = {};
+  data._armorEnabled[key] = val;
+  persist(); refreshArmorStats();
+}
+function saveArmorStat(key, val) {
+  if (!data._armorStats) data._armorStats = {};
+  data._armorStats[key] = val; persist();
+  // Only update the armure slot display, not the cartouche inputs (would lose focus)
+  refreshArmureSlotOnly();
+}
+
+function refreshArmureSlotOnly() {
+  const armureEl = document.getElementById('sl-armure');
+  if (!armureEl) return;
+  const d = data.armure || {};
+  let inner = `<span class="lbl" data-i18n="armure">Armure</span>`;
+  inner += `<span class="val" id="dsp-armure-nom">${d.nom||'—'}</span>`;
+  if (d.type)  inner += `<span class="val-type" id="dsp-armure-type">${d.type}</span>`;
+  if (d.effet) inner += `<span class="val-effet" id="dsp-armure-effet">${d.effet}</span>`;
+  const activeStats = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
+  const hasValues = activeStats.some(s => data._armorStats?.[s.key]);
+  if (activeStats.length > 0 && (d.nom || hasValues)) {
+    inner += `<div class="armure-stats">`;
+    activeStats.forEach(({ key }) => {
+      const cur = data._armorStats?.[key] || '';
+      if (cur) inner += `<span class="armure-stat"><span class="armure-stat-lbl">${getArmorStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
+    });
+    inner += `</div>`;
+  }
+  armureEl.innerHTML = inner;
+}
+
+function applyArmorStatLabels() {
+  // Update all armor stat labels in cartouches, fiche, armure slot
+  ARMOR_STATS.forEach(({ key }) => {
+    const lbl = getArmorStatLabel(key);
+    document.querySelectorAll('[data-armor-lbl="'+key+'"]').forEach(el => { el.textContent = lbl; });
+  });
+  refreshArmorStats();
+}
+
+function refreshArmorStats() {
+  // Update armure slot display
+  refreshArmureSlotOnly();
+  // Update cartouche armor rows
+  updateArmorCartouche();
+  updateFicheArmorStats();
+}
+
+function updateArmorCartouche() {
+  // Inventaire — inline
+  const inv = document.getElementById('inv-armor-stats');
+  if (inv) {
+    inv.innerHTML = '';
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
+      const wrap = document.createElement('span');
+      wrap.className = 'armor-stat-cartouche';
+      const w = (key==='def'||key==='res') ? '55px' : '38px';
+      wrap.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
+        <input class="char-input narrow stat-cur" style="width:${w};" type="text" value="${data._armorStats?.[key]||''}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
+      inv.appendChild(wrap);
+    });
+  }
+  // Compétences — inline, même ligne
+  const comp = document.getElementById('comp-armor-stats');
+  if (comp) {
+    comp.innerHTML = '';
+    comp.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:4px;width:100%;';
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
+      const wrap2 = document.createElement('span');
+      wrap2.className = 'armor-stat-cartouche';
+      const w2 = (key==='def'||key==='res') ? '55px' : '38px';
+      wrap2.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
+        <input class="char-input narrow stat-cur" style="width:${w2};" type="text" value="${data._armorStats?.[key]||''}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
+      comp.appendChild(wrap2);
+    });
+  }
+}
+
+function updateFicheArmorStats() {
+  const el = document.getElementById('fiche-armor-stats');
+  if (!el) return;
+  el.innerHTML = '';
+  const active = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
+  const wFor = k => (['def','res','poids'].includes(k) ? '70px' : '42px');
+  // Render in pairs per row
+  for (let i = 0; i < active.length; i += 2) {
+    const row = document.createElement('div');
+    row.className = 'fiche-row';
+    row.style.gap = '6px';
+    const a = active[i];
+    row.innerHTML = `<span class="fiche-lbl" data-armor-lbl="${a.key}" style="font-size:13px;">${getArmorStatLabel(a.key)}</span>
+      <input class="fiche-stat-inp" style="width:${wFor(a.key)};" type="text" value="${data._armorStats?.[a.key]||''}" placeholder="—" oninput="saveArmorStat('${a.key}',this.value)">`;
+    if (active[i+1]) {
+      const b = active[i+1];
+      row.innerHTML += `<span class="fiche-sep" style="margin:0 4px;">|</span>
+        <span class="fiche-lbl" data-armor-lbl="${b.key}" style="font-size:13px;">${getArmorStatLabel(b.key)}</span>
+        <input class="fiche-stat-inp" style="width:${wFor(b.key)};" type="text" value="${data._armorStats?.[b.key]||''}" placeholder="—" oninput="saveArmorStat('${b.key}',this.value)">`;
+    }
+    el.appendChild(row);
+  }
+}
+
+function renderArmorParams() {
+  const container = document.getElementById('cfg-armor-stats');
+  if (!container) return;
+  container.innerHTML = '';
+  ARMOR_STATS.forEach(({ key, defaultLabel, defaultName }) => {
+    const row = document.createElement('div');
+    row.className = 'param-row';
+    row.style.gap = '6px';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.className = 'blessure-cb'; cb.checked = isArmorStatEnabled(key);
+    cb.title = 'Activer'; cb.onchange = () => saveArmorStatEnabled(key, cb.checked);
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-input param-input-wide'; nameInp.type = 'text';
+    nameInp.placeholder = defaultName; nameInp.value = getArmorStatName(key);
+    nameInp.oninput = () => saveArmorStatName(key, nameInp.value);
+    const lblInp = document.createElement('input');
+    lblInp.className = 'param-input'; lblInp.type = 'text'; lblInp.style.width = '60px';
+    lblInp.placeholder = defaultLabel; lblInp.value = getArmorStatLabel(key);
+    lblInp.oninput = () => saveArmorStatLabel(key, lblInp.value);
+    row.appendChild(cb); row.appendChild(nameInp); row.appendChild(lblInp);
+    container.appendChild(row);
+  });
+}
+
 function syncChar(field, val) {
   if (!data._char) data._char = {};
   data._char[field] = val;
@@ -2312,13 +2670,19 @@ function toggleInfuse(val) {
   [['comp-char-ps','ps-lbl'],['char-ps','inv-ps-lbl']].forEach(([inp,lbl]) => {
     const i = document.getElementById(inp);
     const l = document.getElementById(lbl);
+    const iMax = document.getElementById(inp+'-max');
+    const sl = inp==='char-ps' ? document.getElementById('stat-slash-ps') : document.getElementById('stat-slash-ps2');
     if (i) { i.disabled = !val; i.style.opacity = val?'1':'.4'; }
+    if (iMax) { iMax.disabled = !val; iMax.style.opacity = val?'1':'.4'; }
+    if (sl) sl.style.opacity = val?'1':'.4';
     if (l) l.style.opacity = val?'1':'.4';
   });
-  // PS field — fiche perso
+  // PS — fiche perso
   const fichePsInp = document.getElementById('fiche-ps');
+  const fichePsMax = document.getElementById('fiche-ps-max');
   const fichePsLbl = document.getElementById('fiche-ps-lbl');
   if (fichePsInp) { fichePsInp.disabled = !val; fichePsInp.style.opacity = val?'1':'.4'; }
+  if (fichePsMax) { fichePsMax.disabled = !val; fichePsMax.style.opacity = val?'1':'.4'; }
   if (fichePsLbl) fichePsLbl.style.opacity = val?'1':'.4';
   // magic rows
   document.querySelectorAll('#list-magiques .skill-dd-row').forEach(row => {
@@ -2515,7 +2879,8 @@ function renderLivreSorts() {
       } else {
         cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">Emplacement sort…</span>';
       }
-      cell.onclick = () => openSortModal(key, i, s);
+      cell.onclick = () => { if (!wasDragging) openSortModal(key, i, s); };
+      makeFreecelDraggable(cell, i, 'sort', key);
       sec.appendChild(cell);
     }
     body.appendChild(sec);
@@ -2564,6 +2929,63 @@ function saveSortSlot() {
 }
 
 /* ── Coups Spéciaux ── */
+/* ── Free-cell drag & drop (coups, savoirs, sorts) ── */
+let freeDragSrc = null; // { type, idx, sortKey? }
+
+function makeFreecelDraggable(el, idx, type, sortKey) {
+  el.draggable = true;
+  el.style.cursor = 'grab';
+
+  el.addEventListener('dragstart', e => {
+    wasDragging = false;
+    freeDragSrc = { type, idx, sortKey };
+    el.style.opacity = '0.5';
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', () => {
+    el.style.opacity = '';
+    setTimeout(() => { wasDragging = false; }, 50);
+  });
+  el.addEventListener('dragover', e => {
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    el.classList.add('drag-over');
+  });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
+    el.classList.remove('drag-over');
+    wasDragging = true;
+    if (!freeDragSrc) return;
+    const src = freeDragSrc;
+    freeDragSrc = null;
+    if (src.type !== type) return; // no cross-type drop (coups/savoirs/sorts)
+    if (src.idx === idx && src.sortKey === sortKey) return;
+    // Swap entries
+    if (type === 'coup') {
+      if (!data._coups) data._coups = [];
+      const a = data._coups[src.idx] || null;
+      const b = data._coups[idx] || null;
+      data._coups[src.idx] = b; data._coups[idx] = a;
+      persist(); renderCoups();
+    } else if (type === 'savoir') {
+      if (!data._savoirs) data._savoirs = [];
+      const a = data._savoirs[src.idx] || null;
+      const b = data._savoirs[idx] || null;
+      data._savoirs[src.idx] = b; data._savoirs[idx] = a;
+      persist(); renderSavoirs();
+    } else if (type === 'sort') {
+      if (!data._sorts) data._sorts = {};
+      if (!data._sorts[src.sortKey]) data._sorts[src.sortKey] = [];
+      if (!data._sorts[sortKey]) data._sorts[sortKey] = [];
+      const a = data._sorts[src.sortKey][src.idx] || null;
+      const b = data._sorts[sortKey][idx] || null;
+      data._sorts[src.sortKey][src.idx] = b;
+      data._sorts[sortKey][idx] = a;
+      persist(); renderLivreSorts();
+    }
+  });
+}
+
 function renderCoups() {
   const container = document.getElementById('list-coups');
   if (!container) return;
@@ -2587,7 +3009,8 @@ function renderCoups() {
     } else {
       cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (getCatLabel('coups') || 'Coup spécial…') + '</span>';
     }
-    cell.onclick = () => openFreeModal('coup', i, coup);
+    cell.onclick = () => { if (!wasDragging) openFreeModal('coup', i, coup); };
+    makeFreecelDraggable(cell, i, 'coup');
     container.appendChild(cell);
   }
 }
@@ -2615,7 +3038,8 @@ function renderSavoirs() {
     } else {
       cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (getCatLabel('savoirs') || 'Connaissance…') + '</span>';
     }
-    cell.onclick = () => openFreeModal('savoir', i, sav);
+    cell.onclick = () => { if (!wasDragging) openFreeModal('savoir', i, sav); };
+    makeFreecelDraggable(cell, i, 'savoir');
     container.appendChild(cell);
   }
 }
@@ -2666,8 +3090,17 @@ function renderCompetences() {
   const cpCount = document.getElementById('cp-count');
   if (cpCount) cpCount.textContent = '('+cnt+'/'+max+')';
 
-  // Update section titles from i18n
-  document.querySelectorAll('[data-i18n-comp]').forEach(el => { el.textContent = t(el.dataset.i18nComp); });
+  // Update section titles — respect custom labels
+  const CAT_KEY_MAP = { comp_principales:'pri', comp_secondaires:'sec', comp_martiales:'mar', comp_magiques:'mag', savoirs:'savoirs', coups:'coups', livre_sorts:'livre' };
+  document.querySelectorAll('[data-i18n-comp]').forEach(el => {
+    const i18nKey = el.dataset.i18nComp;
+    const catKey = CAT_KEY_MAP[i18nKey];
+    if (catKey && data._catLabels?.[catKey]) {
+      el.textContent = data._catLabels[catKey]; // custom label wins
+    } else {
+      el.textContent = t(i18nKey); // fallback to i18n
+    }
+  });
 
   const levels      = getLevelsForCat('pri'); // pri/sec/mar may differ
   const levelsMagic = getLevelsForCat('mag');
@@ -2784,7 +3217,7 @@ const I18N = {
     amulette: 'Amulette', 'couvre-chef': 'Couvre-Chef', gants: 'Gants',
     bracelet: 'Bracelet', armure: 'Armure', cape: 'Cape / Manteau',
     anneau1: 'Anneau', anneau2: 'Anneau',
-    ceinture: 'Ceinture', bottes: 'Bottes',
+    ceinture: 'Ceinture', bottes: 'Bottes', divers: 'Divers',
     arme: 'Arme en Main', dos: 'Dos', epaule: 'Épaule',
     ceintureGauche: 'Ceinture — Gauche', ceintureDroite: 'Ceinture — Droite',
     sac: 'Sac', poches: 'Poches', munitions: 'Munitions', bourse: 'Bourse',
@@ -2814,7 +3247,7 @@ const I18N = {
     amulette: 'Amulet', 'couvre-chef': 'Headgear', gants: 'Gloves',
     bracelet: 'Bracelet', armure: 'Armor', cape: 'Cape / Cloak',
     anneau1: 'Ring', anneau2: 'Ring',
-    ceinture: 'Belt', bottes: 'Boots',
+    ceinture: 'Belt', bottes: 'Boots', divers: 'Misc.',
     arme: 'Weapon in Hand', dos: 'Back', epaule: 'Shoulder',
     ceintureGauche: 'Belt — Left', ceintureDroite: 'Belt — Right',
     sac: 'Bag', poches: 'Pockets', munitions: 'Ammo', bourse: 'Purse',
@@ -2849,7 +3282,12 @@ function applyI18n() {
   document.getElementById('nav-capital').textContent     = t('nav_capital');
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-char]').forEach(el => { el.textContent = t(el.dataset.i18nChar); });
-  document.querySelectorAll('[data-i18n-comp]').forEach(el => { el.textContent = t(el.dataset.i18nComp); });
+  const CAT_KEY_MAP2 = { comp_principales:'pri', comp_secondaires:'sec', comp_martiales:'mar', comp_magiques:'mag', savoirs:'savoirs', coups:'coups', livre_sorts:'livre' };
+  document.querySelectorAll('[data-i18n-comp]').forEach(el => {
+    const catKey = CAT_KEY_MAP2[el.dataset.i18nComp];
+    if (catKey && data._catLabels?.[catKey]) el.textContent = data._catLabels[catKey];
+    else el.textContent = t(el.dataset.i18nComp);
+  });
   // PS label (has id, not data-i18n-char)
   const psLbl = document.getElementById('ps-lbl');
   if (psLbl) psLbl.textContent = t('ps');
@@ -2955,6 +3393,7 @@ function applyParamShow() {
   // Statistiques section in comp page
   const statsEl = document.getElementById('comp-stats-section');
   if (statsEl) statsEl.style.display = isShown('stats') ? '' : 'none';
+  const magEnabled = data._magieEnabled !== false;
   // Comp sections
   const sections = {
     pri: 'list-principales', sec: 'list-secondaires',
@@ -2964,10 +3403,20 @@ function applyParamShow() {
   Object.entries(sections).forEach(([cat, listId]) => {
     const listEl = document.getElementById(listId);
     const titleEl = listEl?.previousElementSibling;
-    const show = isShown(cat);
+    // mag is always hidden if magie disabled, regardless of isShown
+    const show = (cat === 'mag' ? magEnabled && isShown(cat) : isShown(cat));
     if (listEl)  listEl.style.display  = show ? '' : 'none';
     if (titleEl) titleEl.style.display = show ? '' : 'none';
   });
+  // Livre de sorts — also respects magie setting
+  const livreBody = document.getElementById('livre-sorts-body');
+  const livreTitle = livreBody?.previousElementSibling;
+  const showLivre = magEnabled && isShown('mag');
+  if (livreBody)  livreBody.style.display  = showLivre ? '' : 'none';
+  if (livreTitle) livreTitle.style.display = showLivre ? '' : 'none';
+  // Entire last comp-col (mag + livre)
+  const magCol = document.querySelector('.comp-body .comp-col:last-child');
+  if (magCol) magCol.style.display = magEnabled ? '' : 'none';
 }
 
 // Category formats
@@ -3007,13 +3456,19 @@ function saveParamStat(stat, val) {
 }
 
 function applyStatLabels() {
-  ['pv','pa','pe','ps'].forEach(s => {
+  ['pv','pa','pe','ps','dsnc'].forEach(s => {
     const lbl = getStatLabel(s);
     document.querySelectorAll('[data-i18n-char="'+s+'"]').forEach(el => { el.textContent = lbl; });
     if (s==='ps') {
       const a = document.getElementById('inv-ps-lbl');
       const b = document.getElementById('ps-lbl');
       if(a) a.textContent = lbl; if(b) b.textContent = lbl;
+    }
+    if (s==='dsnc') {
+      const a = document.getElementById('inv-dsnc-lbl');
+      const b = document.getElementById('comp-dsnc-lbl');
+      const c2 = document.getElementById('fiche-dsnc-lbl');
+      if(a) a.textContent = lbl; if(b) b.textContent = lbl; if(c2) c2.textContent = lbl;
     }
     ['char-'+s,'comp-char-'+s].forEach(id => {
       const el = document.getElementById(id); if(el) el.placeholder = lbl;
@@ -3156,6 +3611,8 @@ function renderParametres() {
     if(nameEl) nameEl.value = getResName(s);
     if(abbEl)  abbEl.value  = getStatLabel(s);
   });
+  // Armor stats params
+  renderArmorParams();
   // Level names & colors
   renderLevelParams();
   // Bags & spe
@@ -3182,7 +3639,15 @@ function renderParametres() {
     const el = document.getElementById('cfg-max-'+cat);
     if (el) el.value = getMaxForCat(cat);
   });
-  // PS row
+  // Stat labels (pv, pa, pe, ps, dsnc)
+  ['pv','pa','pe','ps','dsnc'].forEach(s => {
+    const nameEl = document.getElementById('cfg-'+s+'-name');
+    const abbrEl = document.getElementById('cfg-'+s);
+    if (nameEl) nameEl.value = data._resNames?.[s] || '';
+    if (abbrEl) abbrEl.value = getStatLabel(s) === s.toUpperCase() ? '' : getStatLabel(s);
+    const splitCb = document.getElementById('cfg-'+s+'-split');
+    if (splitCb) splitCb.checked = getResSplit(s);
+  });
   const psRow = document.getElementById('cfg-ps-row');
   if(psRow) psRow.style.display = data._magieEnabled!==false ? '' : 'none';
   // Infusion + Magie toggles
@@ -3226,6 +3691,10 @@ function renderFiche() {
   setV('fiche-pv', c.pv); setV('fiche-pa', c.pa);
   setV('fiche-pe', c.pe); setV('fiche-ps', c.ps);
   setV('fiche-dsnc', c.dsnc);
+  setV('fiche-pv-max', c['pv-max']); setV('fiche-pa-max', c['pa-max']);
+  setV('fiche-pe-max', c['pe-max']); setV('fiche-ps-max', c['ps-max']);
+  setV('fiche-dsnc-max', c['dsnc-max']);
+  applyStatSplits();
 
   // Apply stat labels from params
   ['pv','pa','pe'].forEach(s => {
@@ -3361,7 +3830,9 @@ applyCatLabels();
 applyMagieSetting();
 applyParamShow();
 applyFontSizes();
+applyStatSplits();
 updateBagSelect();
+refreshArmorStats();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
 renderFiche();
