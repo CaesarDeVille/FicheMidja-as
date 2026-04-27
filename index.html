@@ -366,7 +366,7 @@ body {
 /* ══ COMPÉTENCES PAGE ══ */
 .comp-layout {
   display: flex; flex-direction: column; gap: 10px;
-  flex: 1; min-height: 0; overflow: hidden;
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
 }
 .comp-char-panel {
   background: var(--char-panel); border: 1.5px solid var(--border2); border-radius: 4px;
@@ -375,8 +375,17 @@ body {
   align-self: flex-start; width: auto; min-width: min(600px, 100%); max-width: 100%;
 }
 .comp-body {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(8px,1%,16px);
-  flex: 1; min-height: 0; overflow-y: auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,1%,16px);
+  flex: 0 0 auto; overflow-y: auto;
+}
+.comp-magie-row {
+  flex: 0 0 auto; margin-top: clamp(8px,1%,16px);
+}
+.comp-magie-row .comp-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.comp-livre-row {
+  flex: 1; min-height: 0; margin-top: clamp(8px,1%,16px); overflow-y: auto;
 }
 .comp-col { display: flex; flex-direction: column; gap: 4px; }
 .comp-section-title {
@@ -1076,9 +1085,7 @@ body {
                 style="background:transparent;border:none;color:var(--muted);font-family:var(--font);font-size:11px;text-transform:uppercase;letter-spacing:.5px;outline:none;width:100%;text-align:center;"
                 oninput="saveBourseLabel(this.value)">
             </div>
-            <div class="mun-counter" style="gap:4px;">
-              <input class="mun-input" id="bourse-val" type="text" placeholder="0" title="Montant" style="width:52px;" oninput="saveBourse()">
-              <input class="mun-input" id="bourse-devise" type="text" placeholder="Đ" title="Devise" style="width:28px;border-left:1px solid var(--border2);padding-left:4px;" oninput="saveBourse()">
+            <div class="mun-counter" style="gap:4px;flex-direction:column;justify-content:center;padding:4px 6px;" id="bourse-rows">
             </div>
           </div>
         </div>
@@ -1114,6 +1121,18 @@ body {
           <input class="fiche-stat-inp" id="fiche-naiss-inp" type="text" placeholder="—" style="width:80px;" oninput="syncChar('naiss',this.value)">
         </div>
 
+        <div class="fiche-row">
+          <span class="fiche-lbl" id="fiche-infuse-lbl" data-i18n-char="infuse">Infusé ?</span>
+          <input type="checkbox" id="fiche-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
+          <span class="fiche-sep">|</span>
+          <label class="fiche-main-lbl">
+            <input type="radio" name="main-dominante" value="droite" onchange="saveFicheMain('droite')" checked> Droitier
+          </label>
+          <label class="fiche-main-lbl">
+            <input type="radio" name="main-dominante" value="gauche" onchange="saveFicheMain('gauche')"> Gaucher
+          </label>
+        </div>
+
         <div class="fiche-row" style="gap:8px;">
           <span class="fiche-lbl" id="fiche-pv-lbl" style="font-size:13px;">PV</span>
           <input class="fiche-stat-inp" id="fiche-pv" type="text" placeholder="—" oninput="syncChar('pv',this.value)">
@@ -1146,24 +1165,10 @@ body {
         <div class="fiche-section-title" style="margin-top:4px;">Armure</div>
         <div id="fiche-armor-stats"></div>
 
-        <div class="fiche-row">
-          <span class="fiche-lbl" id="fiche-infuse-lbl" data-i18n-char="infuse">Infusé ?</span>
-          <input type="checkbox" id="fiche-infuse-cb" class="blessure-cb" onchange="toggleInfuse(this.checked)" style="accent-color:#7ab8d4;">
-        </div>
-
-        <div class="fiche-row">
-          <label class="fiche-main-lbl">
-            <input type="radio" name="main-dominante" value="droite" onchange="saveFicheMain('droite')" checked> Droitier
-          </label>
-          <label class="fiche-main-lbl">
-            <input type="radio" name="main-dominante" value="gauche" onchange="saveFicheMain('gauche')"> Gaucher
-          </label>
-        </div>
-
-        <div class="fiche-section-title">Caractère</div>
+        <div class="fiche-section-title"><span data-fiche-section="caractere">Caractère</span></div>
         <textarea class="fiche-textarea" id="fiche-caractere" placeholder="Personnalité, tempérament, traits de caractère…" oninput="saveFicheField('caractere',this.value)" style="flex:1;"></textarea>
 
-        <div class="fiche-section-title">Physique</div>
+        <div class="fiche-section-title"><span data-fiche-section="physique">Physique</span></div>
         <textarea class="fiche-textarea" id="fiche-physique" placeholder="Description physique, taille, particularités…" oninput="saveFicheField('physique',this.value)" style="flex:1;"></textarea>
       </div>
 
@@ -1178,7 +1183,7 @@ body {
 
       <!-- COL DROITE : Histoire -->
       <div class="fiche-right">
-        <div class="fiche-section-title">Histoire</div>
+        <div class="fiche-section-title"><span data-fiche-section="histoire">Histoire</span></div>
         <textarea class="fiche-textarea fiche-histoire" id="fiche-histoire" rows="30" placeholder="Histoire, origines, événements marquants…" oninput="saveFicheField('histoire',this.value)"></textarea>
       </div>
 
@@ -1288,10 +1293,10 @@ body {
         </div>
       </div>
 
-      <!-- COMPÉTENCES BODY : 3 cols -->
+      <!-- COMPÉTENCES BODY : 2 cols haut, ligne magie, livre 3 cols -->
       <div class="comp-body">
 
-        <!-- COL 1: Principales + Secondaires + Savoirs -->
+        <!-- COL 1: Principales + Secondaires + Connaissances -->
         <div class="comp-col">
           <div class="comp-section-title">
             <span data-i18n-comp="comp_principales">Compétences Principales</span>
@@ -1315,19 +1320,23 @@ body {
           <div id="list-coups"></div>
         </div>
 
-        <!-- COL 3: Magiques + Livre de Sorts -->
-        <div class="comp-col">
-          <div class="comp-section-title">
-            <span data-i18n-comp="comp_magiques">Compétences Magiques</span>
-            <span style="font-size:10px;color:var(--dim);" data-i18n-comp="comp_magiques_sub">(Infusé requis)</span>
-          </div>
-          <div class="comp-list" id="list-magiques"></div>
-
-          <div class="comp-section-title" style="margin-top:12px;"><span data-i18n-comp="livre_sorts">Livre de Sorts</span></div>
-          <div id="livre-sorts-body" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
-
       </div>
+
+      <!-- LIGNE MAGIE (pleine largeur) -->
+      <div class="comp-magie-row">
+        <div class="comp-section-title">
+          <span data-i18n-comp="comp_magiques">Compétences Magiques</span>
+          <span style="font-size:10px;color:var(--dim);" data-i18n-comp="comp_magiques_sub">(Infusé requis)</span>
+        </div>
+        <div class="comp-list" id="list-magiques"></div>
+      </div>
+
+      <!-- LIVRE DE SORTS (pleine largeur, 3 colonnes internes) -->
+      <div class="comp-livre-row">
+        <div class="comp-section-title"><span data-i18n-comp="livre_sorts">Livre de Sorts</span></div>
+        <div id="livre-sorts-body" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
     </div>
 </div><!-- end page-competences -->
 
@@ -1380,11 +1389,11 @@ body {
       <!-- ACCORDÉON : Apparence -->
       <div class="param-accordion open">
         <div class="param-accordion-header" onclick="toggleAccordion(this)">
-          <span class="param-accordion-title">🎨 Apparence</span>
+          <span class="param-accordion-title">&#9733; Apparence</span>
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
-          <div class="param-cols" style="grid-template-columns:200px 1fr 1fr;">
+          <div class="param-cols" style="grid-template-columns:200px 1fr 1fr 1fr;">
 
             <!-- Couleurs & Police -->
             <div class="param-col">
@@ -1419,14 +1428,14 @@ body {
 
             <!-- Taille des textes -->
             <div class="param-col">
-              <div class="param-section-title">📐 Taille des textes</div>
+              <div class="param-section-title">&#9632; Taille des textes</div>
               <div class="param-fields" style="margin-top:4px;">
                 <div class="param-row"><span class="param-lbl">Nom objet</span><input class="param-max-input" style="width:52px;" id="cfg-fs-nom" type="number" min="8" max="24" value="14" oninput="saveFontSize('nom',this.value)"><span class="param-info">px</span></div>
                 <div class="param-row"><span class="param-lbl">Type objet</span><input class="param-max-input" style="width:52px;" id="cfg-fs-type" type="number" min="8" max="24" value="12" oninput="saveFontSize('type',this.value)"><span class="param-info">px</span></div>
                 <div class="param-row"><span class="param-lbl">Effet/Desc.</span><input class="param-max-input" style="width:52px;" id="cfg-fs-effet" type="number" min="8" max="24" value="12" oninput="saveFontSize('effet',this.value)"><span class="param-info">px</span></div>
                 <button class="param-add-btn" style="margin-top:4px;" onclick="resetFontSizes()">↺ Défaut</button>
               </div>
-              <div class="param-section-title" style="margin-top:14px;">🔷 Niveaux de Compétences</div>
+              <div class="param-section-title" style="margin-top:14px;">&#9670; Niveaux de Compétences</div>
               <div class="param-info">Renomme et colore les 4 niveaux.</div>
               <div class="param-fields" style="margin-top:4px;" id="cfg-levels-list"></div>
               <button class="param-add-btn" style="margin-top:4px;" onclick="resetLevelDefaults()">↺ Défaut</button>
@@ -1434,9 +1443,16 @@ body {
 
             <!-- Qualité / Rareté -->
             <div class="param-col">
-              <div class="param-section-title">💎 Qualité / Rareté</div>
-              <div class="param-info">Couleur et nom des 4 niveaux.</div>
+              <div class="param-section-title">&#9670; Qualité / Rareté</div>
+              <div class="param-info">Couleur, nom et nombre de niveaux.</div>
               <div id="cfg-quality-list" class="param-fields" style="margin-top:4px;"></div>
+            </div>
+
+            <!-- Intitulés Fiche Perso -->
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Fiche Perso</div>
+              <div class="param-info">Renomme les sections Caractère, Physique et Histoire.</div>
+              <div id="cfg-fiche-labels" style="margin-top:4px;"></div>
             </div>
 
           </div>
@@ -1446,15 +1462,15 @@ body {
       <!-- ACCORDÉON : Ressources -->
       <div class="param-accordion">
         <div class="param-accordion-header" onclick="toggleAccordion(this)">
-          <span class="param-accordion-title">📊 Ressources &amp; Magie</span>
+          <span class="param-accordion-title">&#9670; Ressources &amp; Magie</span>
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
-          <div class="param-cols" style="grid-template-columns:240px 1fr;">
+          <div class="param-cols" style="grid-template-columns:240px 1fr 1fr;">
 
             <!-- Ressources -->
             <div class="param-col">
-              <div class="param-section-title">📊 Ressources</div>
+              <div class="param-section-title">&#9670; Ressources</div>
               <div class="param-info">Nom complet, abréviation, et format X/X.</div>
               <div class="param-fields" style="margin-top:4px;">
                 <div class="param-row">
@@ -1487,7 +1503,7 @@ body {
 
             <!-- Magie -->
             <div class="param-col">
-              <div class="param-section-title">🔮 Magie</div>
+              <div class="param-section-title">&#9670; Magie</div>
               <div class="param-row" style="margin-top:6px;">
                 <label class="param-toggle-lbl">
                   <input type="checkbox" id="cfg-magie" class="blessure-cb" onchange="saveParamMagie(this.checked)" style="accent-color:#7ab8d4;" checked>
@@ -1504,8 +1520,55 @@ body {
                 </div>
                 <div class="param-info">Si décoché, "Infusé ?" disparaît.</div>
               </div>
-              <div class="param-section-title" style="margin-top:14px;">Statistiques</div>
-              <div class="param-cat-header" style="margin-top:6px;">
+            </div>
+
+            <!-- Compétences Magiques + Livre de Sorts -->
+            <div class="param-col">
+              <div class="param-cat-header">
+                <input class="param-cat-name-input" id="cfg-name-mag" type="text" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
+                <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+                  <span class="param-info" style="font-style:normal;">Max</span>
+                  <input class="param-max-input" id="cfg-max-mag" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mag',this.value)">
+                  <span class="param-info" style="font-style:normal;">Afficher</span>
+                  <input type="checkbox" id="cfg-show-mag" class="blessure-cb" onchange="saveParamShow('mag',this.checked)" checked>
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
+                <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mag" onchange="saveParamFormat('mag',this.value)">
+                  <option value="AEM">AEM</option><option value="NAEM">NAEM</option><option value="CUSTOM">Personnalisé</option>
+                </select>
+                <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺</button>
+              </div>
+              <div id="cfg-list-mag" class="param-list"></div>
+              <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
+
+              <div class="param-cat-header" style="margin-top:14px;">
+                <input class="param-cat-name-input" id="cfg-name-livre" type="text" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
+                <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
+                  <span class="param-info" style="font-style:normal;">Max/magie</span>
+                  <input class="param-max-input" id="cfg-max-livre" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('livre',this.value)">
+                  <span class="param-info" style="font-style:normal;">Afficher</span>
+                  <input type="checkbox" id="cfg-show-livre" class="blessure-cb" onchange="saveParamShow('livre',this.checked)" checked>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCORDÉON : Stats / Compétences -->
+      <div class="param-accordion">
+        <div class="param-accordion-header" onclick="toggleAccordion(this)">
+          <span class="param-accordion-title">&#9876; Stats &amp; Compétences</span>
+          <span class="param-accordion-arrow">▼</span>
+        </div>
+        <div class="param-accordion-body">
+          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr;">
+
+            <!-- Statistiques -->
+            <div class="param-col">
+              <div class="param-cat-header">
                 <input class="param-cat-name-input" id="cfg-name-stats" type="text" value="Statistiques" oninput="saveParamCatLabel('stats',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
                   <span class="param-info" style="font-style:normal;">Afficher</span>
@@ -1518,20 +1581,8 @@ body {
                 <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer compétences par défaut</button>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ACCORDÉON : Stats / Compétences -->
-      <div class="param-accordion">
-        <div class="param-accordion-header" onclick="toggleAccordion(this)">
-          <span class="param-accordion-title">⚔ Stats &amp; Compétences</span>
-          <span class="param-accordion-arrow">▼</span>
-        </div>
-        <div class="param-accordion-body">
-          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
-
-            <!-- Principales + Secondaires -->
+            <!-- Principales + Secondaires + Connaissances -->
             <div class="param-col">
               <div class="param-cat-header">
                 <input class="param-cat-name-input" id="cfg-name-pri" type="text" value="Compétences Principales" oninput="saveParamCatLabel('pri',this.value)">
@@ -1613,37 +1664,6 @@ body {
               </div>
             </div>
 
-            <!-- Magiques + Livre + Connaissances -->
-            <div class="param-col">
-              <div class="param-cat-header">
-                <input class="param-cat-name-input" id="cfg-name-mag" type="text" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
-                <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
-                  <span class="param-info" style="font-style:normal;">Max</span>
-                  <input class="param-max-input" id="cfg-max-mag" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mag',this.value)">
-                  <span class="param-info" style="font-style:normal;">Afficher</span>
-                  <input type="checkbox" id="cfg-show-mag" class="blessure-cb" onchange="saveParamShow('mag',this.checked)" checked>
-                </div>
-              </div>
-              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;">
-                <select class="param-format-sel" style="flex:1;" id="cfg-fmt-mag" onchange="saveParamFormat('mag',this.value)">
-                  <option value="AEM">AEM</option><option value="NAEM">NAEM</option><option value="CUSTOM">Personnalisé</option>
-                </select>
-                <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺</button>
-              </div>
-              <div id="cfg-list-mag" class="param-list"></div>
-              <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
-
-              <div class="param-cat-header" style="margin-top:14px;">
-                <input class="param-cat-name-input" id="cfg-name-livre" type="text" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
-                <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
-                  <span class="param-info" style="font-style:normal;">Max/magie</span>
-                  <input class="param-max-input" id="cfg-max-livre" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('livre',this.value)">
-                  <span class="param-info" style="font-style:normal;">Afficher</span>
-                  <input type="checkbox" id="cfg-show-livre" class="blessure-cb" onchange="saveParamShow('livre',this.checked)" checked>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -1651,22 +1671,32 @@ body {
       <!-- ACCORDÉON : Inventaire -->
       <div class="param-accordion">
         <div class="param-accordion-header" onclick="toggleAccordion(this)">
-          <span class="param-accordion-title">🎒 Inventaire</span>
+          <span class="param-accordion-title">&#9744; Inventaire</span>
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
-          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
 
             <!-- Stats d'Armure -->
             <div class="param-col">
-              <div class="param-section-title">🛡 Stats d'Armure</div>
+              <div class="param-section-title">&#9632; Stats d'Armure</div>
               <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
               <div id="cfg-armor-stats" style="margin-top:6px;"></div>
+              <div class="param-section-title" style="margin-top:14px;">&#9632; Bourse</div>
+              <div class="param-info">Nombre de monnaies affichées.</div>
+              <div class="param-row" style="margin-top:6px;gap:8px;">
+                <select id="cfg-bourse-count" onchange="saveBourseCount(+this.value)"
+                  style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:3px;">
+                  <option value="1">1 monnaie</option>
+                  <option value="2">2 monnaies</option>
+                  <option value="3">3 monnaies</option>
+                </select>
+              </div>
             </div>
 
             <!-- Types de Sacs -->
             <div class="param-col">
-              <div class="param-section-title">🎒 Types de Sacs</div>
+              <div class="param-section-title">&#9632; Types de Sacs</div>
               <div class="param-info">Renomme, modifie les emplacements, ou ajoute un type.</div>
               <div id="cfg-bags-list" class="param-list" style="margin-top:6px;"></div>
               <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomBag()">+ Ajouter un type de sac</button>
@@ -1674,10 +1704,17 @@ body {
 
             <!-- Emplacements Spéciaux -->
             <div class="param-col">
-              <div class="param-section-title">✦ Emplacements Spéciaux</div>
+              <div class="param-section-title">&#10022; Emplacements Spéciaux</div>
               <div class="param-info">Configure chaque emplacement spécial.</div>
               <div id="cfg-spe-list" class="param-list" style="margin-top:6px;"></div>
               <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomSpe()">+ Ajouter un emplacement</button>
+            </div>
+
+            <!-- Labels des slots d'inventaire -->
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Intitulés des slots</div>
+              <div class="param-info">Renomme chaque case de l'inventaire.</div>
+              <div id="cfg-slot-labels" style="margin-top:6px;"></div>
             </div>
 
           </div>
@@ -1685,6 +1722,14 @@ body {
       </div>
 
     </div><!-- end param-layout -->
+
+    <!-- Reset global -->
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:center;">
+      <button class="param-reset-btn" style="padding:10px 32px;font-size:13px;letter-spacing:1px;" onclick="if(confirm('Réinitialiser TOUTES les données ? Cette action est irréversible.')) clearAll()">
+        &#9888; Réinitialiser tous les paramètres
+      </button>
+    </div>
+
   </div><!-- end page-parametres -->
 
 </div><!-- end app -->
@@ -1849,7 +1894,7 @@ function importData(e) {
       data = JSON.parse(ev.target.result);
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats();
+      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels();
       setTimeout(() => {
         resizeAllCartouche();
         document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
@@ -1865,7 +1910,8 @@ function clearAll() {
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); persist();
+  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
+  applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors(); persist();
 }
 
 /* ── bag normal slots ── */
@@ -1922,6 +1968,8 @@ function buildBag() {
     el.onclick = () => { if (!wasDragging) open_(k); };
     makeDraggable(el, k);
     makeDropTarget(el, k);
+    if (!isLivre) applyQualityColor(el, d?.quality !== undefined ? d.quality : null);
+    else if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
     g.appendChild(el);
   }
 
@@ -1940,6 +1988,7 @@ function buildBag() {
       el.onclick = () => { if (!wasDragging) open_(k, label); };
       makeDraggable(el, k);
       makeDropTarget(el, k);
+      if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
       g.appendChild(el);
     }
   });
@@ -1960,11 +2009,10 @@ function buildPoche() {
     el.onclick = () => { if (!wasDragging) open_(k); };
     makeDraggable(el, k);
     makeDropTarget(el, k);
+    if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
     g.appendChild(el);
   }
 }
-
-/* ── spe slots ── */
 function buildSpe() {
   const sz = document.getElementById('bagSize').value;
   const bags = getCustomBags();
@@ -2079,10 +2127,7 @@ function refresh() {
   if (ci && mc != null) ci.value = mc; if (mi && mm != null) mi.value = mm;
   const bl = document.getElementById('bourse-label');
   if (bl) bl.value = data._bourseLabel || 'Bourse';
-  const bi = document.getElementById('bourse-val');
-  const bd = document.getElementById('bourse-devise');
-  if (bi) bi.value = data._bourse || '';
-  if (bd) bd.value = data._bourseDevise || 'Đ';
+  buildBourseRows();
 }
 
 function open_(key, speLabel) {
@@ -2090,7 +2135,7 @@ function open_(key, speLabel) {
   const label = key.startsWith('bag_') ? 'Sac — Emplacement ' + (+key.split('_')[1] + 1)
     : key.startsWith('poche_') ? 'Poche ' + (+key.split('_')[1] + 1)
     : key.startsWith('spe_') ? (speLabel || 'Emplacement spécial')
-    : LABELS[key] || key;
+    : getSlotLabel(key) || key;
   document.getElementById('modalTitle').textContent = label;
   const d = data[key] || {};
   document.getElementById('fNom').value = d.nom || '';
@@ -2384,6 +2429,132 @@ function applyEffetsPlus() {
   if (cb) cb.checked = !!(data._effetsPlus);
 }
 
+/* ══ SLOT LABELS (inventaire) ══ */
+function getSlotLabel(key) {
+  return data._slotLabels?.[key] || LABELS[key] || key;
+}
+function saveSlotLabel(key, val) {
+  if (!data._slotLabels) data._slotLabels = {};
+  data._slotLabels[key] = val || LABELS[key] || key;
+  persist();
+  // Update displayed label in slot
+  const el = document.querySelector('#sl-'+key+' .lbl');
+  if (el) el.textContent = getSlotLabel(key);
+  // Also update modal title if open
+  if (curSlot === key) document.getElementById('modalTitle').textContent = getSlotLabel(key);
+}
+function applySlotLabels() {
+  NAMED_SLOTS.forEach(k => {
+    const el = document.querySelector('#sl-'+k+' .lbl');
+    if (el) el.textContent = getSlotLabel(k);
+  });
+}
+
+/* ══ FICHE SECTION LABELS ══ */
+const FICHE_SECTION_DEFAULTS = {
+  caractere: 'Caractère',
+  physique:  'Physique',
+  histoire:  'Histoire',
+};
+function getFicheSectionLabel(key) {
+  return data._ficheSectionLabels?.[key] || FICHE_SECTION_DEFAULTS[key] || key;
+}
+function saveFicheSectionLabel(key, val) {
+  if (!data._ficheSectionLabels) data._ficheSectionLabels = {};
+  data._ficheSectionLabels[key] = val || FICHE_SECTION_DEFAULTS[key];
+  persist(); applyFicheSectionLabels();
+}
+function applyFicheSectionLabels() {
+  Object.keys(FICHE_SECTION_DEFAULTS).forEach(key => {
+    document.querySelectorAll('[data-fiche-section="'+key+'"]').forEach(el => {
+      el.textContent = getFicheSectionLabel(key);
+    });
+  });
+}
+
+/* ══ DYNAMIC QUALITIES ══ */
+function addQuality() {
+  if (!data._qualities) data._qualities = QUALITY_DEFAULTS.map(q=>({...q}));
+  data._qualities.push({ key: 'q'+Date.now(), label: 'Nouvelle qualité', color: '#aaaaaa' });
+  persist(); renderQualityParams();
+}
+function removeQuality(idx) {
+  if (!data._qualities) data._qualities = QUALITY_DEFAULTS.map(q=>({...q}));
+  if (data._qualities.length <= 1) return;
+  data._qualities.splice(idx, 1);
+  persist(); renderQualityParams(); applyAllQualityColors();
+}
+
+function renderQualityParams() {
+  const container = document.getElementById('cfg-quality-list');
+  if (!container) return;
+  container.innerHTML = '';
+  const qualities = data._qualities || QUALITY_DEFAULTS;
+  qualities.forEach((q, idx) => {
+    const def = QUALITY_DEFAULTS[idx] || {};
+    const row = document.createElement('div');
+    row.className = 'param-row'; row.style.gap = '6px';
+    const colorInp = document.createElement('input');
+    colorInp.type = 'color';
+    colorInp.value = q.color || '#f0c040';
+    colorInp.style.cssText = 'width:28px;height:22px;border:1px solid var(--border2);border-radius:2px;cursor:pointer;padding:1px;flex-shrink:0;';
+    colorInp.oninput = () => saveQualityColor(idx, colorInp.value);
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-comp-input'; nameInp.type = 'text';
+    nameInp.value = q.label; nameInp.placeholder = def.label || 'Qualité';
+    nameInp.oninput = () => saveQualityLabel(idx, nameInp.value);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'param-add-btn'; delBtn.textContent = '✕';
+    delBtn.style.cssText = 'color:#f08080;flex-shrink:0;padding:2px 6px;';
+    delBtn.onclick = () => removeQuality(idx);
+    row.appendChild(colorInp); row.appendChild(nameInp); row.appendChild(delBtn);
+    container.appendChild(row);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'param-add-btn'; addBtn.textContent = '+ Ajouter';
+  addBtn.style.marginTop = '4px';
+  addBtn.onclick = addQuality;
+  container.appendChild(addBtn);
+}
+
+function renderSlotLabelParams() {
+  const container = document.getElementById('cfg-slot-labels');
+  if (!container) return;
+  container.innerHTML = '';
+  NAMED_SLOTS.forEach(k => {
+    const row = document.createElement('div');
+    row.className = 'param-row'; row.style.gap = '6px';
+    const lbl = document.createElement('span');
+    lbl.className = 'param-lbl'; lbl.style.cssText = 'min-width:90px;font-size:10px;color:var(--muted);';
+    lbl.textContent = LABELS[k] || k;
+    const inp = document.createElement('input');
+    inp.className = 'param-comp-input'; inp.type = 'text';
+    inp.value = getSlotLabel(k); inp.placeholder = LABELS[k] || k;
+    inp.oninput = () => saveSlotLabel(k, inp.value);
+    row.appendChild(lbl); row.appendChild(inp);
+    container.appendChild(row);
+  });
+}
+
+function renderFicheLabelParams() {
+  const container = document.getElementById('cfg-fiche-labels');
+  if (!container) return;
+  container.innerHTML = '';
+  Object.entries(FICHE_SECTION_DEFAULTS).forEach(([key, def]) => {
+    const row = document.createElement('div');
+    row.className = 'param-row'; row.style.gap = '6px';
+    const lbl = document.createElement('span');
+    lbl.className = 'param-lbl'; lbl.style.cssText = 'min-width:70px;font-size:11px;color:var(--muted);';
+    lbl.textContent = def;
+    const inp = document.createElement('input');
+    inp.className = 'param-comp-input'; inp.type = 'text';
+    inp.value = getFicheSectionLabel(key); inp.placeholder = def;
+    inp.oninput = () => saveFicheSectionLabel(key, inp.value);
+    row.appendChild(lbl); row.appendChild(inp);
+    container.appendChild(row);
+  });
+}
+
 function toggleAccordion(el) {
   el.closest('.param-accordion').classList.toggle('open');
 }
@@ -2444,16 +2615,42 @@ function saveMun() {
   persist();
 }
 
-function saveBourse() {
-  const v = document.getElementById('bourse-val').value;
-  const d = document.getElementById('bourse-devise').value;
-  data._bourse     = v || '';
-  data._bourseDevise = d || '';
-  persist();
+function getBourseCount() {
+  return data._bourseCount || 1;
 }
-function saveBourseLabel(val) {
-  data._bourseLabel = val; persist();
+
+function buildBourseRows() {
+  const container = document.getElementById('bourse-rows');
+  if (!container) return;
+  container.innerHTML = '';
+  const count = getBourseCount();
+  for (let i = 0; i < count; i++) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:4px;align-items:center;' + (i > 0 ? 'margin-top:3px;border-top:1px solid var(--border2);padding-top:3px;' : '');
+    const val = document.createElement('input');
+    val.className = 'mun-input'; val.type = 'text';
+    val.placeholder = '0'; val.style.width = '52px';
+    val.value = data['_bourseVal'+i] || '';
+    val.oninput = () => { data['_bourseVal'+i] = val.value; persist(); };
+    const dev = document.createElement('input');
+    dev.className = 'mun-input'; dev.type = 'text';
+    dev.placeholder = 'Đ'; dev.style.cssText = 'width:28px;border-left:1px solid var(--border2);padding-left:4px;';
+    dev.value = data['_bourseDevise'+i] || '';
+    dev.oninput = () => { data['_bourseDevise'+i] = dev.value; persist(); };
+    row.appendChild(val); row.appendChild(dev);
+    container.appendChild(row);
+  }
 }
+
+function saveBourseCount(n) {
+  data._bourseCount = n; persist(); buildBourseRows();
+  // Update param selector
+  const sel = document.getElementById('cfg-bourse-count');
+  if (sel) sel.value = n;
+}
+
+function saveBourse() {} // legacy no-op kept for safety
+function saveBourseLabel(val) { data._bourseLabel = val; persist(); }
 
 function loadChar() {
   const c = data._char || {};
@@ -2746,12 +2943,21 @@ function getQuality(idx) {
   return { label: q?.label || def.label, color: q?.color !== undefined ? q.color : def.color };
 }
 function saveQualityLabel(idx, val) {
-  if (!data._qualities) data._qualities = [...QUALITY_DEFAULTS.map(q=>({...q}))];
-  data._qualities[idx].label = val; persist(); renderQualityParams();
+  if (!data._qualities) data._qualities = QUALITY_DEFAULTS.map(q=>({...q}));
+  if (!data._qualities[idx]) data._qualities[idx] = {...QUALITY_DEFAULTS[idx]};
+  data._qualities[idx].label = val; persist();
+  // Don't re-render (would lose focus) — just update quality buttons if modal open
+  if (document.getElementById('modalOverlay')?.classList.contains('open')) {
+    renderQualityBtns(_modalQuality);
+  }
 }
 function saveQualityColor(idx, val) {
-  if (!data._qualities) data._qualities = [...QUALITY_DEFAULTS.map(q=>({...q}))];
+  if (!data._qualities) data._qualities = QUALITY_DEFAULTS.map(q=>({...q}));
+  if (!data._qualities[idx]) data._qualities[idx] = {...QUALITY_DEFAULTS[idx]};
   data._qualities[idx].color = val; persist(); applyAllQualityColors();
+  if (document.getElementById('modalOverlay')?.classList.contains('open')) {
+    renderQualityBtns(_modalQuality);
+  }
 }
 function applyAllQualityColors() {
   // Update border colors on all slots that have a quality set
@@ -2780,14 +2986,15 @@ function renderQualityBtns(currentQuality) {
   const container = document.getElementById('fQualityBtns');
   if (!container) return;
   container.innerHTML = '';
+  const qualities = data._qualities || QUALITY_DEFAULTS;
   // None option
   const noneBtn = document.createElement('button');
   noneBtn.textContent = '—';
-  noneBtn.className = 'btn' + (currentQuality === null || currentQuality === undefined ? ' active' : '');
+  noneBtn.className = 'btn';
   noneBtn.style.cssText = 'padding:4px 10px;font-size:11px;opacity:' + (currentQuality == null ? '1' : '.5');
   noneBtn.onclick = (e) => { e.preventDefault(); setModalQuality(null); };
   container.appendChild(noneBtn);
-  QUALITY_DEFAULTS.forEach((_, idx) => {
+  qualities.forEach((_, idx) => {
     const q = getQuality(idx);
     const btn = document.createElement('button');
     btn.textContent = q.label;
@@ -2812,28 +3019,6 @@ function hexToRgbStr(hex) {
   return r+','+g+','+b;
 }
 
-function renderQualityParams() {
-  const container = document.getElementById('cfg-quality-list');
-  if (!container) return;
-  container.innerHTML = '';
-  QUALITY_DEFAULTS.forEach((def, idx) => {
-    const q = getQuality(idx);
-    const row = document.createElement('div');
-    row.className = 'param-row'; row.style.gap = '6px';
-    const colorInp = document.createElement('input');
-    colorInp.type = 'color';
-    colorInp.value = q.color || '#f0c040';
-    colorInp.style.cssText = 'width:28px;height:22px;border:1px solid var(--border2);border-radius:2px;cursor:pointer;padding:1px;flex-shrink:0;';
-    if (!q.color) colorInp.style.opacity = '0.4';
-    colorInp.oninput = () => saveQualityColor(idx, colorInp.value);
-    const nameInp = document.createElement('input');
-    nameInp.className = 'param-comp-input'; nameInp.type = 'text';
-    nameInp.value = q.label; nameInp.placeholder = def.label;
-    nameInp.oninput = () => saveQualityLabel(idx, nameInp.value);
-    row.appendChild(colorInp); row.appendChild(nameInp);
-    container.appendChild(row);
-  });
-}
 
 function toggleArmorStatsSection(show, existingStats) {
   const list = document.getElementById('fArmorStatsList');
@@ -3108,10 +3293,11 @@ function renderLivreSorts() {
   const body = document.getElementById('livre-sorts-body');
   if (!body) return;
   body.innerHTML = '';
+  body.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:start;';
   const magiesApprises = getUsedMagiques();
   if (magiesApprises.length === 0) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'font-size:12px;color:var(--dim);font-style:italic;';
+    empty.style.cssText = 'font-size:12px;color:var(--dim);font-style:italic;grid-column:1/-1;';
     empty.textContent = 'Aucune magie apprise.';
     body.appendChild(empty);
     return;
@@ -3150,6 +3336,7 @@ function renderLivreSorts() {
       }
       cell.onclick = () => { if (!wasDragging) openSortModal(key, i, s); };
       makeFreecelDraggable(cell, i, 'sort', key);
+      applyQualityColor(cell, s.quality !== undefined ? s.quality : null);
       sec.appendChild(cell);
     }
     body.appendChild(sec);
@@ -3160,17 +3347,15 @@ function renderLivreSorts() {
 function openSortModal(key, idx, current) {
   curSortKey = key; curSortIdx = idx; curSlot = null; curFreeType = null;
   document.getElementById('modalTitle').textContent = 'Sort';
-  // Relabel fields for sort context
-  const fNomLabel = document.querySelector('#fTypeField')?.previousElementSibling;
   document.getElementById('fNom').value   = current.nom   || '';
   document.getElementById('fTypeField').style.display  = '';
   document.getElementById('fEffetField').style.display = '';
   document.getElementById('fCoutField').style.display  = '';
   document.getElementById('fImgField').style.display   = 'none';
+  document.getElementById('fArmorStats').style.display = 'none';
   document.getElementById('fType').value  = current.type  || '';
   document.getElementById('fEffet').value = current.effet || '';
   document.getElementById('fCout').value  = current.cout  || '';
-  // Update labels for sort context
   const typeLabel = document.querySelector('#fTypeField label');
   const effetLabel = document.querySelector('#fEffetField label');
   const coutLabel  = document.querySelector('#fCoutField label');
@@ -3179,6 +3364,8 @@ function openSortModal(key, idx, current) {
   if (typeLabel)  typeLabel.textContent = 'Niveau du sort';
   if (effetLabel) effetLabel.textContent = 'Effet';
   if (coutLabel)  coutLabel.textContent  = 'Coût';
+  _modalQuality = current.quality !== undefined ? current.quality : null;
+  renderQualityBtns(_modalQuality);
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -3191,7 +3378,7 @@ function saveSortSlot() {
   const cout  = document.getElementById('fCout').value.trim();
   if (!data._sorts) data._sorts = {};
   if (!data._sorts[curSortKey]) data._sorts[curSortKey] = [];
-  data._sorts[curSortKey][curSortIdx] = (nom||type||effet||cout) ? { nom, type, effet, cout } : null;
+  data._sorts[curSortKey][curSortIdx] = (nom||type||effet||cout) ? { nom, type, effet, cout, quality: _modalQuality } : null;
   persist();
   renderLivreSorts();
   closeModal();
@@ -3280,6 +3467,7 @@ function renderCoups() {
     }
     cell.onclick = () => { if (!wasDragging) openFreeModal('coup', i, coup); };
     makeFreecelDraggable(cell, i, 'coup');
+    applyQualityColor(cell, coup.quality !== undefined ? coup.quality : null);
     container.appendChild(cell);
   }
 }
@@ -3309,6 +3497,7 @@ function renderSavoirs() {
     }
     cell.onclick = () => { if (!wasDragging) openFreeModal('savoir', i, sav); };
     makeFreecelDraggable(cell, i, 'savoir');
+    applyQualityColor(cell, sav.quality !== undefined ? sav.quality : null);
     container.appendChild(cell);
   }
 }
@@ -3322,11 +3511,13 @@ function openFreeModal(type, idx, current) {
   document.getElementById('fEffet').value = current.effet || '';
   document.getElementById('fTypeField').style.display  = '';
   document.getElementById('fEffetField').style.display = '';
+  document.getElementById('fArmorStats').style.display = 'none';
   const coutField = document.getElementById('fCoutField');
   coutField.style.display = type === 'coup' ? '' : 'none';
   if (type === 'coup') document.getElementById('fCout').value = current.cout || '';
-  // No image for coups/savoirs
   document.getElementById('fImgField').style.display = 'none';
+  _modalQuality = current.quality !== undefined ? current.quality : null;
+  renderQualityBtns(_modalQuality);
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -3336,7 +3527,7 @@ function saveFreeSlot() {
   const type  = document.getElementById('fType').value.trim();
   const effet = document.getElementById('fEffet').value.trim();
   const cout  = document.getElementById('fCout')?.value.trim() || '';
-  const obj   = nom || type || effet ? { nom, type, effet } : null;
+  const obj   = nom || type || effet ? { nom, type, effet, quality: _modalQuality } : null;
   if (curFreeType === 'coup') {
     if (!data._coups) data._coups = [];
     data._coups[curFreeIdx] = obj ? { ...obj, cout } : null;
@@ -3676,23 +3867,30 @@ function applyParamShow() {
     if (titleEl) titleEl.style.display = show ? '' : 'none';
   });
 
-  // Magiques — entire col hidden if magie disabled OR toggle off
-  const magCol = document.querySelector('.comp-body .comp-col:last-child');
+  // Magiques — row hidden if magie disabled OR toggle off
+  const magRow = document.querySelector('.comp-magie-row');
   const showMag = magEnabled && isShown('mag');
-  const showLivre = magEnabled && isShown('livre');
-  if (magCol) magCol.style.display = (showMag || showLivre) ? '' : 'none';
+  if (magRow) magRow.style.display = showMag ? '' : 'none';
 
-  // Magiques section within col
+  // Livre de sorts
+  const livreRow = document.querySelector('.comp-livre-row');
+  const showLivre = magEnabled && isShown('livre');
+  if (livreRow) livreRow.style.display = showLivre ? '' : 'none';
+
+  // Keep old references for backward compat
   const listMag = document.getElementById('list-magiques');
   const titleMag = listMag?.previousElementSibling;
   if (listMag)  listMag.style.display  = showMag ? '' : 'none';
   if (titleMag) titleMag.style.display = showMag ? '' : 'none';
 
-  // Livre de sorts section
   const livreBody  = document.getElementById('livre-sorts-body');
   const livreTitle = livreBody?.previousElementSibling;
   if (livreBody)  livreBody.style.display  = showLivre ? '' : 'none';
   if (livreTitle) livreTitle.style.display = showLivre ? '' : 'none';
+
+  // Entire last comp-col hidden if both off
+  const magCol = document.querySelector('.comp-body .comp-col:last-child');
+  if (magCol) magCol.style.display = (showMag || showLivre) ? '' : 'none';
 }
 
 // Category formats
@@ -3889,10 +4087,19 @@ function renderParametres() {
   });
   // Effets Visuels +++
   applyEffetsPlus();
+  // Stat splits (X/X checkboxes)
+  applyStatSplits();
   // Armor stats params
   renderArmorParams();
+  // Bourse count
+  const bourseCountSel = document.getElementById('cfg-bourse-count');
+  if (bourseCountSel) bourseCountSel.value = getBourseCount();
   // Quality params
   renderQualityParams();
+  // Slot labels
+  renderSlotLabelParams();
+  // Fiche section labels
+  renderFicheLabelParams();
   // Level names & colors
   renderLevelParams();
   // Bags & spe
@@ -4115,6 +4322,9 @@ applyEffetsPlus();
 updateBagSelect();
 refreshArmorStats();
 applyAllQualityColors();
+applySlotLabels();
+applyFicheSectionLabels();
+buildBourseRows();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
 renderFiche();
