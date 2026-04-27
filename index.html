@@ -1595,6 +1595,10 @@ body {
             <button class="param-add-btn" style="margin-top:4px;" onclick="resetFontSizes()">↺ Défaut</button>
           </div>
 
+          <div class="param-section-title" style="margin-top:12px;">💎 Qualité / Rareté</div>
+          <div class="param-info">Couleur et nom des 4 niveaux de qualité.</div>
+          <div id="cfg-quality-list" class="param-fields" style="margin-top:4px;"></div>
+
           <div class="param-section-title" style="margin-top:12px;">🔷 Niveaux de Compétences</div>
           <div class="param-info">Renomme et colore les 4 niveaux.</div>
           <div class="param-fields" style="margin-top:4px;" id="cfg-levels-list"></div>
@@ -1634,13 +1638,20 @@ body {
   <div class="modal">
     <div class="modal-title" id="modalTitle">Emplacement</div>
     <div class="mfield"><label>Nom</label><input type="text" id="fNom" placeholder="Nom de l'objet..."></div>
+    <div class="mfield" id="fQualityField">
+      <label>Qualité / Rareté</label>
+      <div id="fQualityBtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;"></div>
+    </div>
     <div class="mfield" id="fTypeField"><label>Type</label><input type="text" id="fType" placeholder="Arme, Armure, Potion..."></div>
     <div class="mfield" id="fEffetField"><label>Effet / Description</label><textarea id="fEffet" placeholder="Bonus, effets, notes..."></textarea></div>
     <div class="mfield" id="fCoutField" style="display:none;"><label>Coût</label><input type="text" id="fCout" placeholder="ex: 2 PE"></div>
     <div class="mfield" id="fImgField"><label>Lien d'image (optionnel)</label><input type="text" id="fImg" placeholder="https://..."></div>
-    <div id="fArmorStats" style="display:none;border-top:1px solid var(--border2);padding-top:8px;margin-top:4px;">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Stats d'Armure</div>
-      <div id="fArmorStatsList" style="display:flex;flex-direction:column;gap:6px;"></div>
+    <div id="fArmorStats" style="border-top:1px solid var(--border2);padding-top:8px;margin-top:4px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <input type="checkbox" id="fArmorStatsToggle" class="blessure-cb" onchange="toggleArmorStatsSection(this.checked)">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">Stats d'Armure</span>
+      </div>
+      <div id="fArmorStatsList" style="display:none;flex-direction:column;gap:6px;"></div>
     </div>
     <div class="modal-btns">
       <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>
@@ -1967,6 +1978,8 @@ function setSlotDisplay(key) {
     const hasSomething = !!(d.nom);
     sl.classList.toggle('filled', hasSomething);
     sl.style.background = hasSomething ? 'var(--bg3)' : 'var(--slot-empty)';
+    // Quality border color
+    applyQualityColor(sl, d.quality !== undefined ? d.quality : null);
     // background image
     let bg = sl.querySelector('.slot-img-bg');
     if (d.img) {
@@ -1989,7 +2002,7 @@ function refresh() {
       sl.dataset.dragReady = '1';
     }
   });
-  refreshArmureSlotOnly();
+  refreshArmorStats(); // updates slot display + cartouches + fiche
 
   // mun
   const munEl = document.getElementById('sl-mun');
@@ -2027,23 +2040,15 @@ function open_(key, speLabel) {
   document.getElementById('fType').value = d.type || '';
   document.getElementById('fEffet').value = d.effet || '';
   document.getElementById('fImg').value = d.img || '';
-  // Armor stats fields — show only for armure slot
+  // Armor stats — show toggle on all slots, load from object data
   const armorSection = document.getElementById('fArmorStats');
-  if (key === 'armure') {
-    armorSection.style.display = '';
-    const list = document.getElementById('fArmorStatsList');
-    list.innerHTML = '';
-    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key: sk }) => {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
-      wrap.innerHTML = `<label style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:42px;">${getArmorStatLabel(sk)}</label>
-        <input type="text" id="farmor-${sk}" value="${data._armorStats?.[sk]||''}" placeholder="—"
-          style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
-      list.appendChild(wrap);
-    });
-  } else {
-    armorSection.style.display = 'none';
-  }
+  if (armorSection) armorSection.style.display = '';
+  const hasArmorStats = !!(d.armorStats);
+  const toggleCb = document.getElementById('fArmorStatsToggle');
+  if (toggleCb) toggleCb.checked = hasArmorStats;
+  toggleArmorStatsSection(hasArmorStats, d.armorStats || {});
+  _modalQuality = (d.quality !== undefined && d.quality !== null) ? d.quality : null;
+  renderQualityBtns(_modalQuality);
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fNom').focus(), 60);
 }
@@ -2056,22 +2061,24 @@ function saveSlot() {
   const type  = document.getElementById('fType').value.trim();
   const effet = document.getElementById('fEffet').value.trim();
   const img   = document.getElementById('fImg').value.trim();
-  if (nom || type || effet || img) data[curSlot] = { nom, type, effet, img }; else delete data[curSlot];
-  // Save armor stats if armure slot
-  if (curSlot === 'armure') {
-    if (!data._armorStats) data._armorStats = {};
-    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
-      const inp = document.getElementById('farmor-'+key);
-      if (inp) data._armorStats[key] = inp.value.trim();
+  const armorToggle = document.getElementById('fArmorStatsToggle');
+  let armorStats = null;
+  if (armorToggle?.checked) {
+    armorStats = {};
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key: sk }) => {
+      const inp = document.getElementById('farmor-'+sk);
+      if (inp) armorStats[sk] = inp.value.trim();
     });
   }
+  if (nom || type || effet || img || armorStats) {
+    data[curSlot] = { nom, type, effet, img, quality: _modalQuality, armorStats };
+  } else delete data[curSlot];
   persist();
   const k = curSlot;
   closeModal();
-  if (k.startsWith('bag_') || k.startsWith('spe_')) buildBag();
+  if (k.startsWith('bag_') || k.startsWith('spe_')) { buildBag(); setTimeout(() => refreshArmorStats(), 0); }
   else if (k.startsWith('poche_')) buildPoche();
-  else refresh();
-  if (k === 'armure') refreshArmorStats();
+  else refresh(); // refresh already calls refreshArmorStats
 }
 
 function clearSlot() {
@@ -2517,9 +2524,9 @@ function saveArmorStatEnabled(key, val) {
   persist(); refreshArmorStats();
 }
 function saveArmorStat(key, val) {
-  if (!data._armorStats) data._armorStats = {};
-  data._armorStats[key] = val; persist();
-  // Only update the armure slot display, not the cartouche inputs (would lose focus)
+  if (!data.armure) data.armure = {};
+  if (!data.armure.armorStats) data.armure.armorStats = {};
+  data.armure.armorStats[key] = val; persist();
   refreshArmureSlotOnly();
 }
 
@@ -2527,22 +2534,24 @@ function refreshArmureSlotOnly() {
   const armureEl = document.getElementById('sl-armure');
   if (!armureEl) return;
   const d = data.armure || {};
+  const armorStats = d.armorStats || {};
   let inner = '';
-  // Preserve background image
   if (d.img) inner += `<div class="slot-img-bg" style="background-image:url('${d.img}');"></div>`;
   inner += `<span class="lbl" data-i18n="armure">Armure</span>`;
   inner += `<span class="val" id="dsp-armure-nom">${d.nom||'—'}</span>`;
   if (d.type)  inner += `<span class="val-type" id="dsp-armure-type">${d.type}</span>`;
   if (d.effet) inner += `<span class="val-effet" id="dsp-armure-effet">${d.effet}</span>`;
-  const activeStats = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
-  const hasValues = activeStats.some(s => data._armorStats?.[s.key]);
-  if (activeStats.length > 0 && (d.nom || hasValues)) {
-    inner += `<div class="armure-stats">`;
-    activeStats.forEach(({ key }) => {
-      const cur = data._armorStats?.[key] || '';
-      if (cur) inner += `<span class="armure-stat"><span class="armure-stat-lbl">${getArmorStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
-    });
-    inner += `</div>`;
+  if (d.armorStats) {
+    const activeStats = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
+    const hasValues = activeStats.some(s => armorStats[s.key]);
+    if (hasValues) {
+      inner += `<div class="armure-stats">`;
+      activeStats.forEach(({ key }) => {
+        const cur = armorStats[key] || '';
+        if (cur) inner += `<span class="armure-stat"><span class="armure-stat-lbl">${getArmorStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
+      });
+      inner += `</div>`;
+    }
   }
   armureEl.innerHTML = inner;
 }
@@ -2565,56 +2574,45 @@ function refreshArmorStats() {
 }
 
 function updateArmorCartouche() {
-  // Inventaire — inline
-  const inv = document.getElementById('inv-armor-stats');
-  if (inv) {
-    inv.innerHTML = '';
+  const armorStats = data.armure?.armorStats || {};
+  ['inv-armor-stats','comp-armor-stats'].forEach(containerId => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = '';
+    if (!data.armure?.armorStats) return; // only show if armure slot has armor stats
+    const isComp = containerId === 'comp-armor-stats';
+    if (isComp) el.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:4px;width:100%;';
     ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
-      const val = data._armorStats?.[key]||'';
+      const val = armorStats[key] || '';
       const wrap = document.createElement('span');
       wrap.className = 'armor-stat-cartouche';
       const w = Math.min(Math.max(3, val.length) + 2, 16) + 'ch';
       wrap.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
         <input class="char-input narrow stat-cur" style="width:${w};" type="text" value="${val}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
-      inv.appendChild(wrap);
+      el.appendChild(wrap);
     });
-  }
-  // Compétences — inline, même ligne
-  const comp = document.getElementById('comp-armor-stats');
-  if (comp) {
-    comp.innerHTML = '';
-    comp.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:4px;width:100%;';
-    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
-      const val = data._armorStats?.[key]||'';
-      const wrap2 = document.createElement('span');
-      wrap2.className = 'armor-stat-cartouche';
-      const w2 = Math.min(Math.max(3, val.length) + 2, 16) + 'ch';
-      wrap2.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
-        <input class="char-input narrow stat-cur" style="width:${w2};" type="text" value="${val}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
-      comp.appendChild(wrap2);
-    });
-  }
+  });
 }
 
 function updateFicheArmorStats() {
   const el = document.getElementById('fiche-armor-stats');
   if (!el) return;
   el.innerHTML = '';
+  const armorStats = data.armure?.armorStats;
+  if (!armorStats) return; // only show if armure slot has armor stats
   const active = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
   const wFor = k => (['def','res','poids'].includes(k) ? '70px' : '42px');
-  // Render in pairs per row
   for (let i = 0; i < active.length; i += 2) {
     const row = document.createElement('div');
-    row.className = 'fiche-row';
-    row.style.gap = '6px';
+    row.className = 'fiche-row'; row.style.gap = '6px';
     const a = active[i];
     row.innerHTML = `<span class="fiche-lbl" data-armor-lbl="${a.key}" style="font-size:13px;">${getArmorStatLabel(a.key)}</span>
-      <input class="fiche-stat-inp" style="width:${wFor(a.key)};" type="text" value="${data._armorStats?.[a.key]||''}" placeholder="—" oninput="saveArmorStat('${a.key}',this.value)">`;
+      <input class="fiche-stat-inp" style="width:${wFor(a.key)};" type="text" value="${armorStats[a.key]||''}" placeholder="—" oninput="saveArmorStat('${a.key}',this.value)">`;
     if (active[i+1]) {
       const b = active[i+1];
       row.innerHTML += `<span class="fiche-sep" style="margin:0 4px;">|</span>
         <span class="fiche-lbl" data-armor-lbl="${b.key}" style="font-size:13px;">${getArmorStatLabel(b.key)}</span>
-        <input class="fiche-stat-inp" style="width:${wFor(b.key)};" type="text" value="${data._armorStats?.[b.key]||''}" placeholder="—" oninput="saveArmorStat('${b.key}',this.value)">`;
+        <input class="fiche-stat-inp" style="width:${wFor(b.key)};" type="text" value="${armorStats[b.key]||''}" placeholder="—" oninput="saveArmorStat('${b.key}',this.value)">`;
     }
     el.appendChild(row);
   }
@@ -2671,6 +2669,130 @@ document.addEventListener('input', e => {
 function resizeAllCartouche() {
   document.querySelectorAll('.char-input.narrow.stat-cur, .char-input.narrow.stat-max').forEach(el => resizeCharInp(el));
   document.querySelectorAll('#inv-armor-stats input, #comp-armor-stats input').forEach(el => resizeArmorInp(el));
+}
+
+/* ══ QUALITY / RARITY ══ */
+const QUALITY_DEFAULTS = [
+  { key: 'bad',    label: 'Mauvaise', color: '#808080' },
+  { key: 'common', label: 'Commune',  color: null },      // null = default slot color
+  { key: 'high',   label: 'Haute',    color: '#2aaacc' },
+  { key: 'master', label: 'Maître',   color: '#e02020' },
+];
+
+function getQuality(idx) {
+  const q = data._qualities?.[idx];
+  const def = QUALITY_DEFAULTS[idx];
+  return { label: q?.label || def.label, color: q?.color !== undefined ? q.color : def.color };
+}
+function saveQualityLabel(idx, val) {
+  if (!data._qualities) data._qualities = [...QUALITY_DEFAULTS.map(q=>({...q}))];
+  data._qualities[idx].label = val; persist(); renderQualityParams();
+}
+function saveQualityColor(idx, val) {
+  if (!data._qualities) data._qualities = [...QUALITY_DEFAULTS.map(q=>({...q}))];
+  data._qualities[idx].color = val; persist(); applyAllQualityColors();
+}
+function applyAllQualityColors() {
+  // Update border colors on all slots that have a quality set
+  NAMED_SLOTS.forEach(k => {
+    const d = data[k];
+    if (d?.quality !== undefined && d.quality !== null) {
+      const sl = document.getElementById('sl-'+k);
+      if (sl) applyQualityColor(sl, d.quality);
+    }
+  });
+  // Bag and poche slots
+  document.querySelectorAll('[data-bag-quality],[data-poche-quality]').forEach(sl => {
+    const qi = parseInt(sl.dataset.bagQuality ?? sl.dataset.pocheQuality);
+    if (!isNaN(qi)) applyQualityColor(sl, qi);
+  });
+}
+function applyQualityColor(el, qualityIdx) {
+  if (qualityIdx === null || qualityIdx === undefined || qualityIdx === '') {
+    el.style.borderColor = ''; return;
+  }
+  const q = getQuality(qualityIdx);
+  el.style.borderColor = q.color || '';
+}
+
+function renderQualityBtns(currentQuality) {
+  const container = document.getElementById('fQualityBtns');
+  if (!container) return;
+  container.innerHTML = '';
+  // None option
+  const noneBtn = document.createElement('button');
+  noneBtn.textContent = '—';
+  noneBtn.className = 'btn' + (currentQuality === null || currentQuality === undefined ? ' active' : '');
+  noneBtn.style.cssText = 'padding:4px 10px;font-size:11px;opacity:' + (currentQuality == null ? '1' : '.5');
+  noneBtn.onclick = (e) => { e.preventDefault(); setModalQuality(null); };
+  container.appendChild(noneBtn);
+  QUALITY_DEFAULTS.forEach((_, idx) => {
+    const q = getQuality(idx);
+    const btn = document.createElement('button');
+    btn.textContent = q.label;
+    btn.className = 'btn';
+    const isActive = currentQuality === idx;
+    btn.style.cssText = `padding:4px 10px;font-size:11px;border-color:${q.color||'var(--border)'};color:${q.color||'var(--gold)'};opacity:${isActive?'1':'.5'};`;
+    if (isActive) btn.style.background = 'rgba('+hexToRgbStr(q.color||'#f0c040')+',0.15)';
+    btn.onclick = (e) => { e.preventDefault(); setModalQuality(idx); };
+    container.appendChild(btn);
+  });
+}
+
+let _modalQuality = null;
+function setModalQuality(idx) {
+  _modalQuality = idx;
+  renderQualityBtns(idx);
+}
+
+function hexToRgbStr(hex) {
+  if (!hex || hex[0]!=='#') return '255,255,255';
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return r+','+g+','+b;
+}
+
+function renderQualityParams() {
+  const container = document.getElementById('cfg-quality-list');
+  if (!container) return;
+  container.innerHTML = '';
+  QUALITY_DEFAULTS.forEach((def, idx) => {
+    const q = getQuality(idx);
+    const row = document.createElement('div');
+    row.className = 'param-row'; row.style.gap = '6px';
+    const colorInp = document.createElement('input');
+    colorInp.type = 'color';
+    colorInp.value = q.color || '#f0c040';
+    colorInp.style.cssText = 'width:28px;height:22px;border:1px solid var(--border2);border-radius:2px;cursor:pointer;padding:1px;flex-shrink:0;';
+    if (!q.color) colorInp.style.opacity = '0.4';
+    colorInp.oninput = () => saveQualityColor(idx, colorInp.value);
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-comp-input'; nameInp.type = 'text';
+    nameInp.value = q.label; nameInp.placeholder = def.label;
+    nameInp.oninput = () => saveQualityLabel(idx, nameInp.value);
+    row.appendChild(colorInp); row.appendChild(nameInp);
+    container.appendChild(row);
+  });
+}
+
+function toggleArmorStatsSection(show, existingStats) {
+  const list = document.getElementById('fArmorStatsList');
+  if (!list) return;
+  list.style.display = show ? 'flex' : 'none';
+  list.style.flexDirection = 'column';
+  if (show && list.children.length === 0) {
+    // Build inputs
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key: sk }) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+      const val = existingStats?.[sk] || '';
+      wrap.innerHTML = `<label style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:42px;">${getArmorStatLabel(sk)}</label>
+        <input type="text" id="farmor-${sk}" value="${val}" placeholder="—"
+          style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
+      list.appendChild(wrap);
+    });
+  } else if (!show) {
+    list.innerHTML = ''; // clear when hidden so they rebuild fresh next time
+  }
 }
 
 function syncChar(field, val) {
@@ -3708,6 +3830,8 @@ function renderParametres() {
   applyEffetsPlus();
   // Armor stats params
   renderArmorParams();
+  // Quality params
+  renderQualityParams();
   // Level names & colors
   renderLevelParams();
   // Bags & spe
@@ -3929,6 +4053,7 @@ applyStatSplits();
 applyEffetsPlus();
 updateBagSelect();
 refreshArmorStats();
+applyAllQualityColors();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
 renderFiche();
