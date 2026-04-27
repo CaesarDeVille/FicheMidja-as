@@ -2504,7 +2504,10 @@ function refreshArmureSlotOnly() {
   const armureEl = document.getElementById('sl-armure');
   if (!armureEl) return;
   const d = data.armure || {};
-  let inner = `<span class="lbl" data-i18n="armure">Armure</span>`;
+  let inner = '';
+  // Preserve background image
+  if (d.img) inner += `<div class="slot-img-bg" style="background-image:url('${d.img}');"></div>`;
+  inner += `<span class="lbl" data-i18n="armure">Armure</span>`;
   inner += `<span class="val" id="dsp-armure-nom">${d.nom||'—'}</span>`;
   if (d.type)  inner += `<span class="val-type" id="dsp-armure-type">${d.type}</span>`;
   if (d.effet) inner += `<span class="val-effet" id="dsp-armure-effet">${d.effet}</span>`;
