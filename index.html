@@ -2295,7 +2295,7 @@ function loadCompChar() {
   if (cb) cb.checked = infuse;
   // minos
   const ml = document.getElementById('comp-minos-lbl');
-  if (ml) ml.value = data._minosLabel || 'Pièce de Minos';
+  if (ml) ml.textContent = getCharLabel('minos');
   const mc2 = document.getElementById('comp-minos-cb');
   if (mc2) mc2.checked = data._minos || false;
 }
