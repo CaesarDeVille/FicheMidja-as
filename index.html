@@ -122,6 +122,8 @@ body {
 #sl-anneau1 .val, #sl-anneau2 .val { -webkit-line-clamp: 1; }
 #sl-anneau1 .val-type, #sl-anneau2 .val-type { -webkit-line-clamp: 1; }
 #sl-anneau1 .val-effet, #sl-anneau2 .val-effet { -webkit-line-clamp: 1; }
+#sl-couvre-chef .val-effet, #sl-amulette .val-effet,
+#sl-bottes .val-effet, #sl-divers .val-effet { -webkit-line-clamp: 4; }
 
 /* Armure : effet jusqu'à 9 lignes */
 #sl-armure .val-effet { -webkit-line-clamp: 9; }
@@ -271,19 +273,24 @@ body {
 .spe-cell.filled { color: var(--text); border-color: var(--filled); }
 .spe-full { width: 100%; height: 36px; }
 
+.spe-row { display: flex; gap: 8px; align-items: stretch; }
 /* Munitions split cell */
 .mun-cell {
-  display: flex; align-items: stretch; min-height: 36px;
+  display: flex; flex: 1; align-items: stretch;
   border: 1.5px solid var(--border2); border-radius: 3px; overflow: hidden;
+  min-height: 62px;
 }
 .mun-cell .mun-name {
   border: none; border-radius: 0;
-  overflow: hidden; min-width: 0; flex: 1;
+  min-width: 0; flex: 1; height: auto !important; min-height: 100%;
   display: flex; flex-direction: column; justify-content: center;
-  padding: 4px 0;
+  padding: 6px 10px; word-break: break-word; box-sizing: border-box;
+  white-space: normal !important; overflow: visible !important;
 }
-.mun-cell .mun-name span {
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+.mun-cell .mun-name span { display: block; word-break: break-word; white-space: normal; }
+.mun-bourse-label {
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
 }
 .mun-counter {
   display: flex; align-items: center; gap: 2px;
@@ -480,7 +487,7 @@ body {
 }
 .char-input:focus { border-color: var(--gold); }
 .char-input.wide { max-width: clamp(120px, 12vw, 220px); min-width: 60px; width: 12vw; }
-.char-input.narrow { width: 55px; }
+.char-input.narrow { width: 4.5ch; min-width: 2.5ch; }
 .char-sep { color: var(--border2); font-size: 13px; flex-shrink: 0; }
 .blessure-wrap { display: flex; align-items: center; gap: 6px; }
 .blessure-cb {
@@ -581,8 +588,9 @@ body {
 .fiche-stat-inp {
   background: transparent; border: none; border-bottom: 1px solid var(--border2);
   color: var(--text); font-family: var(--font); font-size: 13px;
-  outline: none; padding: 1px 4px; min-width: 0; width: 42px;
-  transition: border-color .15s;
+  outline: none; padding: 1px 4px; min-width: 2.5ch; width: 2.5ch; max-width: 12ch;
+  text-align: center;
+  transition: border-color .15s, width .1s;
 }
 .fiche-stat-inp:focus { border-color: var(--gold); }
 .fiche-stat-max { color: var(--muted); }
@@ -1024,7 +1032,7 @@ body {
       <div class="inv-spe" id="speSection">
         <div class="spe-row">
           <div class="mun-cell">
-            <div class="mun-name spe-cell" id="sl-mun" onclick="open_('mun')" style="flex:1;border-right:none;border-radius:3px 0 0 3px;">Munitions</div>
+            <div class="mun-name spe-cell" id="sl-mun" onclick="open_('mun')" style="border-right:none;border-radius:3px 0 0 3px;cursor:pointer;">Munitions</div>
             <div class="mun-counter">
               <input class="mun-input" id="mun-cur" type="number" min="0" max="9999" placeholder="0" title="Quantité actuelle" oninput="saveMun()">
               <span class="mun-sep">/</span>
@@ -1032,7 +1040,11 @@ body {
             </div>
           </div>
           <div class="mun-cell">
-            <div class="mun-name spe-cell" style="flex:1;border-right:none;border-radius:3px 0 0 3px;cursor:default;">Bourse</div>
+            <div class="mun-name spe-cell" style="border-right:none;border-radius:3px 0 0 3px;cursor:default;align-items:center;justify-content:center;text-align:center;">
+              <input type="text" id="bourse-label" value="Bourse" placeholder="Bourse"
+                style="background:transparent;border:none;color:var(--muted);font-family:var(--font);font-size:11px;text-transform:uppercase;letter-spacing:.5px;outline:none;width:100%;text-align:center;"
+                oninput="saveBourseLabel(this.value)">
+            </div>
             <div class="mun-counter" style="gap:4px;">
               <input class="mun-input" id="bourse-val" type="text" placeholder="0" title="Montant" style="width:52px;" oninput="saveBourse()">
               <input class="mun-input" id="bourse-devise" type="text" placeholder="Đ" title="Devise" style="width:28px;border-left:1px solid var(--border2);padding-left:4px;" oninput="saveBourse()">
@@ -1522,6 +1534,8 @@ body {
             <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
               <span class="param-info" style="font-style:normal;">Max/magie</span>
               <input class="param-max-input" id="cfg-max-livre" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('livre',this.value)">
+              <span class="param-info" style="font-style:normal;">Afficher</span>
+              <input type="checkbox" id="cfg-show-livre" class="blessure-cb" onchange="saveParamShow('livre',this.checked)" checked>
             </div>
           </div>
 
@@ -1613,7 +1627,7 @@ body {
     <div class="mfield" id="fImgField"><label>Lien d'image (optionnel)</label><input type="text" id="fImg" placeholder="https://..."></div>
     <div id="fArmorStats" style="display:none;border-top:1px solid var(--border2);padding-top:8px;margin-top:4px;">
       <div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;">Stats d'Armure</div>
-      <div id="fArmorStatsList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;"></div>
+      <div id="fArmorStatsList" style="display:flex;flex-direction:column;gap:6px;"></div>
     </div>
     <div class="modal-btns">
       <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>
@@ -1755,6 +1769,10 @@ function importData(e) {
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
       applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); refreshArmorStats();
+      setTimeout(() => {
+        resizeAllCartouche();
+        document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
+      }, 50);
       persist(); toast('Importé !');
     } catch { toast('Erreur JSON'); }
   };
@@ -1901,9 +1919,9 @@ function buildSpe() {
       const bonusVal = data[livreKey] ?? 4;
       const bLbl = document.createElement('span'); bLbl.style.cssText='font-size:11px;color:var(--muted);'; bLbl.textContent='+';
       const bInp = document.createElement('input');
-      bInp.type='number'; bInp.min=4; bInp.max=7; bInp.value=bonusVal;
-      bInp.style.cssText='width:46px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:4px 6px;border-radius:3px;text-align:center;outline:none;';
-      bInp.oninput = () => { let v=Math.min(7,Math.max(4,parseInt(bInp.value)||4)); data[livreKey]=v; buildBag(); persist(); };
+      bInp.type='number'; bInp.min=1; bInp.max=99; bInp.value=bonusVal;
+      bInp.style.cssText='width:52px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:4px 6px;border-radius:3px;text-align:center;outline:none;';
+      bInp.oninput = () => { let v=Math.max(1,parseInt(bInp.value)||1); data[livreKey]=v; buildBag(); persist(); };
       const bSuf = document.createElement('span'); bSuf.style.cssText='font-size:11px;color:var(--dim);'; bSuf.textContent='empl.';
       row.appendChild(bLbl); row.appendChild(bInp); row.appendChild(bSuf);
     }
@@ -1952,13 +1970,13 @@ function refresh() {
     setSlotDisplay(k);
     const sl = document.getElementById('sl-' + k);
     if (sl && !sl.dataset.dragReady) {
-      // wrap existing onclick to guard against drag
       const originalOnclick = sl.onclick;
       sl.onclick = () => { if (!wasDragging && originalOnclick) originalOnclick(); };
       makeSlotDraggable(sl, k);
       sl.dataset.dragReady = '1';
     }
   });
+  refreshArmureSlotOnly();
 
   // mun
   const munEl = document.getElementById('sl-mun');
@@ -1967,7 +1985,8 @@ function refresh() {
     const hasMun = !!(mun.nom);
     munEl.classList.toggle('filled', hasMun);
     if (hasMun) {
-      munEl.innerHTML = `<span style="font-size:var(--fs-item-nom);color:var(--gold);">${mun.nom}</span>${mun.effet?`<span style="font-size:var(--fs-item-effet);color:#7ab8d4;font-style:italic;display:block;margin-top:4px;">${mun.effet}</span>`:''}`;
+      munEl.style.cssText = 'border-right:none;border-radius:3px 0 0 3px;cursor:pointer;';
+      munEl.innerHTML = '<span style="font-size:var(--fs-item-nom);color:var(--gold);">' + mun.nom + '</span>' + (mun.effet ? '<span style="font-size:var(--fs-item-effet);color:#7ab8d4;font-style:italic;display:block;margin-top:4px;">' + mun.effet + '</span>' : '');
     } else {
       munEl.textContent = 'Munitions';
     }
@@ -1975,6 +1994,8 @@ function refresh() {
   const mc = data._munCur, mm = data._munMax;
   const ci = document.getElementById('mun-cur'), mi = document.getElementById('mun-max');
   if (ci && mc != null) ci.value = mc; if (mi && mm != null) mi.value = mm;
+  const bl = document.getElementById('bourse-label');
+  if (bl) bl.value = data._bourseLabel || 'Bourse';
   const bi = document.getElementById('bourse-val');
   const bd = document.getElementById('bourse-devise');
   if (bi) bi.value = data._bourse || '';
@@ -2339,6 +2360,9 @@ function saveBourse() {
   data._bourseDevise = d || '';
   persist();
 }
+function saveBourseLabel(val) {
+  data._bourseLabel = val; persist();
+}
 
 function loadChar() {
   const c = data._char || {};
@@ -2361,6 +2385,7 @@ function loadChar() {
   const mc2 = document.getElementById('inv-minos-cb');
   if (mc2) mc2.checked = data._minos || false;
   updateTbNom();
+  setTimeout(() => resizeAllCartouche(), 50);
 }
 
 /* ══ PAGE NAVIGATION ══ */
@@ -2394,6 +2419,10 @@ function saveParamResSplit(stat, enabled) {
   if (!data._resSplit) data._resSplit = {};
   data._resSplit[stat] = enabled; persist();
   applyStatSplits();
+  // Auto-resize all fiche stat inputs after render
+  setTimeout(() => {
+    document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
+  }, 30);
 }
 
 function getResSplit(stat) {
@@ -2515,11 +2544,12 @@ function updateArmorCartouche() {
   if (inv) {
     inv.innerHTML = '';
     ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
+      const val = data._armorStats?.[key]||'';
       const wrap = document.createElement('span');
       wrap.className = 'armor-stat-cartouche';
-      const w = (key==='def'||key==='res') ? '55px' : '38px';
+      const w = Math.min(Math.max(3, val.length) + 2, 16) + 'ch';
       wrap.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
-        <input class="char-input narrow stat-cur" style="width:${w};" type="text" value="${data._armorStats?.[key]||''}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
+        <input class="char-input narrow stat-cur" style="width:${w};" type="text" value="${val}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
       inv.appendChild(wrap);
     });
   }
@@ -2529,11 +2559,12 @@ function updateArmorCartouche() {
     comp.innerHTML = '';
     comp.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:4px;width:100%;';
     ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key }) => {
+      const val = data._armorStats?.[key]||'';
       const wrap2 = document.createElement('span');
       wrap2.className = 'armor-stat-cartouche';
-      const w2 = (key==='def'||key==='res') ? '55px' : '38px';
+      const w2 = Math.min(Math.max(3, val.length) + 2, 16) + 'ch';
       wrap2.innerHTML = `<span class="char-lbl" data-armor-lbl="${key}">${getArmorStatLabel(key)}</span>
-        <input class="char-input narrow stat-cur" style="width:${w2};" type="text" value="${data._armorStats?.[key]||''}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
+        <input class="char-input narrow stat-cur" style="width:${w2};" type="text" value="${val}" placeholder="—" oninput="saveArmorStat('${key}',this.value)">`;
       comp.appendChild(wrap2);
     });
   }
@@ -2587,6 +2618,35 @@ function renderArmorParams() {
   });
 }
 
+function resizeFicheInp(el) {
+  const len = Math.max(2.5, (el.value || '').length);
+  el.style.width = Math.min(len + 2, 14) + 'ch';
+}
+
+function resizeCharInp(el) {
+  const len = Math.max(2.5, (el.value || '').length);
+  el.style.width = Math.min(len + 2, 16) + 'ch';
+}
+
+function resizeArmorInp(el) {
+  const len = Math.max(3, (el.value || '').length);
+  el.style.width = Math.min(len + 2, 16) + 'ch';
+}
+
+// Auto-resize handlers
+document.addEventListener('input', e => {
+  if (e.target.classList.contains('fiche-stat-inp')) resizeFicheInp(e.target);
+  if (e.target.closest('#inv-armor-stats, #comp-armor-stats')) resizeArmorInp(e.target);
+  if (e.target.classList.contains('stat-cur') || e.target.classList.contains('stat-max')) {
+    if (!e.target.closest('#inv-armor-stats, #comp-armor-stats')) resizeCharInp(e.target);
+  }
+});
+
+function resizeAllCartouche() {
+  document.querySelectorAll('.char-input.narrow.stat-cur, .char-input.narrow.stat-max').forEach(el => resizeCharInp(el));
+  document.querySelectorAll('#inv-armor-stats input, #comp-armor-stats input').forEach(el => resizeArmorInp(el));
+}
+
 function syncChar(field, val) {
   if (!data._char) data._char = {};
   data._char[field] = val;
@@ -2599,7 +2659,7 @@ function syncChar(field, val) {
   const ficheMap = { nom:'fiche-nom-inp', race:'fiche-race-inp', age:'fiche-age-inp', naiss:'fiche-naiss-inp', pv:'fiche-pv', pa:'fiche-pa', pe:'fiche-pe', ps:'fiche-ps', dsnc:'fiche-dsnc' };
   if (ficheMap[field]) {
     const el = document.getElementById(ficheMap[field]);
-    if (el && el !== document.activeElement) el.value = val || '';
+    if (el && el !== document.activeElement) { el.value = val || ''; resizeFicheInp(el); }
   }
   if (field === 'nom') {
     updateTbNom();
@@ -3390,33 +3450,40 @@ function isShown(cat) {
   return data._paramShow[cat] !== false;
 }
 function applyParamShow() {
-  // Statistiques section in comp page
   const statsEl = document.getElementById('comp-stats-section');
   if (statsEl) statsEl.style.display = isShown('stats') ? '' : 'none';
   const magEnabled = data._magieEnabled !== false;
-  // Comp sections
-  const sections = {
-    pri: 'list-principales', sec: 'list-secondaires',
-    mar: 'list-martiales',   mag: 'list-magiques',
-    savoirs: 'list-savoirs', coups: 'list-coups',
-  };
-  Object.entries(sections).forEach(([cat, listId]) => {
+
+  // Simple comp sections
+  [
+    ['pri','list-principales'], ['sec','list-secondaires'],
+    ['mar','list-martiales'],   ['savoirs','list-savoirs'],
+    ['coups','list-coups'],
+  ].forEach(([cat, listId]) => {
     const listEl = document.getElementById(listId);
     const titleEl = listEl?.previousElementSibling;
-    // mag is always hidden if magie disabled, regardless of isShown
-    const show = (cat === 'mag' ? magEnabled && isShown(cat) : isShown(cat));
+    const show = isShown(cat);
     if (listEl)  listEl.style.display  = show ? '' : 'none';
     if (titleEl) titleEl.style.display = show ? '' : 'none';
   });
-  // Livre de sorts — also respects magie setting
-  const livreBody = document.getElementById('livre-sorts-body');
+
+  // Magiques — entire col hidden if magie disabled OR toggle off
+  const magCol = document.querySelector('.comp-body .comp-col:last-child');
+  const showMag = magEnabled && isShown('mag');
+  const showLivre = magEnabled && isShown('livre');
+  if (magCol) magCol.style.display = (showMag || showLivre) ? '' : 'none';
+
+  // Magiques section within col
+  const listMag = document.getElementById('list-magiques');
+  const titleMag = listMag?.previousElementSibling;
+  if (listMag)  listMag.style.display  = showMag ? '' : 'none';
+  if (titleMag) titleMag.style.display = showMag ? '' : 'none';
+
+  // Livre de sorts section
+  const livreBody  = document.getElementById('livre-sorts-body');
   const livreTitle = livreBody?.previousElementSibling;
-  const showLivre = magEnabled && isShown('mag');
   if (livreBody)  livreBody.style.display  = showLivre ? '' : 'none';
   if (livreTitle) livreTitle.style.display = showLivre ? '' : 'none';
-  // Entire last comp-col (mag + livre)
-  const magCol = document.querySelector('.comp-body .comp-col:last-child');
-  if (magCol) magCol.style.display = magEnabled ? '' : 'none';
 }
 
 // Category formats
@@ -3658,7 +3725,7 @@ function renderParametres() {
   const infRow = document.getElementById('cfg-infusion-row');
   if(infRow) infRow.style.display = data._magieEnabled!==false?'':'none';
   // Show/hide toggles
-  ['stats','pri','sec','mar','mag','savoirs','coups'].forEach(cat => {
+  ['stats','pri','sec','mar','mag','savoirs','coups','livre'].forEach(cat => {
     const cb = document.getElementById('cfg-show-'+cat);
     if(cb) cb.checked = isShown(cat);
   });
@@ -3836,6 +3903,11 @@ refreshArmorStats();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
 renderFiche();
+// Resize all inputs after everything is loaded
+setTimeout(() => {
+  document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
+  resizeAllCartouche();
+}, 120);
 </script>
 </body>
 </html>
