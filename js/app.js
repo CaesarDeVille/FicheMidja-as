@@ -116,20 +116,27 @@ function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
 function saveData() { persist(); toast('Sauvegardé !'); }
 
 function exportData() {
-  // Collect current theme values
+  // Collect current theme values.
+  // getComputedStyle is important: it also captures default CSS variables,
+  // not only values manually changed inline.
   const root = document.documentElement;
+  const cs = getComputedStyle(root);
   const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--char-panel'];
   const theme = {};
-  themeKeys.forEach(k => { theme[k] = root.style.getPropertyValue(k).trim(); });
+  themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
+
   const out = Object.assign({}, data, {
-    _bagSize: document.getElementById('bagSize').value,
+    _bagSize: document.getElementById('bagSize')?.value || data._bagSize || 'sacoche',
     _exportTheme: theme,
-    _exportFont: root.style.getPropertyValue('--font').trim(),
+    _exportFont: cs.getPropertyValue('--font').trim(),
   });
+
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const nom = (data._char?.nom || '').trim().replace(/[^a-zA-Z0-9_\-\. ]/g,'').trim() || 'Personnage';
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = nom + ' - Midjaas.json'; a.click();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nom + ' - Midjaas.json';
+  a.click();
 }
 
 function saveKeepTheme(val) {
@@ -145,16 +152,24 @@ function importData(e) {
   const r = new FileReader();
 
   r.onload = ev => {
+    let parsed;
     try {
-      const parsed = JSON.parse(ev.target.result);
+      parsed = JSON.parse(ev.target.result);
+    } catch (err) {
+      console.error(err);
+      toast('Erreur JSON');
+      e.target.value = '';
+      return;
+    }
 
-      // Option actuelle AVANT l'import :
+    try {
+      // Option locale AVANT l'import :
       // coché = on garde notre apparence locale
-      // décoché = on accepte l'apparence de la fiche importée
+      // décoché = on importe l'apparence de la fiche reçue
       const keepTheme = getKeepTheme();
 
-      // Sauvegarde de notre apparence actuelle au cas où on veut la conserver
       const root = document.documentElement;
+      const cs = getComputedStyle(root);
       const pickers = {
         '--bg':'tc-bg',
         '--bg2':'tc-bg2',
@@ -167,67 +182,69 @@ function importData(e) {
 
       const currentTheme = {};
       Object.keys(pickers).forEach(k => {
-        currentTheme[k] = root.style.getPropertyValue(k).trim();
+        currentTheme[k] = cs.getPropertyValue(k).trim();
       });
-      const currentFont = root.style.getPropertyValue('--font').trim();
+      const currentFont = cs.getPropertyValue('--font').trim();
+
+      const setPickerValue = (id, value) => {
+        const el = document.getElementById(id);
+        if (!el || !value) return;
+        // Les inputs color n'acceptent que #rrggbb.
+        if (el.type === 'color' && !/^#[0-9a-fA-F]{6}$/.test(value.trim())) return;
+        el.value = value.trim();
+      };
 
       // Import des données de la fiche
       data = parsed;
-
-      // On garde le réglage local de cette case
       data._keepThemeOnImport = keepTheme;
 
       if (keepTheme) {
-        // Conserver mes couleurs : on restaure notre apparence
-        Object.entries(currentTheme).forEach(([k, v]) => {
-          if (v) root.style.setProperty(k, v);
-        });
+        // Conserver mes couleurs : restaurer l'apparence locale
+        Object.entries(currentTheme).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
         if (currentFont) root.style.setProperty('--font', currentFont);
 
-        Object.entries(pickers).forEach(([cssVar, id]) => {
-          const el = document.getElementById(id);
-          if (el && currentTheme[cssVar]) el.value = currentTheme[cssVar];
-        });
-        const fontEl = document.getElementById('tc-font');
-        if (fontEl && currentFont) fontEl.value = currentFont;
-      } else if (parsed._exportTheme) {
-        // Importer l'apparence de la fiche
+        Object.entries(pickers).forEach(([cssVar, id]) => setPickerValue(id, currentTheme[cssVar]));
+        setPickerValue('tc-font', currentFont);
+      } else if (parsed._exportTheme && typeof parsed._exportTheme === 'object') {
+        // Importer l'apparence de la fiche reçue
         const t = parsed._exportTheme;
-        Object.entries(t).forEach(([k, v]) => {
-          if (v) root.style.setProperty(k, v);
-        });
+        Object.entries(t).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
         if (parsed._exportFont) root.style.setProperty('--font', parsed._exportFont);
 
-        Object.entries(pickers).forEach(([cssVar, id]) => {
-          const el = document.getElementById(id);
-          if (el && t[cssVar]) el.value = t[cssVar];
-        });
-        const fontEl = document.getElementById('tc-font');
-        if (fontEl && parsed._exportFont) fontEl.value = parsed._exportFont;
+        Object.entries(pickers).forEach(([cssVar, id]) => setPickerValue(id, t[cssVar]));
+        setPickerValue('tc-font', parsed._exportFont);
 
         localStorage.setItem('dnd_theme', JSON.stringify({
-          bg: t['--bg'],
-          bg2: t['--bg2'],
-          gold: t['--gold'],
-          text: t['--text'],
-          border: t['--border'],
+          bg: t['--bg'] || '',
+          bg2: t['--bg2'] || '',
+          gold: t['--gold'] || '',
+          text: t['--text'] || '',
+          border: t['--border'] || '',
           font: parsed._exportFont || '',
-          slotEmpty: t['--slot-empty'],
-          charPanel: t['--char-panel']
+          slotEmpty: t['--slot-empty'] || '',
+          charPanel: t['--char-panel'] || ''
         }));
       }
 
-      document.getElementById('bagSize').value = data._bagSize || 'sacoche';
+      const bag = document.getElementById('bagSize');
+      if (bag) bag.value = data._bagSize || 'sacoche';
+
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
       applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels(); buildBourseRows();
+
+      const keepThemeBox = document.getElementById('cfg-keep-theme');
+      if (keepThemeBox) keepThemeBox.checked = keepTheme;
+
       setTimeout(() => {
         resizeAllCartouche();
         document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
       }, 50);
-      persist(); toast('Importé !');
+
+      persist();
+      toast('Importé !');
     } catch (err) {
       console.error(err);
-      toast('Erreur JSON');
+      toast('Import incomplet : vérifie la console');
     } finally {
       e.target.value = '';
     }
