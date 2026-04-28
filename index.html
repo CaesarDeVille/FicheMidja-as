@@ -22,7 +22,8 @@
         <input type="radio" name="lang-switch" value="en" onchange="setLang('en')"> EN
       </label>
     </div>
-    <button class="btn-sm" onclick="saveData()">&#128190; Sauvegarder</button>
+    <button class="btn-sm" onclick="openFirebaseSaveModal()">&#128190; Sauvegarder</button>
+    <button class="btn-sm" onclick="openFirebaseLoadModal()">&#8635; Charger</button>
     <button class="btn-sm" id="btn-undo" onclick="undoAction()" title="Ctrl+Z">↶ Annuler</button>
     <button class="btn-sm" id="btn-redo" onclick="redoAction()" title="Ctrl+Y">↷ Rétablir</button>
     <button class="btn-sm" onclick="exportData()">&#8679; Export</button>
@@ -1170,5 +1171,44 @@
     <div class="sp-armor-stats" id="sp-armor-stats"></div>
   </div>
 </div>
+
+<!-- ══ FIREBASE SAVE / LOAD MODALS ══ -->
+<div class="modal-overlay" id="firebase-save-modal">
+  <div class="modal">
+    <div class="modal-title">Sauvegarde Firebase</div>
+
+    <div class="mfield">
+      <label>Code actuel</label>
+      <input id="firebase-current-code" type="text" readonly placeholder="Aucun code">
+    </div>
+
+    <div class="modal-btns" style="justify-content:space-between;flex-wrap:wrap;">
+      <button class="btn" onclick="firebaseSaveCurrent()">Sauvegarder</button>
+      <button class="btn" onclick="firebaseSaveAs()">Sauvegarder sous</button>
+      <button class="btn" onclick="closeFirebaseSaveModal()">Fermer</button>
+    </div>
+
+    <div class="param-info" style="margin-top:12px;">
+      “Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="firebase-load-modal">
+  <div class="modal">
+    <div class="modal-title">Charger une sauvegarde</div>
+
+    <div class="mfield">
+      <label>Code de sauvegarde</label>
+      <input id="firebase-load-code" type="text" placeholder="ABC DEF GHI" maxlength="11">
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn" onclick="firebaseLoadByCode()">Charger</button>
+      <button class="btn" onclick="closeFirebaseLoadModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

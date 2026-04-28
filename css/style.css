@@ -1046,3 +1046,13 @@ body {
   cursor: default;
   filter: grayscale(.35);
 }
+
+
+/* === FIREBASE SAVE / LOAD === */
+#firebase-current-code,
+#firebase-load-code {
+  text-align: center;
+  letter-spacing: 3px;
+  color: var(--gold);
+  font-weight: bold;
+}

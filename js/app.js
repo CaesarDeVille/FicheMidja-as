@@ -3261,3 +3261,207 @@ window.addEventListener('DOMContentLoaded', () => {
   // Laisse d'abord le script initial charger la fiche, puis branche l'historique.
   setTimeout(initUndoRedo, 0);
 });
+
+
+/* === FIREBASE DIRECT SAVES === */
+
+function normalizeSaveCode(code) {
+  return String(code || '')
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '')
+    .slice(0, 9);
+}
+
+function formatSaveCode(code) {
+  const c = normalizeSaveCode(code);
+  return [c.slice(0,3), c.slice(3,6), c.slice(6,9)].filter(Boolean).join(' ');
+}
+
+function generateSaveCode() {
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // sans I/O pour éviter les confusions
+  let out = '';
+  for (let i = 0; i < 9; i++) out += letters[Math.floor(Math.random() * letters.length)];
+  return out;
+}
+
+function getSaveCode() {
+  return normalizeSaveCode(data._firebaseSaveCode || localStorage.getItem('midjaas_save_code') || '');
+}
+
+function setSaveCode(code) {
+  const clean = normalizeSaveCode(code);
+  data._firebaseSaveCode = clean;
+  localStorage.setItem('midjaas_save_code', clean);
+  persist();
+  return clean;
+}
+
+function getFirebaseDbCompat() {
+  try {
+    if (window.firebase && firebase.database) return firebase.database();
+  } catch(e) {}
+  return null;
+}
+
+function makeFirebaseSavePayload() {
+  const root = document.documentElement;
+  const cs = getComputedStyle(root);
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--char-panel'];
+  const theme = {};
+  themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
+
+  return Object.assign({}, data, {
+    _bagSize: document.getElementById('bagSize')?.value || data._bagSize || 'sacoche',
+    _exportTheme: theme,
+    _exportFont: cs.getPropertyValue('--font').trim(),
+    _savedAt: Date.now()
+  });
+}
+
+function openFirebaseSaveModal() {
+  const m = document.getElementById('firebase-save-modal');
+  const input = document.getElementById('firebase-current-code');
+  if (input) input.value = formatSaveCode(getSaveCode()) || 'Aucun code';
+  if (m) m.classList.add('open');
+}
+
+function closeFirebaseSaveModal() {
+  const m = document.getElementById('firebase-save-modal');
+  if (m) m.classList.remove('open');
+}
+
+function openFirebaseLoadModal() {
+  const m = document.getElementById('firebase-load-modal');
+  const input = document.getElementById('firebase-load-code');
+  if (input) input.value = '';
+  if (m) m.classList.add('open');
+  setTimeout(() => input?.focus(), 50);
+}
+
+function closeFirebaseLoadModal() {
+  const m = document.getElementById('firebase-load-modal');
+  if (m) m.classList.remove('open');
+}
+
+async function firebaseSaveToCode(code) {
+  const db = getFirebaseDbCompat();
+  if (!db) {
+    toast('Firebase indisponible');
+    return false;
+  }
+
+  const clean = normalizeSaveCode(code);
+  if (clean.length !== 9) {
+    toast('Code invalide');
+    return false;
+  }
+
+  const payload = makeFirebaseSavePayload();
+  payload._firebaseSaveCode = clean;
+
+  await db.ref('saves/' + clean).set(payload);
+  setSaveCode(clean);
+
+  const input = document.getElementById('firebase-current-code');
+  if (input) input.value = formatSaveCode(clean);
+
+  toast('Sauvegardé : ' + formatSaveCode(clean));
+  return true;
+}
+
+async function firebaseSaveCurrent() {
+  try {
+    let code = getSaveCode();
+    if (!code) {
+      code = generateSaveCode();
+    }
+    await firebaseSaveToCode(code);
+  } catch (err) {
+    console.error(err);
+    toast('Erreur sauvegarde Firebase');
+  }
+}
+
+async function firebaseSaveAs() {
+  try {
+    let code = generateSaveCode();
+    const db = getFirebaseDbCompat();
+    if (!db) {
+      toast('Firebase indisponible');
+      return;
+    }
+
+    // Évite de réutiliser un code existant.
+    for (let i = 0; i < 8; i++) {
+      const snap = await db.ref('saves/' + code).get();
+      if (!snap.exists()) break;
+      code = generateSaveCode();
+    }
+
+    await firebaseSaveToCode(code);
+  } catch (err) {
+    console.error(err);
+    toast('Erreur sauvegarde Firebase');
+  }
+}
+
+async function firebaseLoadByCode() {
+  try {
+    const raw = document.getElementById('firebase-load-code')?.value || '';
+    const code = normalizeSaveCode(raw);
+
+    if (code.length !== 9) {
+      toast('Code invalide');
+      return;
+    }
+
+    const db = getFirebaseDbCompat();
+    if (!db) {
+      toast('Firebase indisponible');
+      return;
+    }
+
+    const snap = await db.ref('saves/' + code).get();
+    if (!snap.exists()) {
+      toast('Aucune sauvegarde trouvée');
+      return;
+    }
+
+    const loaded = snap.val();
+    if (!loaded || typeof loaded !== 'object') {
+      toast('Sauvegarde invalide');
+      return;
+    }
+
+    if (!confirm('Charger cette sauvegarde ? La fiche actuelle sera remplacée.')) return;
+
+    data = loaded;
+    data._firebaseSaveCode = code;
+    localStorage.setItem('midjaas_save_code', code);
+
+    const bag = document.getElementById('bagSize');
+    if (bag) bag.value = data._bagSize || 'sacoche';
+
+    buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
+    applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
+    applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
+    buildBourseRows(); refreshArmorStats();
+
+    persist();
+    closeFirebaseLoadModal();
+    toast('Sauvegarde chargée : ' + formatSaveCode(code));
+  } catch (err) {
+    console.error(err);
+    toast('Erreur chargement Firebase');
+  }
+}
+
+// Format automatique du champ code
+window.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('firebase-load-code');
+  if (input) {
+    input.addEventListener('input', () => {
+      input.value = formatSaveCode(input.value);
+    });
+  }
+});
