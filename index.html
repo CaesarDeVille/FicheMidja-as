@@ -3073,13 +3073,14 @@ function loadChar() {
 
 /* ══ PAGE NAVIGATION ══ */
 function showPage(name) {
-  ['fiche','inventaire','competences','capital','parametres'].forEach(p => {
-    document.getElementById('page-'+p).classList.toggle('active', p===name);
-    document.getElementById('nav-'+p).classList.toggle('active', p===name);
+  ['fiche','inventaire','competences','capital','campagne','parametres'].forEach(p => {
+    const pageEl = document.getElementById('page-'+p);
+    const navEl  = document.getElementById('nav-'+p);
+    if (pageEl) pageEl.classList.toggle('active', p===name);
+    if (navEl)  navEl.classList.toggle('active', p===name);
   });
   if (name === 'competences') renderCompetences();
   if (name === 'capital') renderCapital();
-  if (name === 'campagne') {} // Firebase module handles itself
   if (name === 'parametres') renderParametres();
   if (name === 'fiche') renderFiche();
 }
