@@ -1259,8 +1259,23 @@ function saveBourseLabel(val) { data._bourseLabel = val; persist(); }
 
 function loadChar() {
   const c = data._char || {};
-  const f = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-  const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
+
+  // IMPORTANT :
+  // Il faut écrire une chaîne vide quand la valeur n'existe plus.
+  // Sinon, après reset, les anciens textes restent visuellement dans
+  // les cartouches Inventaire / Compétences.
+  const f = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = (val ?? '');
+      if (typeof resizeCharInp === 'function') resizeCharInp(el);
+    }
+  };
+
+  const fc = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!val;
+  };
 
   // Inventaire cartouche
   f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
@@ -1278,12 +1293,10 @@ function loadChar() {
   f('comp-char-ps-max', c['ps-max']); f('comp-char-pe-max', c['pe-max']);
   f('comp-char-dsnc-max', c['dsnc-max']);
 
-  // Gender
-  if (c.gender) {
-    document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
-    document.querySelectorAll('input[name="comp-gender"]').forEach(r => r.checked = r.value === c.gender);
-    document.querySelectorAll('input[name="fiche-gender"]').forEach(r => r.checked = r.value === c.gender);
-  }
+  // Gender : si absent, on décoche bien tout après reset.
+  document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = !!c.gender && r.value === c.gender);
+  document.querySelectorAll('input[name="comp-gender"]').forEach(r => r.checked = !!c.gender && r.value === c.gender);
+  document.querySelectorAll('input[name="fiche-gender"]').forEach(r => r.checked = !!c.gender && r.value === c.gender);
 
   applyStatSplits();
   fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
