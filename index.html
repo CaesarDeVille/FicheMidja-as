@@ -580,7 +580,16 @@ body {
 .camp-player-name { font-size: 14px; color: var(--gold); flex: 1; }
 .camp-player-time { font-size: 10px; color: var(--dim); }
 .camp-player-load { font-size: 11px; color: var(--muted); background: transparent; border: 1px solid var(--border2); border-radius: 3px; padding: 3px 8px; cursor: pointer; }
-.camp-player-card:hover .camp-player-load { border-color: var(--gold); color: var(--gold); }
+.camp-accordion { border: 1.5px solid var(--border2); border-radius: 5px; overflow: hidden; }
+.camp-accordion.open .camp-acc-body { display: block; }
+.camp-acc-hdr { display: flex; align-items: center; gap: 8px; background: var(--bg3); padding: 10px 12px; cursor: pointer; flex-wrap: wrap; }
+.camp-acc-name { font-size: 13px; color: var(--gold); flex: 1; min-width: 80px; }
+.camp-acc-code { font-size: 11px; color: var(--muted); letter-spacing: 2px; background: var(--bg2); padding: 2px 6px; border-radius: 3px; }
+.camp-acc-count { font-size: 11px; color: var(--dim); }
+.camp-acc-arrow { font-size: 10px; color: var(--muted); transition: transform .2s; margin-left: auto; }
+.camp-accordion.open .camp-acc-arrow { transform: rotate(180deg); }
+.camp-acc-body { display: none; padding: 8px 12px; background: var(--bg2); display: none; flex-direction: column; gap: 6px; }
+.camp-accordion.open .camp-acc-body { display: flex; }
 
 /* ══ PAGE CAPITAL ══ */
 .capital-layout { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; overflow-y: auto; padding: 2px; }
@@ -1484,44 +1493,50 @@ body {
       <!-- COL MJ -->
       <div class="camp-col">
         <div class="camp-col-title">&#9812; Maître du Jeu</div>
+
+        <!-- Créer -->
         <div class="camp-section">
           <div class="camp-section-title">Créer une campagne</div>
           <input type="text" id="camp-name" class="camp-input" placeholder="Nom de la campagne…">
-          <button class="camp-btn" onclick="createCampagne()">Créer et obtenir un code</button>
-          <div id="camp-code-display" style="display:none;margin-top:12px;text-align:center;">
-            <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Code à donner aux joueurs</div>
-            <div id="camp-code-text" style="font-size:32px;color:var(--gold);letter-spacing:6px;font-weight:bold;border:2px solid var(--gold);border-radius:6px;padding:10px 20px;display:inline-block;"></div>
-            <div style="margin-top:8px;">
-              <button class="camp-btn-sm" onclick="copyCampCode()">&#9635; Copier le code</button>
-            </div>
-          </div>
+          <button class="camp-btn" onclick="createCampagne()">+ Créer et obtenir un code</button>
         </div>
 
-        <div class="camp-section" style="margin-top:16px;">
-          <div class="camp-section-title">Joueurs connectés <span id="camp-player-count" style="font-size:11px;color:var(--muted);"></span></div>
-          <div id="camp-players-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-            <div style="color:var(--dim);font-size:12px;font-style:italic;">Aucun joueur pour l'instant…</div>
+        <!-- Rejoindre comme MJ -->
+        <div class="camp-section" style="margin-top:10px;">
+          <div class="camp-section-title">Rejoindre comme Maître du Jeu</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="camp-mj-join-code" class="camp-input" placeholder="Code…" maxlength="6"
+              style="text-transform:uppercase;letter-spacing:3px;text-align:center;font-size:16px;flex:1;">
+            <button class="camp-btn" style="width:auto;padding:8px 14px;flex-shrink:0;" onclick="mjJoinCampagne()">Rejoindre</button>
           </div>
+          <div id="camp-mj-join-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
         </div>
+
+        <!-- Campagnes MJ en accordéons -->
+        <div id="camp-mj-campagnes" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
       <!-- COL JOUEUR -->
       <div class="camp-col">
         <div class="camp-col-title">&#9817; Joueur</div>
+
+        <!-- Rejoindre -->
         <div class="camp-section">
           <div class="camp-section-title">Rejoindre une campagne</div>
-          <input type="text" id="camp-join-code" class="camp-input" placeholder="Code de campagne (6 lettres)…" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center;">
-          <input type="text" id="camp-player-name" class="camp-input" style="margin-top:8px;" placeholder="Votre nom (si différent du perso)…">
-          <button class="camp-btn" onclick="joinCampagne()">Rejoindre la campagne</button>
-          <div id="camp-join-status" style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;"></div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="camp-join-code" class="camp-input" placeholder="Code…" maxlength="6"
+              style="text-transform:uppercase;letter-spacing:3px;text-align:center;font-size:16px;flex:1;">
+            <button class="camp-btn" style="width:auto;padding:8px 14px;flex-shrink:0;" onclick="joinCampagne()">Rejoindre</button>
+          </div>
+          <div id="camp-join-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
         </div>
 
-        <div class="camp-section" id="camp-publish-section" style="margin-top:16px;display:none;">
-          <div class="camp-section-title">Publier ma fiche</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Envoie ta fiche au MJ de la campagne <span id="camp-joined-name" style="color:var(--gold);"></span>.</div>
-          <button class="camp-btn camp-btn-publish" onclick="publishFiche()">&#8593; Publier ma fiche</button>
-          <div id="camp-publish-status" style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;"></div>
-          <button class="camp-btn-sm" style="margin-top:8px;color:#f08080;border-color:#5a2010;" onclick="leaveCampagne()">Quitter la campagne</button>
+        <!-- Publier -->
+        <div class="camp-section" id="camp-publish-section" style="margin-top:10px;display:none;">
+          <div class="camp-section-title">Campagne active : <span id="camp-joined-name" style="color:var(--gold);"></span></div>
+          <button class="camp-btn camp-btn-publish" onclick="publishFiche()">&#8679; Publier ma fiche</button>
+          <div id="camp-publish-status" style="font-size:11px;color:var(--muted);margin-top:4px;text-align:center;"></div>
+          <button class="camp-btn-sm" style="margin-top:8px;color:#f08080;border-color:#5a2010;width:100%;" onclick="leaveCampagne()">Quitter la campagne</button>
         </div>
       </div>
 
@@ -2097,7 +2112,16 @@ function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
 function saveData() { persist(); toast('Sauvegardé !'); }
 
 function exportData() {
-  const out = Object.assign({}, data, { _bagSize: document.getElementById('bagSize').value });
+  // Collect current theme values
+  const root = document.documentElement;
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--char-panel'];
+  const theme = {};
+  themeKeys.forEach(k => { theme[k] = root.style.getPropertyValue(k).trim(); });
+  const out = Object.assign({}, data, {
+    _bagSize: document.getElementById('bagSize').value,
+    _exportTheme: theme,
+    _exportFont: root.style.getPropertyValue('--font').trim(),
+  });
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const nom = (data._char?.nom || '').trim().replace(/[^a-zA-Z0-9_\-\. ]/g,'').trim() || 'Personnage';
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
@@ -2111,8 +2135,14 @@ function importData(e) {
     try {
       data = JSON.parse(ev.target.result);
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
+      // Restore theme if present
+      if (data._exportTheme) {
+        const root = document.documentElement;
+        Object.entries(data._exportTheme).forEach(([k,v]) => { if(v) root.style.setProperty(k, v); });
+        if (data._exportFont) root.style.setProperty('--font', data._exportFont);
+      }
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
-      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels();
+      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels(); buildBourseRows();
       setTimeout(() => {
         resizeAllCartouche();
         document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
@@ -4748,206 +4778,291 @@ setTimeout(() => {
 }, 120);
 </script>
 
-<!-- Firebase SDK compat (pas de module, fonctionne en fichier statique) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<!-- Firebase SDK compat v9 -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAbpulYeObmWABpe4uFr6ufYSmtQ1em9d4",
-  authDomain: "midjaasfichesrpg.firebaseapp.com",
-  databaseURL: "https://midjaasfichesrpg-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "midjaasfichesrpg",
-  storageBucket: "midjaasfichesrpg.firebasestorage.app",
-  messagingSenderId: "428543060349",
-  appId: "1:428543060349:web:eb7505960429eae4dc4414"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+(function() {
+  // ── Init ──
+  const FB_CFG = {
+    apiKey: "AIzaSyAbpulYeObmWABpe4uFr6ufYSmtQ1em9d4",
+    authDomain: "midjaasfichesrpg.firebaseapp.com",
+    databaseURL: "https://midjaasfichesrpg-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "midjaasfichesrpg",
+    storageBucket: "midjaasfichesrpg.firebasestorage.app",
+    messagingSenderId: "428543060349",
+    appId: "1:428543060349:web:eb7505960429eae4dc4414"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  const db = firebase.database();
 
-// ── State ──
-let campCode = null;
-let campRole = null;
-let campPlayerKey = null;
-let campListener = null;
+  // ── State ──
+  let mjCodes = [];      // codes des campagnes MJ
+  let mjListeners = {};  // listeners par code
+  let joueurCode = null;
+  let joueurKey  = null;
 
-// ── Toast ──
-function campToast(msg, color) {
-  const t = document.createElement('div');
-  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${color||'#1e3a1e'};color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;border:1px solid ${color||'#4aaa7a'};pointer-events:none;`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-// ── Générer code ──
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c = '';
-  for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
-  return c;
-}
-
-// ── MJ : Créer ──
-function createCampagne() {
-  const name = document.getElementById('camp-name').value.trim() || 'Campagne';
-  const code = genCode();
-  campCode = code; campRole = 'mj';
-  db.ref('campagnes/'+code).set({ name, createdAt: Date.now() })
-    .then(() => {
-      document.getElementById('camp-code-text').textContent = code;
-      document.getElementById('camp-code-display').style.display = '';
-      localStorage.setItem('mj_camp_code', code);
-      localStorage.setItem('mj_camp_name', name);
-      campToast('Campagne "'+name+'" créée !', '#1a3a6a');
-      listenPlayers(code);
-    })
-    .catch(e => campToast('Erreur : '+e.message, '#5a1010'));
-}
-
-function copyCampCode() {
-  const code = document.getElementById('camp-code-text').textContent;
-  navigator.clipboard?.writeText(code).then(() => campToast('Code copié !', '#1a3a6a'));
-}
-
-// ── Écouter joueurs (MJ) ──
-function listenPlayers(code) {
-  if (campListener) campListener();
-  db.ref('campagnes/'+code+'/joueurs').on('value', snap => {
-    const list = document.getElementById('camp-players-list');
-    const count = document.getElementById('camp-player-count');
-    if (!list) return;
-    list.innerHTML = '';
-    const val = snap.val();
-    if (!val) {
-      list.innerHTML = '<div style="color:var(--dim);font-size:12px;font-style:italic;">Aucun joueur pour l\'instant…</div>';
-      if (count) count.textContent = '';
-      return;
-    }
-    const joueurs = Object.entries(val);
-    if (count) count.textContent = '('+joueurs.length+')';
-    joueurs.forEach(([key, joueur]) => {
-      const card = document.createElement('div');
-      card.className = 'camp-player-card';
-      const timeStr = joueur.publishedAt
-        ? new Date(joueur.publishedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
-        : '';
-      card.innerHTML =
-        '<span class="camp-player-name">'+(joueur.nom||key)+'</span>'+
-        (joueur.publishedAt
-          ? '<span class="camp-player-time">Publié '+timeStr+'</span>'
-          : '<span class="camp-player-time" style="color:#888;">En attente…</span>')+
-        (joueur.fiche
-          ? '<button class="camp-player-load" onclick="loadPlayerFiche(\''+code+'\',\''+key+'\')">Charger</button>'
-          : '');
-      list.appendChild(card);
-    });
-  });
-  campListener = () => db.ref('campagnes/'+code+'/joueurs').off('value');
-}
-
-// ── MJ : Charger fiche joueur ──
-function loadPlayerFiche(code, key) {
-  db.ref('campagnes/'+code+'/joueurs/'+key+'/fiche').get().then(snap => {
-    if (!snap.exists()) { campToast('Aucune fiche publiée.', '#5a1010'); return; }
-    const ficheData = snap.val();
-    data = typeof ficheData === 'string' ? JSON.parse(ficheData) : ficheData;
-    persist();
-    buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
-    applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting();
-    applyParamShow(); applyStatSplits(); applyEffetsPlus(); applySlotLabels();
-    applyFicheSectionLabels(); applyAllQualityColors(); buildBourseRows(); refreshArmorStats();
-    showPage('fiche');
-    campToast('Fiche de '+(data._char?.nom||key)+' chargée !', '#1a3a6a');
-  }).catch(e => campToast('Erreur : '+e.message, '#5a1010'));
-}
-
-// ── Joueur : Rejoindre ──
-function joinCampagne() {
-  const code = (document.getElementById('camp-join-code').value||'').toUpperCase().trim();
-  const playerName = (document.getElementById('camp-player-name').value||'').trim()
-    || data?._char?.nom || 'Joueur';
-  if (code.length !== 6) { campToast('Code invalide (6 caractères)', '#5a1010'); return; }
-  db.ref('campagnes/'+code).get().then(snap => {
-    if (!snap.exists()) { campToast('Campagne introuvable.', '#5a1010'); return; }
-    const campName = snap.val().name || code;
-    const playerKey = playerName.replace(/[^a-zA-Z0-9_-]/g,'_');
-    return db.ref('campagnes/'+code+'/joueurs/'+playerKey).set({
-      nom: playerName, joinedAt: Date.now()
-    }).then(() => {
-      campCode = code; campRole = 'joueur'; campPlayerKey = playerKey;
-      localStorage.setItem('joueur_camp_code', code);
-      localStorage.setItem('joueur_camp_key', playerKey);
-      localStorage.setItem('joueur_camp_name', playerName);
-      const status = document.getElementById('camp-join-status');
-      if (status) { status.textContent = '✓ Connecté à "'+campName+'"'; status.style.color = '#4aaa7a'; }
-      const nameEl = document.getElementById('camp-joined-name');
-      if (nameEl) nameEl.textContent = '"'+campName+'"';
-      const sec = document.getElementById('camp-publish-section');
-      if (sec) sec.style.display = '';
-      campToast('Rejoint "'+campName+'" !', '#1a3a6a');
-    });
-  }).catch(e => campToast('Erreur : '+e.message, '#5a1010'));
-}
-
-// ── Joueur : Publier ──
-function publishFiche() {
-  if (!campCode || !campPlayerKey) { campToast('Rejoins d\'abord une campagne.', '#5a1010'); return; }
-  const playerName = localStorage.getItem('joueur_camp_name') || campPlayerKey;
-  db.ref('campagnes/'+campCode+'/joueurs/'+campPlayerKey).set({
-    nom: playerName,
-    joinedAt: Date.now(),
-    publishedAt: Date.now(),
-    fiche: JSON.parse(JSON.stringify(data))
-  }).then(() => {
-    const status = document.getElementById('camp-publish-status');
-    if (status) { status.textContent = '✓ Publiée à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); status.style.color = '#4aaa7a'; }
-    campToast('Fiche publiée !', '#1a3a6a');
-  }).catch(e => campToast('Erreur : '+e.message, '#5a1010'));
-}
-
-// ── Joueur : Quitter ──
-function leaveCampagne() {
-  if (!campCode || !campPlayerKey) return;
-  if (!confirm('Quitter la campagne ?')) return;
-  db.ref('campagnes/'+campCode+'/joueurs/'+campPlayerKey).remove().catch(()=>{});
-  campCode = null; campRole = null; campPlayerKey = null;
-  ['joueur_camp_code','joueur_camp_key','joueur_camp_name'].forEach(k=>localStorage.removeItem(k));
-  const status = document.getElementById('camp-join-status');
-  if (status) { status.textContent = ''; }
-  const sec = document.getElementById('camp-publish-section');
-  if (sec) sec.style.display = 'none';
-  document.getElementById('camp-join-code').value = '';
-  campToast('Campagne quittée.', '#3a2010');
-}
-
-// ── Restore session ──
-window.addEventListener('load', () => {
-  const mjCode = localStorage.getItem('mj_camp_code');
-  if (mjCode) {
-    campCode = mjCode; campRole = 'mj';
-    const codeEl = document.getElementById('camp-code-text');
-    const codeDisp = document.getElementById('camp-code-display');
-    const nameEl = document.getElementById('camp-name');
-    if (codeEl) codeEl.textContent = mjCode;
-    if (codeDisp) codeDisp.style.display = '';
-    if (nameEl) nameEl.value = localStorage.getItem('mj_camp_name') || '';
-    listenPlayers(mjCode);
+  // ── Toast ──
+  function toast(msg, ok) {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;pointer-events:none;color:#fff;border:1px solid '+(ok?'#4aaa7a':'#c04040')+';background:'+(ok?'#1e3a1e':'#3a1010')+';';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 3000);
   }
-  const joueurCode = localStorage.getItem('joueur_camp_code');
-  const joueurKey  = localStorage.getItem('joueur_camp_key');
-  const joueurName = localStorage.getItem('joueur_camp_name');
-  if (joueurCode && joueurKey) {
-    campCode = joueurCode; campRole = 'joueur'; campPlayerKey = joueurKey;
+
+  // ── Génère code ──
+  function genCode() {
+    const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let s=''; for(let i=0;i<6;i++) s+=c[Math.floor(Math.random()*c.length)];
+    return s;
+  }
+
+  // ── MJ : Créer campagne ──
+  window.createCampagne = function() {
+    const name = (document.getElementById('camp-name').value||'').trim() || 'Campagne';
+    const code = genCode();
+    db.ref('campagnes/'+code).set({ name, createdAt: Date.now() })
+      .then(()=>{
+        toast('Campagne "'+name+'" créée ! Code : '+code, true);
+        saveMjCode(code, name);
+        renderMjCampagnes();
+        listenCampagne(code);
+        document.getElementById('camp-name').value = '';
+      })
+      .catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  // ── MJ : Rejoindre campagne existante ──
+  window.mjJoinCampagne = function() {
+    const code = (document.getElementById('camp-mj-join-code').value||'').toUpperCase().trim();
+    const status = document.getElementById('camp-mj-join-status');
+    if (code.length !== 6) { toast('Code invalide', false); return; }
+    db.ref('campagnes/'+code).get().then(snap => {
+      if (!snap.exists()) { status.textContent = 'Campagne introuvable.'; status.style.color='#c04040'; return; }
+      saveMjCode(code, snap.val().name);
+      renderMjCampagnes();
+      listenCampagne(code);
+      status.textContent = '✓ Rejoint "'+snap.val().name+'"';
+      status.style.color = '#4aaa7a';
+      document.getElementById('camp-mj-join-code').value = '';
+    }).catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  function saveMjCode(code, name) {
+    const stored = JSON.parse(localStorage.getItem('mj_codes')||'{}');
+    stored[code] = name;
+    localStorage.setItem('mj_codes', JSON.stringify(stored));
+    mjCodes = Object.entries(stored);
+  }
+
+  function getMjCodes() {
+    return Object.entries(JSON.parse(localStorage.getItem('mj_codes')||'{}'));
+  }
+
+  // ── Écouter joueurs d'une campagne ──
+  function listenCampagne(code) {
+    if (mjListeners[code]) return; // déjà en écoute
+    mjListeners[code] = db.ref('campagnes/'+code+'/joueurs').on('value', () => {
+      renderMjCampagnes();
+    });
+  }
+
+  // ── Render accordéons MJ ──
+  function renderMjCampagnes() {
+    const container = document.getElementById('camp-mj-campagnes');
+    if (!container) return;
+    const codes = getMjCodes();
+    if (!codes.length) { container.innerHTML = ''; return; }
+
+    // On ne recrée que les cartes manquantes (évite de perdre l'état ouvert/fermé)
+    codes.forEach(([code, name]) => {
+      let acc = document.getElementById('camp-acc-'+code);
+      if (!acc) {
+        acc = document.createElement('div');
+        acc.id = 'camp-acc-'+code;
+        acc.className = 'camp-accordion open';
+        container.appendChild(acc);
+        listenCampagne(code);
+      }
+      db.ref('campagnes/'+code+'/joueurs').get().then(snap => {
+        const joueurs = snap.val() ? Object.entries(snap.val()) : [];
+        // Build header
+        const hdr = document.createElement('div');
+        hdr.className = 'camp-acc-hdr';
+        hdr.onclick = () => toggleCampAcc(code);
+        const nm2=document.createElement('span');nm2.className='camp-acc-name';nm2.textContent=name;hdr.appendChild(nm2);
+        const cd2=document.createElement('span');cd2.className='camp-acc-code';cd2.textContent=code;hdr.appendChild(cd2);
+        const ct2=document.createElement('span');ct2.className='camp-acc-count';ct2.textContent=joueurs.length+' joueur'+(joueurs.length!==1?'s':'');hdr.appendChild(ct2);
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'camp-btn-sm'; copyBtn.textContent = 'Copier code';
+        copyBtn.onclick = (e) => { e.stopPropagation(); copyCampCodeVal(code); };
+        const delBtn = document.createElement('button');
+        delBtn.className = 'camp-btn-sm'; delBtn.style.cssText = 'color:#f08080;border-color:#5a2010;';
+        delBtn.textContent = 'Supprimer';
+        delBtn.onclick = (e) => { e.stopPropagation(); deleteCampagne(code); };
+        const arrow = document.createElement('span');
+        arrow.className = 'camp-acc-arrow'; arrow.textContent = '\u25bc';
+        hdr.appendChild(copyBtn); hdr.appendChild(delBtn); hdr.appendChild(arrow);
+        // Build body
+        const body = document.createElement('div');
+        body.className = 'camp-acc-body'; body.id = 'camp-body-'+code;
+        if (joueurs.length === 0) {
+          const empty = document.createElement('div');
+          empty.style.cssText = 'color:var(--dim);font-size:12px;font-style:italic;padding:8px 0;';
+          empty.textContent = 'Aucun joueur…';
+          body.appendChild(empty);
+        } else {
+          joueurs.forEach(([key, j]) => {
+            const card = document.createElement('div');
+            card.className = 'camp-player-card';
+            const nm = document.createElement('span'); nm.className='camp-player-name'; nm.textContent=j.nom||key;
+            const tm = document.createElement('span'); tm.className='camp-player-time';
+            tm.textContent = j.publishedAt ? '\u2713 Publi\u00e9 '+new Date(j.publishedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : 'En attente\u2026';
+            card.appendChild(nm); card.appendChild(tm);
+            if (j.fiche) {
+              const lb = document.createElement('button'); lb.className='camp-player-load'; lb.textContent='Charger';
+              lb.onclick = () => loadPlayerFiche(code, key); card.appendChild(lb);
+            }
+            const rb = document.createElement('button'); rb.className='camp-player-load';
+            rb.style.color='#f08080'; rb.textContent='\u2715';
+            rb.onclick = () => removePlayer(code, key); card.appendChild(rb);
+            body.appendChild(card);
+          });
+        }
+        acc.innerHTML = '';
+        acc.appendChild(hdr); acc.appendChild(body);
+      });
+    });
+  }
+
+  window.toggleCampAcc = function(code) {
+    const acc = document.getElementById('camp-acc-'+code);
+    if (acc) acc.classList.toggle('open');
+  };
+
+  window.copyCampCodeVal = function(code) {
+    navigator.clipboard?.writeText(code).then(()=>toast('Code "'+code+'" copié !', true));
+  };
+
+  window.deleteCampagne = function(code) {
+    if (!confirm('Supprimer la campagne '+code+' et tous ses joueurs ?')) return;
+    db.ref('campagnes/'+code).remove().then(()=>{
+      const stored = JSON.parse(localStorage.getItem('mj_codes')||'{}');
+      delete stored[code];
+      localStorage.setItem('mj_codes', JSON.stringify(stored));
+      const acc = document.getElementById('camp-acc-'+code);
+      if (acc) acc.remove();
+      toast('Campagne supprimée.', true);
+    }).catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  window.removePlayer = function(code, key) {
+    if (!confirm('Retirer ce joueur ?')) return;
+    db.ref('campagnes/'+code+'/joueurs/'+key).remove()
+      .then(()=>toast('Joueur retiré.', true))
+      .catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  window.loadPlayerFiche = function(code, key) {
+    db.ref('campagnes/'+code+'/joueurs/'+key+'/fiche').get().then(snap => {
+      if (!snap.exists()) { toast('Aucune fiche publiée.', false); return; }
+      const ficheData = snap.val();
+      data = typeof ficheData === 'string' ? JSON.parse(ficheData) : ficheData;
+      persist();
+      buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
+      applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting();
+      applyParamShow(); applyStatSplits(); applyEffetsPlus(); applySlotLabels();
+      applyFicheSectionLabels(); applyAllQualityColors(); buildBourseRows(); refreshArmorStats();
+      applyTheme();
+      showPage('fiche');
+      toast('Fiche de '+(data._char?.nom||key)+' chargée !', true);
+    }).catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  // ── Joueur : Rejoindre ──
+  window.joinCampagne = function() {
+    const code = (document.getElementById('camp-join-code').value||'').toUpperCase().trim();
+    const playerName = (window.data?._char?.nom || 'Joueur').replace(/[^a-zA-Z0-9_\-]/g,'_');
+    const displayName = window.data?._char?.nom || 'Joueur';
+    const status = document.getElementById('camp-join-status');
+    if (code.length !== 6) { toast('Code invalide (6 lettres)', false); return; }
+    db.ref('campagnes/'+code).get().then(snap => {
+      if (!snap.exists()) { status.textContent='Campagne introuvable.'; status.style.color='#c04040'; return; }
+      const campName = snap.val().name || code;
+      return db.ref('campagnes/'+code+'/joueurs/'+playerName).set({
+        nom: displayName, joinedAt: Date.now()
+      }).then(()=>{
+        joueurCode = code; joueurKey = playerName;
+        localStorage.setItem('joueur_camp_code', code);
+        localStorage.setItem('joueur_camp_key', playerName);
+        localStorage.setItem('joueur_camp_name', displayName);
+        status.textContent = '✓ Connecté à "'+campName+'"';
+        status.style.color = '#4aaa7a';
+        const nameEl = document.getElementById('camp-joined-name');
+        if (nameEl) nameEl.textContent = '"'+campName+'"';
+        const sec = document.getElementById('camp-publish-section');
+        if (sec) sec.style.display = '';
+        toast('Rejoint "'+campName+'" !', true);
+      });
+    }).catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  // ── Joueur : Publier fiche ──
+  window.publishFiche = function() {
+    if (!joueurCode || !joueurKey) { toast('Rejoins une campagne.', false); return; }
+    const displayName = localStorage.getItem('joueur_camp_name') || joueurKey;
+    db.ref('campagnes/'+joueurCode+'/joueurs/'+joueurKey).set({
+      nom: displayName,
+      joinedAt: Date.now(),
+      publishedAt: Date.now(),
+      fiche: JSON.parse(JSON.stringify(window.data || {}))
+    }).then(()=>{
+      const status = document.getElementById('camp-publish-status');
+      if (status) { status.textContent='✓ Publiée à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); status.style.color='#4aaa7a'; }
+      toast('Fiche publiée !', true);
+    }).catch(e=>toast('Erreur : '+e.message, false));
+  };
+
+  // ── Joueur : Quitter ──
+  window.leaveCampagne = function() {
+    if (!joueurCode || !joueurKey) return;
+    if (!confirm('Quitter la campagne ?')) return;
+    db.ref('campagnes/'+joueurCode+'/joueurs/'+joueurKey).remove().catch(()=>{});
+    joueurCode = null; joueurKey = null;
+    ['joueur_camp_code','joueur_camp_key','joueur_camp_name'].forEach(k=>localStorage.removeItem(k));
+    const status = document.getElementById('camp-join-status');
+    if (status) { status.textContent=''; }
+    const sec = document.getElementById('camp-publish-section');
+    if (sec) sec.style.display = 'none';
     const codeInp = document.getElementById('camp-join-code');
-    const nameInp = document.getElementById('camp-player-name');
-    const status  = document.getElementById('camp-join-status');
-    const sec     = document.getElementById('camp-publish-section');
-    if (codeInp) codeInp.value = joueurCode;
-    if (nameInp) nameInp.value = joueurName || '';
-    if (status)  { status.textContent = '✓ Connecté'; status.style.color = '#4aaa7a'; }
-    if (sec)     sec.style.display = '';
-  }
-});
+    if (codeInp) codeInp.value = '';
+    toast('Campagne quittée.', true);
+  };
+
+  // ── Restore sessions ──
+  window.addEventListener('load', ()=>{
+    // MJ
+    getMjCodes().forEach(([code]) => listenCampagne(code));
+    renderMjCampagnes();
+    // Joueur
+    const jc = localStorage.getItem('joueur_camp_code');
+    const jk = localStorage.getItem('joueur_camp_key');
+    const jn = localStorage.getItem('joueur_camp_name');
+    if (jc && jk) {
+      joueurCode = jc; joueurKey = jk;
+      const codeInp = document.getElementById('camp-join-code');
+      const status  = document.getElementById('camp-join-status');
+      const sec     = document.getElementById('camp-publish-section');
+      const nameEl  = document.getElementById('camp-joined-name');
+      if (codeInp) codeInp.value = jc;
+      if (status)  { status.textContent = '✓ Connecté ('+jn+')'; status.style.color='#4aaa7a'; }
+      if (sec)     sec.style.display = '';
+      if (nameEl)  nameEl.textContent = jn || '';
+    }
+  });
+
+})();
 </script>
 </body>
 </html>
