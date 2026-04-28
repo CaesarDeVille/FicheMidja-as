@@ -187,7 +187,7 @@ body {
 .eq-r2-left  { display: flex; flex-direction: column; gap: 8px; width: 30%; flex-shrink: 0; }
 .eq-r2-left .slot { width: 100%; }
 .slot-gants    { min-height: clamp(90px,14vh,160px); flex: 2; }
-.slot-bracelet { min-height: clamp(60px,9vh,110px); flex: 1; }
+.slot-bracelet { min-height: clamp(90px,14vh,160px); flex: 1; }
 .slot-armure   { width: 45%; flex-shrink: 0; min-height: clamp(160px,25vh,280px); }
 .eq-r2 .vband  { flex: 1; min-width: 0; }
 
@@ -197,7 +197,7 @@ body {
 .slot-ceinture { width: 65%; flex-shrink: 0; }
 
 /* Row 4: Divers reste | Bottes 65% */
-.eq-r4 { display: flex; gap: 8px; min-height: clamp(70px,9vh,110px); flex-shrink: 0; }
+.eq-r4 { display: flex; gap: 8px; min-height: clamp(90px,14vh,160px); flex-shrink: 0; }
 .slot-divers { flex: 1; min-width: 0; }
 .slot-bottes { width: 65%; flex-shrink: 0; }
 
@@ -488,7 +488,7 @@ body {
 .stat-split .char-input.narrow { width: 30px; }
 .stat-slash { font-size: 12px; color: var(--border2); padding: 0 1px; flex-shrink: 0; }
 .stat-max { color: var(--muted) !important; }
-.char-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+.char-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .char-lbl {
   font-size: 11px; color: var(--muted); text-transform: uppercase;
   letter-spacing: .5px; white-space: nowrap; flex-shrink: 0;
@@ -499,10 +499,11 @@ body {
   color: var(--gold); font-family: var(--font); font-size: 13px;
   padding: 2px 4px; outline: none;
   transition: border-color .15s;
+  overflow: visible;
 }
 .char-input:focus { border-color: var(--gold); }
-.char-input.wide { max-width: clamp(120px, 12vw, 220px); min-width: 60px; width: 12vw; }
-.char-input.narrow { width: 4.5ch; min-width: 2.5ch; }
+.char-input.wide { min-width: 5ch; flex-shrink: 1; }
+.char-input.narrow { min-width: 3ch; flex-shrink: 1; }
 .char-sep { color: var(--border2); font-size: 13px; flex-shrink: 0; }
 .blessure-wrap { display: flex; align-items: center; gap: 6px; }
 .blessure-cb {
@@ -561,7 +562,47 @@ body {
 .armor-stat-cartouche { display: inline-flex; align-items: center; gap: 3px; margin-right: 8px; }
 #inv-armor-stats, #comp-armor-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 3px; }
 
-/* ══ PAGE CAMPAGNE ══ */
+/* ══ SLOT PREVIEW (clic droit maintenu) ══ */
+#slot-preview {
+  display: none; position: fixed; z-index: 9000;
+  min-width: 280px; max-width: 400px;
+  background: var(--bg2); border: 2px solid var(--gold);
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.8);
+  pointer-events: none;
+}
+#slot-preview .sp-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: .25; border-radius: 6px;
+}
+#slot-preview .sp-content {
+  position: relative; z-index: 1;
+  padding: 18px 20px;
+}
+#slot-preview .sp-nom {
+  font-size: 20px; color: var(--gold); letter-spacing: 1px;
+  margin-bottom: 4px; line-height: 1.2;
+}
+#slot-preview .sp-type {
+  font-size: 12px; color: var(--muted); letter-spacing: .5px;
+  text-transform: uppercase; margin-bottom: 10px;
+}
+#slot-preview .sp-effet {
+  font-size: 13px; color: #7ab8d4; line-height: 1.6;
+  white-space: pre-wrap; font-style: italic;
+}
+#slot-preview .sp-armor-stats {
+  margin-top: 10px; padding-top: 8px;
+  border-top: 1px solid var(--border2);
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+}
+#slot-preview .sp-armor-stat {
+  font-size: 11px; color: var(--muted);
+}
+#slot-preview .sp-armor-stat span {
+  color: var(--gold); margin-left: 4px;
+}
 .camp-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; overflow-y: auto; padding: 4px; }
 .camp-col { display: flex; flex-direction: column; gap: 0; }
 .camp-col-title { font-size: 15px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-bottom: 14px; }
@@ -676,7 +717,7 @@ body {
 .fiche-stat-inp {
   background: transparent; border: none; border-bottom: 1px solid var(--border2);
   color: var(--text); font-family: var(--font); font-size: 13px;
-  outline: none; padding: 1px 4px; min-width: 2.5ch; width: 2.5ch; max-width: 12ch;
+  outline: none; padding: 1px 4px; min-width: 4ch; width: 4ch; max-width: 16ch;
   text-align: center;
   transition: border-color .15s, width .1s;
 }
@@ -892,10 +933,10 @@ body {
         <input type="radio" name="lang-switch" value="en" onchange="setLang('en')"> EN
       </label>
     </div>
-    <button class="btn-sm" onclick="saveData()">💾 Sauvegarder</button>
-    <button class="btn-sm" onclick="exportData()">⬆ Export</button>
-    <label class="btn-sm" style="cursor:pointer;">⬇ Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearAll()">✕ Effacer</button>
+    <button class="btn-sm" onclick="saveData()">&#128190; Sauvegarder</button>
+    <button class="btn-sm" onclick="exportData()">&#8679; Export</button>
+    <label class="btn-sm" style="cursor:pointer;">&#8681; Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearFiche()">&#10005; Réinit. fiche</button>
   </div>
 </div>
 
@@ -1182,17 +1223,17 @@ body {
           oninput="syncChar('nom',this.value);resizeFicheNom(this)"></textarea>
 
         <div class="fiche-row">
-          <input class="fiche-stat-inp" id="fiche-race-inp" type="text" placeholder="Race" style="width:80px;" oninput="syncChar('race',this.value)">
+          <input class="fiche-stat-inp" id="fiche-race-inp" type="text" placeholder="Race" oninput="syncChar('race',this.value)">
           <span class="fiche-sep">|</span>
           <span class="fiche-field-val" id="fiche-genre">—</span>
           <span class="fiche-sep">|</span>
-          <input class="fiche-stat-inp" id="fiche-age-inp" type="text" placeholder="Âge" style="width:50px;" oninput="syncChar('age',this.value)">
+          <input class="fiche-stat-inp" id="fiche-age-inp" type="text" placeholder="Âge" oninput="syncChar('age',this.value)">
         </div>
 
         <div class="fiche-row">
           <span class="fiche-lbl" id="fiche-naiss-lbl" data-i18n-char="naissance">Naissance</span>
           <span class="fiche-sep">:</span>
-          <input class="fiche-stat-inp" id="fiche-naiss-inp" type="text" placeholder="—" style="width:80px;" oninput="syncChar('naiss',this.value)">
+          <input class="fiche-stat-inp" id="fiche-naiss-inp" type="text" placeholder="—" oninput="syncChar('naiss',this.value)">
         </div>
 
         <div class="fiche-row">
@@ -1499,14 +1540,17 @@ body {
           <div class="camp-section-title">Créer une campagne</div>
           <input type="text" id="camp-name" class="camp-input" placeholder="Nom de la campagne…">
           <button class="camp-btn" onclick="createCampagne()">+ Créer et obtenir un code</button>
+          <div id="camp-code-display" style="display:none;margin-top:10px;text-align:center;"></div>
         </div>
 
         <!-- Rejoindre comme MJ -->
         <div class="camp-section" style="margin-top:10px;">
           <div class="camp-section-title">Rejoindre comme Maître du Jeu</div>
           <div style="display:flex;gap:6px;">
-            <input type="text" id="camp-mj-join-code" class="camp-input" placeholder="Code…" maxlength="6"
-              style="text-transform:uppercase;letter-spacing:3px;text-align:center;font-size:16px;flex:1;">
+            <input type="text" id="camp-mj-join-code" class="camp-input" placeholder="Code joueur…" maxlength="6"
+              style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:15px;flex:1;">
+            <input type="text" id="camp-mj-join-mjcode" class="camp-input" placeholder="Code MJ secret…" maxlength="6"
+              style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:15px;flex:1;border-color:#c04040;">
             <button class="camp-btn" style="width:auto;padding:8px 14px;flex-shrink:0;" onclick="mjJoinCampagne()">Rejoindre</button>
           </div>
           <div id="camp-mj-join-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
@@ -1600,6 +1644,8 @@ body {
                 <div class="param-row"><span class="param-lbl">Accent</span><input type="color" id="tc-gold" value="#f0c040" oninput="applyTheme()"></div>
                 <div class="param-row"><span class="param-lbl">Texte</span><input type="color" id="tc-text" value="#e8d5a0" oninput="applyTheme()"></div>
                 <div class="param-row"><span class="param-lbl">Bordure</span><input type="color" id="tc-border" value="#8b6914" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Cases vides</span><input type="color" id="tc-slot-empty" value="#0a0600" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Cartouche</span><input type="color" id="tc-char-panel" value="#0a0600" oninput="applyTheme()"></div>
                 <div class="param-row">
                   <span class="param-lbl">Police</span>
                   <select id="tc-font" onchange="applyTheme()" style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:11px;padding:2px 4px;border-radius:2px;">
@@ -1612,6 +1658,13 @@ body {
                   </select>
                 </div>
                 <button class="param-add-btn" style="margin-top:4px;" onclick="resetTheme()">↺ Reset thème</button>
+                <div class="param-row" style="margin-top:6px;">
+                  <label class="param-toggle-lbl">
+                    <input type="checkbox" id="cfg-keep-theme" class="blessure-cb" onchange="saveKeepTheme(this.checked)" style="accent-color:var(--gold);" checked>
+                    Conserver mes couleurs à l'import
+                  </label>
+                </div>
+                <div class="param-info">Si coché, l'apparence de la fiche importée est ignorée.</div>
                 <div class="param-row" style="margin-top:6px;">
                   <label class="param-toggle-lbl">
                     <input type="checkbox" id="cfg-effets-plus" class="blessure-cb" onchange="saveEffetsPlus(this.checked)" style="accent-color:var(--gold);">
@@ -1642,6 +1695,7 @@ body {
               <div class="param-section-title">&#9670; Qualité / Rareté</div>
               <div class="param-info">Couleur, nom et nombre de niveaux.</div>
               <div id="cfg-quality-list" class="param-fields" style="margin-top:4px;"></div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('qualities')">&#8635; Défaut</button>
             </div>
 
             <!-- Intitulés Fiche Perso -->
@@ -1649,6 +1703,7 @@ body {
               <div class="param-section-title">&#9632; Fiche Perso</div>
               <div class="param-info">Renomme les sections Caractère, Physique et Histoire.</div>
               <div id="cfg-fiche-labels" style="margin-top:4px;"></div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('ficheSections')">&#8635; Défaut</button>
             </div>
 
           </div>
@@ -1668,6 +1723,7 @@ body {
             <div class="param-col">
               <div class="param-section-title">&#9670; Ressources</div>
               <div class="param-info">Nom complet, abréviation, et format X/X.</div>
+              <button class="param-add-btn" style="float:right;margin-top:-2px;" onclick="resetParamSection('resources')">&#8635; Défaut</button>
               <div class="param-fields" style="margin-top:4px;">
                 <div class="param-row">
                   <input class="param-input param-input-wide" id="cfg-pv-name" type="text" placeholder="Points de Vie" oninput="saveParamRes('pv','name',this.value)">
@@ -1736,7 +1792,7 @@ body {
                 <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mag')">↺</button>
               </div>
               <div id="cfg-list-mag" class="param-list"></div>
-              <button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('mag')">&#8635; Défaut</button></div>
 
               <div class="param-cat-header" style="margin-top:14px;">
                 <input class="param-cat-name-input" id="cfg-name-livre" type="text" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
@@ -1747,6 +1803,7 @@ body {
                   <input type="checkbox" id="cfg-show-livre" class="blessure-cb" onchange="saveParamShow('livre',this.checked)" checked>
                 </div>
               </div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('livre')">&#8635; Livre défaut</button>
             </div>
 
           </div>
@@ -1773,9 +1830,7 @@ body {
               </div>
               <div id="cfg-list-sta" class="param-list"></div>
               <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
-              <div style="margin-top:10px;">
-                <button class="param-reset-btn" onclick="resetAllComps()">↺ Restaurer compétences par défaut</button>
-              </div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('sta')">&#8635; Défaut</button>
             </div>
 
             <!-- Principales + Secondaires + Connaissances -->
@@ -1796,7 +1851,7 @@ body {
                 <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('pri')">↺</button>
               </div>
               <div id="cfg-list-pri" class="param-list"></div>
-              <button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('pri')">&#8635; Défaut</button></div>
 
               <div class="param-cat-header" style="margin-top:14px;">
                 <input class="param-cat-name-input" id="cfg-name-sec" type="text" value="Compétences Secondaires" oninput="saveParamCatLabel('sec',this.value)">
@@ -1814,7 +1869,7 @@ body {
                 <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('sec')">↺</button>
               </div>
               <div id="cfg-list-sec" class="param-list"></div>
-              <button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('sec')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('sec')">&#8635; Défaut</button></div>
 
               <!-- Connaissances et Statut sous Secondaires -->
               <div class="param-cat-header" style="margin-top:14px;">
@@ -1826,6 +1881,7 @@ body {
                   <input type="checkbox" id="cfg-show-savoirs" class="blessure-cb" onchange="saveParamShow('savoirs',this.checked)" checked>
                 </div>
               </div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('savoirs')">&#8635; Connaissances défaut</button>
             </div>
 
             <!-- Martiales + Coups -->
@@ -1846,7 +1902,7 @@ body {
                 <button class="param-add-btn" style="white-space:nowrap;" onclick="resetParamFormat('mar')">↺</button>
               </div>
               <div id="cfg-list-mar" class="param-list"></div>
-              <button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('mar')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('mar')">&#8635; Défaut</button></div>
 
               <!-- Coups Spéciaux sous Martiales -->
               <div class="param-cat-header" style="margin-top:14px;">
@@ -1858,8 +1914,12 @@ body {
                   <input type="checkbox" id="cfg-show-coups" class="blessure-cb" onchange="saveParamShow('coups',this.checked)" checked>
                 </div>
               </div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('coups')">&#8635; Coups défaut</button>
             </div>
 
+          </div>
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);">
+            <button class="param-reset-btn" onclick="resetParamSection('allComps')">&#8635; Restaurer toutes les compétences par défaut</button>
           </div>
         </div>
       </div>
@@ -1878,6 +1938,7 @@ body {
               <div class="param-section-title">&#9632; Stats d'Armure</div>
               <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
               <div id="cfg-armor-stats" style="margin-top:6px;"></div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('armorStats')">&#8635; Défaut</button>
               <div class="param-section-title" style="margin-top:14px;">&#9632; Bourse</div>
               <div class="param-info">Nombre de monnaies affichées.</div>
               <div class="param-row" style="margin-top:6px;gap:8px;">
@@ -1895,7 +1956,7 @@ body {
               <div class="param-section-title">&#9632; Types de Sacs</div>
               <div class="param-info">Renomme, modifie les emplacements, ou ajoute un type.</div>
               <div id="cfg-bags-list" class="param-list" style="margin-top:6px;"></div>
-              <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomBag()">+ Ajouter un type de sac</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;"><button class="param-add-btn" onclick="addCustomBag()">+ Ajouter un type de sac</button><button class="param-add-btn" onclick="resetParamSection('bags')">&#8635; Défaut</button></div>
             </div>
 
             <!-- Emplacements Spéciaux -->
@@ -1903,7 +1964,7 @@ body {
               <div class="param-section-title">&#10022; Emplacements Spéciaux</div>
               <div class="param-info">Configure chaque emplacement spécial.</div>
               <div id="cfg-spe-list" class="param-list" style="margin-top:6px;"></div>
-              <button class="param-add-btn" style="margin-top:6px;" onclick="addCustomSpe()">+ Ajouter un emplacement</button>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;"><button class="param-add-btn" onclick="addCustomSpe()">+ Ajouter un emplacement</button><button class="param-add-btn" onclick="resetParamSection('spe')">&#8635; Défaut</button></div>
             </div>
 
             <!-- Labels des slots d'inventaire -->
@@ -1911,6 +1972,7 @@ body {
               <div class="param-section-title">&#9632; Intitulés des slots</div>
               <div class="param-info">Renomme chaque case de l'inventaire.</div>
               <div id="cfg-slot-labels" style="margin-top:6px;"></div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('slotLabels')">&#8635; Défaut</button>
             </div>
 
           </div>
@@ -1957,9 +2019,12 @@ body {
     </div><!-- end param-layout -->
 
     <!-- Reset global -->
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:center;">
-      <button class="param-reset-btn" style="padding:10px 32px;font-size:13px;letter-spacing:1px;" onclick="if(confirm('Réinitialiser TOUTES les données ? Cette action est irréversible.')) clearAll()">
-        &#9888; Réinitialiser tous les paramètres
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;" onclick="if(confirm('Réinitialiser tous les paramètres ? La fiche sera conservée.')){['qualities','ficheSections','slotLabels','charLabels','catLabels','statLabels','armorStats','capLabels','theme','pri','sec','mar','mag','sta','savoirs','coups','livre','resources','magie','bags','spe'].forEach(s=>{try{resetParamSection(s,true);}catch(e){}});toast('Paramètres réinitialisés.');}">
+        &#8635; Réinitialiser tous les paramètres
+      </button>
+      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;border-color:#c04040;color:#f08080;" onclick="clearAll()">
+        &#9888; Tout réinitialiser (fiche + params)
       </button>
     </div>
 
@@ -2013,8 +2078,8 @@ function applyTheme(){
   const text=document.getElementById('tc-text').value;
   const border=document.getElementById('tc-border').value;
   const font=document.getElementById('tc-font').value;
-  const slotEmpty=DEFAULTS.slotEmpty;
-  const charPanel=DEFAULTS.charPanel;
+  const slotEmpty=(document.getElementById('tc-slot-empty')?.value) || DEFAULTS.slotEmpty;
+  const charPanel=(document.getElementById('tc-char-panel')?.value) || DEFAULTS.charPanel;
   const s=document.documentElement.style;
   s.setProperty('--bg',bg);
   s.setProperty('--bg2',bg2);
@@ -2032,7 +2097,7 @@ function applyTheme(){
   s.setProperty('--slot-empty',slotEmpty);
   s.setProperty('--char-panel',charPanel);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font}));
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,charPanel}));
 }
 
 function resetTheme(){
@@ -2042,6 +2107,8 @@ function resetTheme(){
   document.getElementById('tc-text').value=DEFAULTS.text;
   document.getElementById('tc-border').value=DEFAULTS.border;
   document.getElementById('tc-font').value=DEFAULTS.font;
+  const se=document.getElementById('tc-slot-empty'); if(se) se.value=DEFAULTS.slotEmpty;
+  const cp=document.getElementById('tc-char-panel'); if(cp) cp.value=DEFAULTS.charPanel;
   applyTheme();
 }
 
@@ -2055,6 +2122,8 @@ function loadTheme(){
       if(t.text)document.getElementById('tc-text').value=t.text;
       if(t.border)document.getElementById('tc-border').value=t.border;
       if(t.font)document.getElementById('tc-font').value=t.font;
+      const se=document.getElementById('tc-slot-empty'); if(se&&t.slotEmpty) se.value=t.slotEmpty;
+      const cp=document.getElementById('tc-char-panel'); if(cp&&t.charPanel) cp.value=t.charPanel;
     }
   }catch(e){}
   applyTheme();
@@ -2128,18 +2197,34 @@ function exportData() {
   a.download = nom + ' - Midjaas.json'; a.click();
 }
 
+function saveKeepTheme(val) {
+  data._keepThemeOnImport = val; persist();
+}
+
+function getKeepTheme() {
+  return data._keepThemeOnImport !== false; // true by default
+}
+
 function importData(e) {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = ev => {
     try {
+      const keepTheme = getKeepTheme();
       data = JSON.parse(ev.target.result);
+      data._keepThemeOnImport = keepTheme; // keep our own setting
       document.getElementById('bagSize').value = data._bagSize || 'sacoche';
-      // Restore theme if present
-      if (data._exportTheme) {
+      // Restore theme only if keepTheme is OFF on current session
+      if (!getKeepTheme() && parsed._exportTheme) {
         const root = document.documentElement;
-        Object.entries(data._exportTheme).forEach(([k,v]) => { if(v) root.style.setProperty(k, v); });
-        if (data._exportFont) root.style.setProperty('--font', data._exportFont);
+        const t = parsed._exportTheme;
+        Object.entries(t).forEach(([k,v]) => { if(v) root.style.setProperty(k, v); });
+        if (parsed._exportFont) root.style.setProperty('--font', parsed._exportFont);
+        // Update pickers to reflect imported theme
+        const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--char-panel':'tc-char-panel'};
+        Object.entries(pickers).forEach(([cssVar,id])=>{ const el=document.getElementById(id); if(el&&t[cssVar]) el.value=t[cssVar]; });
+        if(parsed._exportFont){ const f=document.getElementById('tc-font'); if(f) f.value=parsed._exportFont; }
+        localStorage.setItem('dnd_theme', JSON.stringify({bg:t['--bg'],bg2:t['--bg2'],gold:t['--gold'],text:t['--text'],border:t['--border'],font:parsed._exportFont||'',slotEmpty:t['--slot-empty'],charPanel:t['--char-panel']}));
       }
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
       applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels(); buildBourseRows();
@@ -2153,8 +2238,37 @@ function importData(e) {
   r.readAsText(f);
 }
 
+// Liste des clés de paramètres à préserver lors d'un effacement de fiche
+const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armorLabels','_armorNames',
+  '_armorEnabled','_slotLabels','_ficheSectionLabels','_capLabels','_capWalletLabels',
+  '_resSplit','_resNames','_magieEnabled','_infusionEnabled','_showCats','_maxCats',
+  '_compFormats','_compArrays','_effetsPlus','_bagConfig','_speConfig','_levelNames',
+  '_levelColors','_magicColors','_themeColors','_fontChoice','_fsSizes','_exportTheme','_exportFont',
+  '_bourseCount','_bourseLabel','_banqueLabel'];
+
+function clearFiche() {
+  if (!confirm('Réinitialiser la fiche du personnage ? Les paramètres seront conservés.')) return;
+  // Keep all param keys
+  const kept = {};
+  PARAM_KEYS.forEach(k => { if (data[k] !== undefined) kept[k] = data[k]; });
+  // Also keep bourse values and bourse/banque wallet values
+  Object.keys(data).forEach(k => {
+    if (k.startsWith('_bourseVal') || k.startsWith('_bourseDevise') ||
+        k.startsWith('_banqueVal') || k.startsWith('_banqueDevise') ||
+        k.startsWith('_capital') || k.startsWith('_capLabels')) kept[k] = data[k];
+  });
+  data = kept;
+  document.getElementById('bagSize').value = 'sacoche';
+  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
+  applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
+  applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
+  buildBourseRows(); refreshArmorStats();
+  persist();
+  toast('Fiche réinitialisée.');
+}
+
 function clearAll() {
-  if (!confirm('Effacer tout ?')) return;
+  if (!confirm('Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.')) return;
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
@@ -2162,6 +2276,52 @@ function clearAll() {
   applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
   buildBourseRows(); refreshArmorStats();
   persist();
+  toast('Tout réinitialisé.');
+}
+
+// Reset individuel de sections de paramètres
+function resetParamSection(section, silent) {
+  if (!silent && !confirm('Réinitialiser '+(section)+' ?')) return;
+    qualities:'les Qualités/Raretés', ficheSections:'les titres de la Fiche Perso',
+    slotLabels:'les noms des slots', charLabels:'le Cartouche Joueur',
+    catLabels:'les noms des catégories', statLabels:'les labels des ressources',
+    armorStats:'les stats d\'Armure', capLabels:'les titres Capital',
+    theme:'l\'apparence',
+    pri:'les Compétences Principales', sec:'les Compétences Secondaires',
+    mar:'les Compétences Martiales', mag:'les Compétences Magiques',
+    sta:'les Statistiques', savoirs:'les Connaissances', coups:'les Coups Spéciaux',
+    livre:'le Livre de Sorts', allComps:'toutes les compétences',
+    resources:'les Ressources', magie:'les réglages Magie',
+    bags:'les types de Sacs', spe:'les Emplacements Spéciaux',
+    capital:'les données Capital',
+  };
+  if (!confirm('Réinitialiser '+(labels[section]||section)+' ?')) return;
+  const map = {
+    qualities:    () => { delete data._qualities; renderQualityParams(); applyAllQualityColors(); },
+    ficheSections:() => { delete data._ficheSectionLabels; applyFicheSectionLabels(); renderFicheLabelParams(); },
+    slotLabels:   () => { delete data._slotLabels; applySlotLabels(); renderSlotLabelParams(); },
+    charLabels:   () => { delete data._charLabels; applyCharLabels(); },
+    catLabels:    () => { delete data._catLabels; applyCatLabels(); renderParametres(); },
+    statLabels:   () => { delete data._statLabels; delete data._resNames; delete data._resSplit; applyStatLabels(); applyStatSplits(); renderParametres(); },
+    armorStats:   () => { delete data._armorLabels; delete data._armorNames; delete data._armorEnabled; renderArmorParams(); refreshArmorStats(); },
+    capLabels:    () => { delete data._capLabels; delete data._capWalletLabels; renderCapitalParams(); },
+    theme:        () => { delete data._exportTheme; delete data._exportFont; resetTheme(); },
+    pri:     () => { if(data._compArrays) delete data._compArrays.pri; renderParametres(); renderCompetences(); },
+    sec:     () => { if(data._compArrays) delete data._compArrays.sec; renderParametres(); renderCompetences(); },
+    mar:     () => { if(data._compArrays) delete data._compArrays.mar; renderParametres(); renderCompetences(); },
+    mag:     () => { if(data._compArrays) delete data._compArrays.mag; renderParametres(); renderCompetences(); },
+    sta:     () => { if(data._compArrays) delete data._compArrays.sta; renderParametres(); renderCompetences(); },
+    savoirs: () => { delete data._savoirs; renderSavoirs(); },
+    coups:   () => { delete data._coups; renderCoups(); },
+    livre:   () => { delete data._sorts; renderLivreSorts(); },
+    allComps:() => { resetAllComps(); },
+    resources:() => { delete data._statLabels; delete data._resNames; delete data._resSplit; applyStatLabels(); applyStatSplits(); renderParametres(); },
+    magie:   () => { delete data._magieEnabled; delete data._infusionEnabled; applyMagieSetting(); renderParametres(); },
+    bags:    () => { delete data._customBags; updateBagSelect(); buildBag(); renderParametres(); },
+    spe:     () => { delete data._customSpe; buildSpe(); renderParametres(); },
+    capital: () => { delete data._capital; delete data._capLabels; delete data._capWalletLabels; delete data._banqueLabel; Object.keys(data).filter(k=>k.startsWith('_banqueVal')||k.startsWith('_banqueDevise')).forEach(k=>delete data[k]); renderCapital(); renderCapitalParams(); },
+  };
+  if (map[section]) { map[section](); persist(); toast('Réinitialisé.'); }
 }
 
 /* ── bag normal slots ── */
@@ -2220,6 +2380,7 @@ function buildBag() {
     makeDropTarget(el, k);
     if (!isLivre) applyQualityColor(el, d?.quality !== undefined ? d.quality : null);
     else if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
+    attachSlotPreview(el, k);
     g.appendChild(el);
   }
 
@@ -2239,6 +2400,7 @@ function buildBag() {
       makeDraggable(el, k);
       makeDropTarget(el, k);
       if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
+      attachSlotPreview(el, k);
       g.appendChild(el);
     }
   });
@@ -2260,6 +2422,7 @@ function buildPoche() {
     makeDraggable(el, k);
     makeDropTarget(el, k);
     if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
+    attachSlotPreview(el, k);
     g.appendChild(el);
   }
 }
@@ -2354,6 +2517,7 @@ function refresh() {
       const originalOnclick = sl.onclick;
       sl.onclick = () => { if (!wasDragging && originalOnclick) originalOnclick(); };
       makeSlotDraggable(sl, k);
+      attachSlotPreview(sl, k);
       sl.dataset.dragReady = '1';
     }
   });
@@ -3079,24 +3243,45 @@ function saveBourseLabel(val) { data._bourseLabel = val; persist(); }
 
 function loadChar() {
   const c = data._char || {};
-  const f = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
   const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
+
+  // Inventaire cartouche
   f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
   f('char-pv', c.pv); f('char-pa', c.pa); f('char-ps', c.ps); f('char-pe', c.pe);
   f('char-race', c.race); f('char-dsnc', c.dsnc);
   f('char-pv-max', c['pv-max']); f('char-pa-max', c['pa-max']);
   f('char-ps-max', c['ps-max']); f('char-pe-max', c['pe-max']);
   f('char-dsnc-max', c['dsnc-max']);
-  applyStatSplits();
-  fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
+
+  // Compétences cartouche
+  f('comp-char-nom', c.nom); f('comp-char-age', c.age); f('comp-char-naiss', c.naiss);
+  f('comp-char-pv', c.pv); f('comp-char-pa', c.pa); f('comp-char-ps', c.ps); f('comp-char-pe', c.pe);
+  f('comp-char-race', c.race); f('comp-char-dsnc', c.dsnc);
+  f('comp-char-pv-max', c['pv-max']); f('comp-char-pa-max', c['pa-max']);
+  f('comp-char-ps-max', c['ps-max']); f('comp-char-pe-max', c['pe-max']);
+  f('comp-char-dsnc-max', c['dsnc-max']);
+
+  // Gender
   if (c.gender) {
     document.querySelectorAll('input[name="inv-gender"]').forEach(r => r.checked = r.value === c.gender);
+    document.querySelectorAll('input[name="comp-gender"]').forEach(r => r.checked = r.value === c.gender);
+    document.querySelectorAll('input[name="fiche-gender"]').forEach(r => r.checked = r.value === c.gender);
   }
-  // minos (now a span)
+
+  applyStatSplits();
+  fc('bl1', c.bl1); fc('bl2', c.bl2); fc('bl3', c.bl3);
+
+  // Minos
   const ml = document.getElementById('inv-minos-lbl');
   if (ml) ml.textContent = getCharLabel('minos');
   const mc2 = document.getElementById('inv-minos-cb');
   if (mc2) mc2.checked = data._minos || false;
+
+  // Bourse label
+  const bl = document.getElementById('bourse-label');
+  if (bl) bl.value = data._bourseLabel || 'Bourse';
+
   updateTbNom();
   setTimeout(() => resizeAllCartouche(), 50);
 }
@@ -3135,9 +3320,10 @@ function saveParamResSplit(stat, enabled) {
   if (!data._resSplit) data._resSplit = {};
   data._resSplit[stat] = enabled; persist();
   applyStatSplits();
-  // Auto-resize all fiche stat inputs after render
+  // Auto-resize all fiche inputs after render
   setTimeout(() => {
     document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
+    resizeAllCartouche();
   }, 30);
 }
 
@@ -3328,6 +3514,57 @@ function renderArmorParams() {
   });
 }
 
+/* ══ SLOT PREVIEW ══ */
+let previewTimer = null;
+
+function showSlotPreview(e, slotData, armorStats) {
+  e.preventDefault();
+  if (!slotData?.nom) return;
+  const pv = document.getElementById('slot-preview');
+  document.getElementById('sp-nom').textContent = slotData.nom || '';
+  document.getElementById('sp-type').textContent = slotData.type || '';
+  document.getElementById('sp-effet').textContent = slotData.effet || '';
+  // Background image
+  const bg = document.getElementById('sp-bg');
+  bg.style.backgroundImage = slotData.img ? `url('${slotData.img}')` : '';
+  // Armor stats
+  const statsEl = document.getElementById('sp-armor-stats');
+  statsEl.innerHTML = '';
+  if (armorStats) {
+    ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)&&armorStats[s.key]).forEach(({key})=>{
+      const s = document.createElement('div');
+      s.className = 'sp-armor-stat';
+      s.innerHTML = getArmorStatLabel(key)+'<span>'+armorStats[key]+'</span>';
+      statsEl.appendChild(s);
+    });
+  }
+  // Position near cursor, keep on screen
+  pv.style.display = 'block';
+  const margin = 16;
+  let x = e.clientX + margin;
+  let y = e.clientY + margin;
+  if (x + 420 > window.innerWidth)  x = e.clientX - 420 - margin;
+  if (y + pv.offsetHeight > window.innerHeight) y = e.clientY - pv.offsetHeight - margin;
+  pv.style.left = Math.max(8, x) + 'px';
+  pv.style.top  = Math.max(8, y) + 'px';
+}
+
+function hideSlotPreview() {
+  document.getElementById('slot-preview').style.display = 'none';
+}
+
+function attachSlotPreview(el, key) {
+  el.addEventListener('contextmenu', e => e.preventDefault()); // block browser menu
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 2) return;
+    e.preventDefault();
+    const d = data[key] || {};
+    showSlotPreview(e, d, d.armorStats || null);
+  });
+  el.addEventListener('mouseup', e => { if (e.button === 2) hideSlotPreview(); });
+  el.addEventListener('mouseleave', hideSlotPreview);
+}
+
 function resizeFicheNom(el) {
   el.style.height = 'auto';
   const scrollH = el.scrollHeight;
@@ -3339,12 +3576,14 @@ function resizeFicheNom(el) {
 
 function resizeFicheInp(el) {
   const len = Math.max(2.5, (el.value || '').length);
-  el.style.width = Math.min(len + 2, 14) + 'ch';
+  el.style.width = Math.min(len + 3.5, 16) + 'ch';
 }
 
 function resizeCharInp(el) {
   const len = Math.max(2.5, (el.value || '').length);
-  el.style.width = Math.min(len + 2, 16) + 'ch';
+  const isWide = el.classList.contains('wide');
+  const max = isWide ? 26 : 16;
+  el.style.width = Math.min(len + 3.5, max) + 'ch';
 }
 
 function resizeArmorInp(el) {
@@ -3356,13 +3595,11 @@ function resizeArmorInp(el) {
 document.addEventListener('input', e => {
   if (e.target.classList.contains('fiche-stat-inp')) resizeFicheInp(e.target);
   if (e.target.closest('#inv-armor-stats, #comp-armor-stats')) resizeArmorInp(e.target);
-  if (e.target.classList.contains('stat-cur') || e.target.classList.contains('stat-max')) {
-    if (!e.target.closest('#inv-armor-stats, #comp-armor-stats')) resizeCharInp(e.target);
-  }
+  if (e.target.classList.contains('char-input')) resizeCharInp(e.target);
 });
 
 function resizeAllCartouche() {
-  document.querySelectorAll('.char-input.narrow.stat-cur, .char-input.narrow.stat-max').forEach(el => resizeCharInp(el));
+  document.querySelectorAll('.char-input').forEach(el => resizeCharInp(el));
   document.querySelectorAll('#inv-armor-stats input, #comp-armor-stats input').forEach(el => resizeArmorInp(el));
 }
 
@@ -3484,7 +3721,7 @@ function syncChar(field, val) {
   // Sync cartouche panels
   ['char-'+field, 'comp-char-'+field].forEach(id => {
     const el = document.getElementById(id);
-    if (el && el !== document.activeElement) el.value = val;
+    if (el && el !== document.activeElement) { el.value = val; resizeCharInp(el); }
   });
   // Sync fiche perso inputs
   const ficheMap = { nom:'fiche-nom-inp', race:'fiche-race-inp', age:'fiche-age-inp', naiss:'fiche-naiss-inp', pv:'fiche-pv', pa:'fiche-pa', pe:'fiche-pe', ps:'fiche-ps', dsnc:'fiche-dsnc' };
@@ -3778,6 +4015,10 @@ function renderLivreSorts() {
       cell.onclick = () => { if (!wasDragging) openSortModal(key, i, s); };
       makeFreecelDraggable(cell, i, 'sort', key);
       applyQualityColor(cell, s.quality !== undefined ? s.quality : null);
+      cell.addEventListener('contextmenu', e => e.preventDefault());
+      cell.addEventListener('mousedown', e => { if (e.button===2) { e.preventDefault(); showSlotPreview(e, s, null); } });
+      cell.addEventListener('mouseup', e => { if (e.button===2) hideSlotPreview(); });
+      cell.addEventListener('mouseleave', hideSlotPreview);
       sec.appendChild(cell);
     }
     body.appendChild(sec);
@@ -3855,31 +4096,22 @@ function makeFreecelDraggable(el, idx, type, sortKey) {
     if (!freeDragSrc) return;
     const src = freeDragSrc;
     freeDragSrc = null;
-    if (src.type !== type) return; // no cross-type drop (coups/savoirs/sorts)
-    if (src.idx === idx && src.sortKey === sortKey) return;
-    // Swap entries
-    if (type === 'coup') {
-      if (!data._coups) data._coups = [];
-      const a = data._coups[src.idx] || null;
-      const b = data._coups[idx] || null;
-      data._coups[src.idx] = b; data._coups[idx] = a;
-      persist(); renderCoups();
-    } else if (type === 'savoir') {
-      if (!data._savoirs) data._savoirs = [];
-      const a = data._savoirs[src.idx] || null;
-      const b = data._savoirs[idx] || null;
-      data._savoirs[src.idx] = b; data._savoirs[idx] = a;
-      persist(); renderSavoirs();
-    } else if (type === 'sort') {
-      if (!data._sorts) data._sorts = {};
-      if (!data._sorts[src.sortKey]) data._sorts[src.sortKey] = [];
-      if (!data._sorts[sortKey]) data._sorts[sortKey] = [];
-      const a = data._sorts[src.sortKey][src.idx] || null;
-      const b = data._sorts[sortKey][idx] || null;
-      data._sorts[src.sortKey][src.idx] = b;
-      data._sorts[sortKey][idx] = a;
-      persist(); renderLivreSorts();
+    if (src.type === type && src.sortKey === sortKey && src.idx === idx) return;
+    // Get or create array for any type
+    function getArr(t, sk) {
+      if (t === 'coup')   return (data._coups   = data._coups   || []);
+      if (t === 'savoir') return (data._savoirs = data._savoirs || []);
+      if (t === 'sort')   { if(!data._sorts) data._sorts={}; return (data._sorts[sk] = data._sorts[sk] || []); }
+      return [];
     }
+    const srcArr = getArr(src.type, src.sortKey);
+    const dstArr = getArr(type, sortKey);
+    const a = srcArr[src.idx] || null;
+    const b = dstArr[idx] || null;
+    srcArr[src.idx] = b;
+    dstArr[idx] = a;
+    persist();
+    renderCoups(); renderSavoirs(); renderLivreSorts();
   });
 }
 
@@ -3909,6 +4141,11 @@ function renderCoups() {
     cell.onclick = () => { if (!wasDragging) openFreeModal('coup', i, coup); };
     makeFreecelDraggable(cell, i, 'coup');
     applyQualityColor(cell, coup.quality !== undefined ? coup.quality : null);
+    // Right-click preview
+    cell.addEventListener('contextmenu', e => e.preventDefault());
+    cell.addEventListener('mousedown', e => { if (e.button===2) { e.preventDefault(); showSlotPreview(e, coup, null); } });
+    cell.addEventListener('mouseup', e => { if (e.button===2) hideSlotPreview(); });
+    cell.addEventListener('mouseleave', hideSlotPreview);
     container.appendChild(cell);
   }
 }
@@ -3939,6 +4176,10 @@ function renderSavoirs() {
     cell.onclick = () => { if (!wasDragging) openFreeModal('savoir', i, sav); };
     makeFreecelDraggable(cell, i, 'savoir');
     applyQualityColor(cell, sav.quality !== undefined ? sav.quality : null);
+    cell.addEventListener('contextmenu', e => e.preventDefault());
+    cell.addEventListener('mousedown', e => { if (e.button===2) { e.preventDefault(); showSlotPreview(e, sav, null); } });
+    cell.addEventListener('mouseup', e => { if (e.button===2) hideSlotPreview(); });
+    cell.addEventListener('mouseleave', hideSlotPreview);
     container.appendChild(cell);
   }
 }
@@ -4526,6 +4767,9 @@ function renderParametres() {
   });
   // Effets Visuels +++
   applyEffetsPlus();
+  // Keep theme on import
+  const ktCb = document.getElementById('cfg-keep-theme');
+  if (ktCb) ktCb.checked = getKeepTheme();
   // Stat splits (X/X checkboxes)
   applyStatSplits();
   // Armor stats params
@@ -4804,6 +5048,9 @@ setTimeout(() => {
 
   // ── Toast ──
   function toast(msg, ok) {
+    campToastFn(msg, ok);
+  }
+  function campToastFn(msg, ok) {
     const t = document.createElement('div');
     t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:6px;font-size:13px;z-index:9999;pointer-events:none;color:#fff;border:1px solid '+(ok?'#4aaa7a':'#c04040')+';background:'+(ok?'#1e3a1e':'#3a1010')+';';
     t.textContent = msg;
@@ -4821,14 +5068,30 @@ setTimeout(() => {
   // ── MJ : Créer campagne ──
   window.createCampagne = function() {
     const name = (document.getElementById('camp-name').value||'').trim() || 'Campagne';
-    const code = genCode();
-    db.ref('campagnes/'+code).set({ name, createdAt: Date.now() })
+    const code = genCode();   // code joueurs
+    const mjCode = genCode(); // code MJ secret
+    db.ref('campagnes/'+code).set({ name, createdAt: Date.now(), mjCode })
       .then(()=>{
-        toast('Campagne "'+name+'" créée ! Code : '+code, true);
-        saveMjCode(code, name);
+        toast('Campagne "'+name+'" créée !', true);
+        saveMjCode(code, name, mjCode);
         renderMjCampagnes();
         listenCampagne(code);
         document.getElementById('camp-name').value = '';
+        // Show both codes
+        const d = document.getElementById('camp-code-display');
+        if (d) {
+          d.style.display = '';
+          d.innerHTML = '<div style="margin-bottom:8px;">'
+            +'<div style="font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;">CODE JOUEURS (à partager)</div>'
+            +'<div style="font-size:28px;color:var(--gold);letter-spacing:6px;font-weight:bold;border:2px solid var(--gold);border-radius:6px;padding:8px 16px;display:inline-block;">'+code+'</div>'
+            +'<button class="camp-btn-sm" style="display:block;margin:6px auto 0;" onclick="navigator.clipboard.writeText(\''+code+'\').then(()=>campToastFn(\'Code joueur copié !\',true))">Copier</button>'
+            +'</div>'
+            +'<div style="margin-top:10px;border-top:1px solid var(--border2);padding-top:10px;">'
+            +'<div style="font-size:11px;color:#c04040;letter-spacing:1px;margin-bottom:4px;">CODE MJ (gardez-le secret !)</div>'
+            +'<div style="font-size:28px;color:#f08080;letter-spacing:6px;font-weight:bold;border:2px solid #c04040;border-radius:6px;padding:8px 16px;display:inline-block;">'+mjCode+'</div>'
+            +'<button class="camp-btn-sm" style="display:block;margin:6px auto 0;border-color:#c04040;color:#f08080;" onclick="navigator.clipboard.writeText(\''+mjCode+'\').then(()=>campToastFn(\'Code MJ copié !\',true))">Copier</button>'
+            +'</div>';
+        }
       })
       .catch(e=>toast('Erreur : '+e.message, false));
   };
@@ -4836,31 +5099,39 @@ setTimeout(() => {
   // ── MJ : Rejoindre campagne existante ──
   window.mjJoinCampagne = function() {
     const code = (document.getElementById('camp-mj-join-code').value||'').toUpperCase().trim();
+    const mjCodeInput = (document.getElementById('camp-mj-join-mjcode').value||'').toUpperCase().trim();
     const status = document.getElementById('camp-mj-join-status');
-    if (code.length !== 6) { toast('Code invalide', false); return; }
+    if (code.length !== 6) { toast('Code joueur invalide (6 lettres)', false); return; }
+    if (mjCodeInput.length !== 6) { toast('Code MJ invalide (6 lettres)', false); return; }
     db.ref('campagnes/'+code).get().then(snap => {
-      if (!snap.exists()) { status.textContent = 'Campagne introuvable.'; status.style.color='#c04040'; return; }
-      saveMjCode(code, snap.val().name);
+      if (!snap.exists()) { status.textContent='Campagne introuvable.'; status.style.color='#c04040'; return; }
+      const campData = snap.val();
+      if (campData.mjCode !== mjCodeInput) {
+        status.textContent = 'Code MJ incorrect.'; status.style.color = '#c04040'; return;
+      }
+      saveMjCode(code, campData.name, mjCodeInput);
       renderMjCampagnes();
       listenCampagne(code);
-      status.textContent = '✓ Rejoint "'+snap.val().name+'"';
+      status.textContent = '✓ Rejoint "'+campData.name+'" comme MJ';
       status.style.color = '#4aaa7a';
       document.getElementById('camp-mj-join-code').value = '';
+      document.getElementById('camp-mj-join-mjcode').value = '';
     }).catch(e=>toast('Erreur : '+e.message, false));
   };
 
-  function saveMjCode(code, name) {
+  function saveMjCode(code, name, mjCode) {
     const stored = JSON.parse(localStorage.getItem('mj_codes')||'{}');
-    stored[code] = name;
+    stored[code] = { name, mjCode: mjCode || stored[code]?.mjCode || '' };
     localStorage.setItem('mj_codes', JSON.stringify(stored));
     mjCodes = Object.entries(stored);
   }
 
   function getMjCodes() {
-    return Object.entries(JSON.parse(localStorage.getItem('mj_codes')||'{}'));
+    const stored = JSON.parse(localStorage.getItem('mj_codes')||'{}');
+    return Object.entries(stored).map(([code,v]) => [code, typeof v==='string' ? {name:v,mjCode:''} : v]);
   }
 
-  // ── Écouter joueurs d'une campagne ──
+  // Ecouter joueurs
   function listenCampagne(code) {
     if (mjListeners[code]) return; // déjà en écoute
     mjListeners[code] = db.ref('campagnes/'+code+'/joueurs').on('value', () => {
@@ -4875,8 +5146,9 @@ setTimeout(() => {
     const codes = getMjCodes();
     if (!codes.length) { container.innerHTML = ''; return; }
 
-    // On ne recrée que les cartes manquantes (évite de perdre l'état ouvert/fermé)
-    codes.forEach(([code, name]) => {
+    // On ne recree que les cartes manquantes (evite de perdre etat ouvert/ferme)
+    codes.forEach(([code, info]) => {
+      const name = typeof info === 'object' ? info.name : info;
       let acc = document.getElementById('camp-acc-'+code);
       if (!acc) {
         acc = document.createElement('div');
@@ -4936,9 +5208,37 @@ setTimeout(() => {
     });
   }
 
-  window.toggleCampAcc = function(code) {
-    const acc = document.getElementById('camp-acc-'+code);
-    if (acc) acc.classList.toggle('open');
+  function showRestoreMjBtn() {
+    let btn = document.getElementById('mj-restore-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'mj-restore-btn';
+      btn.className = 'camp-btn-sm';
+      btn.style.cssText = 'position:fixed;top:52px;right:12px;z-index:1000;border-color:var(--gold);color:var(--gold);background:var(--bg2);padding:5px 12px;';
+      btn.textContent = '\u21a9 Restaurer mon perso';
+      btn.onclick = restoreMjData;
+      document.body.appendChild(btn);
+    }
+    btn.style.display = '';
+  }
+
+  window.restoreMjData = function() {
+    const saved = localStorage.getItem('mj_own_data');
+    if (!saved) { toast('Aucune sauvegarde MJ.', false); return; }
+    data = JSON.parse(saved);
+    persist();
+    buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
+    applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting();
+    applyParamShow(); applyStatSplits(); applyEffetsPlus(); applySlotLabels();
+    applyFicheSectionLabels(); applyAllQualityColors(); buildBourseRows(); refreshArmorStats();
+    if (data._exportTheme) {
+      const root = document.documentElement;
+      Object.entries(data._exportTheme).forEach(([k,v]) => { if(v) root.style.setProperty(k,v); });
+      if (data._exportFont) root.style.setProperty('--font', data._exportFont);
+    }
+    const btn = document.getElementById('mj-restore-btn');
+    if (btn) btn.style.display = 'none';
+    toast('Votre personnage restauré !', true);
   };
 
   window.copyCampCodeVal = function(code) {
@@ -4967,6 +5267,9 @@ setTimeout(() => {
   window.loadPlayerFiche = function(code, key) {
     db.ref('campagnes/'+code+'/joueurs/'+key+'/fiche').get().then(snap => {
       if (!snap.exists()) { toast('Aucune fiche publiée.', false); return; }
+      // Save MJ own data before overwriting
+      localStorage.setItem('mj_own_data', JSON.stringify(window.data || {}));
+      showRestoreMjBtn();
       const ficheData = snap.val();
       data = typeof ficheData === 'string' ? JSON.parse(ficheData) : ficheData;
       persist();
@@ -5064,5 +5367,16 @@ setTimeout(() => {
 
 })();
 </script>
+
+<!-- Slot Preview Overlay -->
+<div id="slot-preview">
+  <div class="sp-bg" id="sp-bg"></div>
+  <div class="sp-content">
+    <div class="sp-nom" id="sp-nom"></div>
+    <div class="sp-type" id="sp-type"></div>
+    <div class="sp-effet" id="sp-effet"></div>
+    <div class="sp-armor-stats" id="sp-armor-stats"></div>
+  </div>
+</div>
 </body>
 </html>
