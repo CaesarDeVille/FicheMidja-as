@@ -143,24 +143,81 @@ function getKeepTheme() {
 function importData(e) {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
+
   r.onload = ev => {
     try {
+      const parsed = JSON.parse(ev.target.result);
+
+      // Option actuelle AVANT l'import :
+      // coché = on garde notre apparence locale
+      // décoché = on accepte l'apparence de la fiche importée
       const keepTheme = getKeepTheme();
-      data = JSON.parse(ev.target.result);
-      data._keepThemeOnImport = keepTheme; // keep our own setting
-      document.getElementById('bagSize').value = data._bagSize || 'sacoche';
-      // Restore theme only if keepTheme is OFF on current session
-      if (!getKeepTheme() && parsed._exportTheme) {
-        const root = document.documentElement;
+
+      // Sauvegarde de notre apparence actuelle au cas où on veut la conserver
+      const root = document.documentElement;
+      const pickers = {
+        '--bg':'tc-bg',
+        '--bg2':'tc-bg2',
+        '--gold':'tc-gold',
+        '--text':'tc-text',
+        '--border':'tc-border',
+        '--slot-empty':'tc-slot-empty',
+        '--char-panel':'tc-char-panel'
+      };
+
+      const currentTheme = {};
+      Object.keys(pickers).forEach(k => {
+        currentTheme[k] = root.style.getPropertyValue(k).trim();
+      });
+      const currentFont = root.style.getPropertyValue('--font').trim();
+
+      // Import des données de la fiche
+      data = parsed;
+
+      // On garde le réglage local de cette case
+      data._keepThemeOnImport = keepTheme;
+
+      if (keepTheme) {
+        // Conserver mes couleurs : on restaure notre apparence
+        Object.entries(currentTheme).forEach(([k, v]) => {
+          if (v) root.style.setProperty(k, v);
+        });
+        if (currentFont) root.style.setProperty('--font', currentFont);
+
+        Object.entries(pickers).forEach(([cssVar, id]) => {
+          const el = document.getElementById(id);
+          if (el && currentTheme[cssVar]) el.value = currentTheme[cssVar];
+        });
+        const fontEl = document.getElementById('tc-font');
+        if (fontEl && currentFont) fontEl.value = currentFont;
+      } else if (parsed._exportTheme) {
+        // Importer l'apparence de la fiche
         const t = parsed._exportTheme;
-        Object.entries(t).forEach(([k,v]) => { if(v) root.style.setProperty(k, v); });
+        Object.entries(t).forEach(([k, v]) => {
+          if (v) root.style.setProperty(k, v);
+        });
         if (parsed._exportFont) root.style.setProperty('--font', parsed._exportFont);
-        // Update pickers to reflect imported theme
-        const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--char-panel':'tc-char-panel'};
-        Object.entries(pickers).forEach(([cssVar,id])=>{ const el=document.getElementById(id); if(el&&t[cssVar]) el.value=t[cssVar]; });
-        if(parsed._exportFont){ const f=document.getElementById('tc-font'); if(f) f.value=parsed._exportFont; }
-        localStorage.setItem('dnd_theme', JSON.stringify({bg:t['--bg'],bg2:t['--bg2'],gold:t['--gold'],text:t['--text'],border:t['--border'],font:parsed._exportFont||'',slotEmpty:t['--slot-empty'],charPanel:t['--char-panel']}));
+
+        Object.entries(pickers).forEach(([cssVar, id]) => {
+          const el = document.getElementById(id);
+          if (el && t[cssVar]) el.value = t[cssVar];
+        });
+        const fontEl = document.getElementById('tc-font');
+        if (fontEl && parsed._exportFont) fontEl.value = parsed._exportFont;
+
+        localStorage.setItem('dnd_theme', JSON.stringify({
+          bg: t['--bg'],
+          bg2: t['--bg2'],
+          gold: t['--gold'],
+          text: t['--text'],
+          border: t['--border'],
+          font: parsed._exportFont || '',
+          slotEmpty: t['--slot-empty'],
+          charPanel: t['--char-panel']
+        }));
       }
+
+      document.getElementById('bagSize').value = data._bagSize || 'sacoche';
       buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
       applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits(); applyEffetsPlus(); refreshArmorStats(); applyAllQualityColors(); applySlotLabels(); applyFicheSectionLabels(); buildBourseRows();
       setTimeout(() => {
@@ -168,8 +225,14 @@ function importData(e) {
         document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
       }, 50);
       persist(); toast('Importé !');
-    } catch { toast('Erreur JSON'); }
+    } catch (err) {
+      console.error(err);
+      toast('Erreur JSON');
+    } finally {
+      e.target.value = '';
+    }
   };
+
   r.readAsText(f);
 }
 
