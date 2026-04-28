@@ -1,64 +1,44 @@
-# Fiche Midja’as
+# Fiche Midja'as
 
-Un outil simple et rapide pour créer et gérer des fiches de personnage dans l’univers de Midja’as ou pour vos propres Sessions.
+Version nettoyée et modularisée du projet.
 
-Accès à l’outil :  
-## https://caesardeville.github.io/FicheMidja-as/
+## Structure
 
----
+```text
+index.html
+css/
+  style.css
+js/
+  app.js
+  firebase-campagne.js
+assets/
+  favicon.png
+README.md
+```
 
-## Présentation
+## Lancer en local
 
-La Fiche Midja’as est une interface web conçue pour faciliter la gestion de personnages en jeu de rôle.
+Double-cliquer sur `index.html` suffit souvent.
 
-L’objectif est de proposer un outil :
-- rapide à utiliser en session
-- clair et lisible
-- adapté au système Midja’as
-- accessible sans installation
-- Et adaptable a vos propres JDR
-  - Exportable, aussi bien en fiche qu'en système de jeu
+Si certaines fonctions bloquent, lancer un petit serveur local :
 
----
+```bash
+python -m http.server 8000
+```
 
-## Fonctionnalités
+Puis ouvrir :
 
-- Création de fiches de personnage
-- Gestion des caractéristiques
-- Suivi de l’équipement et de l’inventaire
-  - Système Drag and Drop (si c'est pas kiffant ça)
-- Interface simple et intuitive
-- Utilisation directe dans le navigateur et sauvegarde locale
-- Import et Export, de fiche et de système.
+```text
+http://localhost:8000
+```
 
----
+## Notes de correction
 
-## Objectifs du projet
-
-Ce projet vise à :
-- proposer un outil accessible aux joueurs et MJ
-- servir de base pour des fonctionnalités plus avancées
-- améliorer la fluidité des sessions de jeu
-- filez le a vos MJ et laissez-les en faire quelque chose d'autre
-
----
-
-## Roadmap
-
-Fonctionnalités prévues :
-
-- Sauvegarde sur un serveur des fiches
-- Amélioration de l’interface utilisateur
-- Système de "Groupes" pour tout types de JDR
-- Accès MJ aux fiches
-- Backend léger (Netlify Functions ou autre)
-
----
-
-## Licence
-
-Vous pouvez utiliser la fiche pour vos JDR si vous le voulez et changer le nom de chaque compétence, les couleurs, le font etc.
-
----
-
-# XVI
+- CSS séparé dans `css/style.css`.
+- JavaScript principal séparé dans `js/app.js`.
+- JavaScript Firebase/campagne séparé dans `js/firebase-campagne.js`.
+- Favicon déplacé dans `assets/favicon.png`.
+- Le titre de page est uniformisé : `Fiche Midja'as`.
+- Les effets restent en italique dans l'inventaire/objets/magies.
+- Les effets de l'infobulle clic droit sont affichés en texte normal.
+- Les champs du cartouche peuvent s'élargir davantage.
