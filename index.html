@@ -488,7 +488,7 @@ body {
 .stat-split .char-input.narrow { width: 30px; }
 .stat-slash { font-size: 12px; color: var(--border2); padding: 0 1px; flex-shrink: 0; }
 .stat-max { color: var(--muted) !important; }
-.char-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.char-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
 .char-lbl {
   font-size: 11px; color: var(--muted); text-transform: uppercase;
   letter-spacing: .5px; white-space: nowrap; flex-shrink: 0;
@@ -499,11 +499,10 @@ body {
   color: var(--gold); font-family: var(--font); font-size: 13px;
   padding: 2px 4px; outline: none;
   transition: border-color .15s;
-  overflow: visible;
 }
 .char-input:focus { border-color: var(--gold); }
-.char-input.wide { min-width: 5ch; flex-shrink: 1; }
-.char-input.narrow { min-width: 3ch; flex-shrink: 1; }
+.char-input.wide { min-width: 5ch; }
+.char-input.narrow { min-width: 3ch; }
 .char-sep { color: var(--border2); font-size: 13px; flex-shrink: 0; }
 .blessure-wrap { display: flex; align-items: center; gap: 6px; }
 .blessure-cb {
@@ -2020,7 +2019,7 @@ body {
 
     <!-- Reset global -->
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;" onclick="if(confirm('Réinitialiser tous les paramètres ? La fiche sera conservée.')){['qualities','ficheSections','slotLabels','charLabels','catLabels','statLabels','armorStats','capLabels','theme','pri','sec','mar','mag','sta','savoirs','coups','livre','resources','magie','bags','spe'].forEach(s=>{try{resetParamSection(s,true);}catch(e){}});toast('Paramètres réinitialisés.');}">
+      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;" onclick="if(confirm('Réinitialiser tous les paramètres ?')){['qualities','ficheSections','slotLabels','charLabels','catLabels','statLabels','armorStats','capLabels','theme'].forEach(s=>{try{resetParamSection(s);}catch(e){}});}">
         &#8635; Réinitialiser tous les paramètres
       </button>
       <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;border-color:#c04040;color:#f08080;" onclick="clearAll()">
@@ -2280,8 +2279,8 @@ function clearAll() {
 }
 
 // Reset individuel de sections de paramètres
-function resetParamSection(section, silent) {
-  if (!silent && !confirm('Réinitialiser '+(section)+' ?')) return;
+function resetParamSection(section) {
+  const labels = {
     qualities:'les Qualités/Raretés', ficheSections:'les titres de la Fiche Perso',
     slotLabels:'les noms des slots', charLabels:'le Cartouche Joueur',
     catLabels:'les noms des catégories', statLabels:'les labels des ressources',
@@ -2400,7 +2399,6 @@ function buildBag() {
       makeDraggable(el, k);
       makeDropTarget(el, k);
       if (d?.quality !== undefined && d.quality !== null) applyQualityColor(el, d.quality);
-      attachSlotPreview(el, k);
       g.appendChild(el);
     }
   });
@@ -3243,7 +3241,7 @@ function saveBourseLabel(val) { data._bourseLabel = val; persist(); }
 
 function loadChar() {
   const c = data._char || {};
-  const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  const f = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
   const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
 
   // Inventaire cartouche
