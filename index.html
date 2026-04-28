@@ -560,6 +560,38 @@ body {
 .armure-stat-val { color: var(--gold); font-size: 12px; }
 .armor-stat-cartouche { display: inline-flex; align-items: center; gap: 3px; margin-right: 8px; }
 #inv-armor-stats, #comp-armor-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 3px; }
+
+/* ══ PAGE CAPITAL ══ */
+.capital-layout { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; overflow-y: auto; padding: 2px; }
+.capital-top-row { display: flex; gap: 16px; flex-shrink: 0; }
+.capital-wallet { flex: 1; background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 5px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.capital-wallet-title { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
+.capital-wallet-sub { font-size: 10px; color: var(--dim); text-transform: none; letter-spacing: 0; }
+.capital-wallet-rows { display: flex; flex-direction: column; gap: 4px; }
+.capital-wallet-row { display: flex; gap: 4px; align-items: center; }
+.capital-wallet-inp { background: transparent; border: none; border-bottom: 1px solid var(--border2); color: var(--gold); font-family: var(--font); font-size: 14px; padding: 2px 4px; width: 80px; outline: none; text-align: center; }
+.capital-wallet-dev { background: transparent; border: none; border-bottom: 1px solid var(--border2); color: var(--muted); font-family: var(--font); font-size: 12px; padding: 2px 4px; width: 36px; outline: none; }
+.capital-wallet-inp:focus, .capital-wallet-dev:focus { border-color: var(--gold); }
+.capital-label-inp { background: transparent; border: none; color: var(--gold); font-family: var(--font); font-size: 13px; letter-spacing: 1px; outline: none; }
+.capital-label-inp:focus { border-bottom: 1px solid var(--gold); }
+.capital-accordion { border: 1.5px solid var(--border2); border-radius: 5px; flex-shrink: 0; }
+.capital-acc-header { display: flex; align-items: center; gap: 12px; background: var(--bg3); padding: 10px 14px; cursor: pointer; user-select: none; border-radius: 5px 5px 0 0; }
+.capital-accordion:not(.open) .capital-acc-header { border-radius: 5px; }
+.capital-label-big { font-size: 14px !important; letter-spacing: 2px !important; }
+.capital-acc-sub { font-size: 10px; color: var(--dim); flex: 1; font-style: italic; }
+.capital-acc-arrow { font-size: 10px; color: var(--muted); transition: transform .2s; }
+.capital-accordion.open .capital-acc-arrow { transform: rotate(180deg); }
+.capital-acc-body { display: none; padding: 12px 14px; border-top: 1px solid var(--border2); background: var(--bg2); border-radius: 0 0 5px 5px; }
+.capital-accordion.open .capital-acc-body { display: block; }
+.capital-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+.capital-card { background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; position: relative; }
+.capital-card-name { background: transparent; border: none; border-bottom: 1px solid var(--border2); color: var(--gold); font-family: var(--font); font-size: 14px; padding: 2px 4px; width: 100%; outline: none; box-sizing: border-box; }
+.capital-card-name:focus { border-color: var(--gold); }
+.capital-card-del { position: absolute; top: 6px; right: 8px; background: transparent; border: none; color: var(--dim); font-size: 14px; cursor: pointer; padding: 0; }
+.capital-card-del:hover { color: #f08080; }
+.capital-add-btn { background: transparent; border: 1.5px dashed var(--border2); color: var(--muted); font-family: var(--font); font-size: 13px; padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: border-color .15s, color .15s; letter-spacing: 1px; }
+.capital-add-btn:hover { border-color: var(--gold); color: var(--gold); }
+
 /* ══ FICHE PERSO ══ */
 /* ══ FICHE PERSO ══ */
 .fiche-layout {
@@ -577,6 +609,17 @@ body {
   font-size: 20px; color: var(--gold); letter-spacing: 2px;
   border-bottom: 1px solid var(--border2); padding-bottom: 4px; margin-bottom: 2px;
 }
+.fiche-nom-ta {
+  font-size: clamp(16px,2vw,22px); color: var(--gold); letter-spacing: 1px;
+  font-family: var(--font); background: transparent;
+  border: none; border-bottom: 2px solid var(--border2);
+  width: 100%; padding: 2px 4px 4px; outline: none;
+  resize: none; overflow-y: hidden; box-sizing: border-box;
+  line-height: 1.4; display: block;
+  margin-bottom: 4px; word-break: break-word;
+}
+.fiche-nom-ta:focus { border-color: var(--gold); }
+.fiche-nom-ta::placeholder { color: var(--muted); font-style: italic; }
 .fiche-row {
   display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; font-size: 12px;
 }
@@ -1103,9 +1146,9 @@ body {
 
       <!-- COL GAUCHE -->
       <div class="fiche-left">
-        <input class="fiche-stat-inp" id="fiche-nom-inp" type="text" placeholder="Nom du personnage"
-          style="font-size:20px;width:100%;border:none;border-bottom:2px solid var(--border2);background:transparent;color:var(--gold);font-family:var(--font);padding:2px 4px;outline:none;letter-spacing:1px;margin-bottom:4px;"
-          oninput="syncChar('nom',this.value)">
+        <textarea id="fiche-nom-inp" placeholder="Nom du personnage" rows="1"
+          class="fiche-nom-ta"
+          oninput="syncChar('nom',this.value);resizeFicheNom(this)"></textarea>
 
         <div class="fiche-row">
           <input class="fiche-stat-inp" id="fiche-race-inp" type="text" placeholder="Race" style="width:80px;" oninput="syncChar('race',this.value)">
@@ -1342,10 +1385,75 @@ body {
 
   <!-- PAGE CAPITAL -->
   <div id="page-capital" class="page">
-    <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:20px;letter-spacing:2px;">
-      💰 Capital — à venir
+    <div class="capital-layout">
+
+      <!-- LIGNE 1 : Bourse + Compte en banque -->
+      <div class="capital-top-row">
+
+        <!-- Bourse (liée à l'inventaire) -->
+        <div class="capital-wallet">
+          <div class="capital-wallet-title">
+            <span id="cap-bourse-label">Bourse</span>
+            <span class="capital-wallet-sub">Inventaire</span>
+          </div>
+          <div class="capital-wallet-rows" id="cap-bourse-rows"></div>
+        </div>
+
+        <!-- Compte en banque -->
+        <div class="capital-wallet">
+          <div class="capital-wallet-title">
+            <input type="text" id="cap-banque-label" value="Compte en Banque" placeholder="Compte en Banque"
+              class="capital-label-inp" oninput="saveCapBanqueLabel(this.value)">
+          </div>
+          <div class="capital-wallet-rows" id="cap-banque-rows"></div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 2 : Possessions -->
+      <div class="capital-accordion open" id="cap-acc-possession">
+        <div class="capital-acc-header" onclick="toggleCapAccordion('possession')">
+          <input type="text" id="cap-label-possession" value="Possessions" placeholder="Possessions"
+            class="capital-label-inp capital-label-big" oninput="saveCapLabel('possession',this.value)" onclick="event.stopPropagation()">
+          <span class="capital-acc-sub">Montures, animaux, véhicules, navires…</span>
+          <span class="capital-acc-arrow">▼</span>
+        </div>
+        <div class="capital-acc-body" id="cap-body-possession">
+          <div class="capital-grid" id="cap-grid-possession"></div>
+          <button class="capital-add-btn" onclick="addCapItem('possession')">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- LIGNE 3 : Immobilier -->
+      <div class="capital-accordion open" id="cap-acc-immobilier">
+        <div class="capital-acc-header" onclick="toggleCapAccordion('immobilier')">
+          <input type="text" id="cap-label-immobilier" value="Immobilier" placeholder="Immobilier"
+            class="capital-label-inp capital-label-big" oninput="saveCapLabel('immobilier',this.value)" onclick="event.stopPropagation()">
+          <span class="capital-acc-sub">Maisons, bâtiments, terrains, propriétés…</span>
+          <span class="capital-acc-arrow">▼</span>
+        </div>
+        <div class="capital-acc-body" id="cap-body-immobilier">
+          <div class="capital-grid" id="cap-grid-immobilier"></div>
+          <button class="capital-add-btn" onclick="addCapItem('immobilier')">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- LIGNE 4 : Commerce -->
+      <div class="capital-accordion open" id="cap-acc-commerce">
+        <div class="capital-acc-header" onclick="toggleCapAccordion('commerce')">
+          <input type="text" id="cap-label-commerce" value="Commerce" placeholder="Commerce"
+            class="capital-label-inp capital-label-big" oninput="saveCapLabel('commerce',this.value)" onclick="event.stopPropagation()">
+          <span class="capital-acc-sub">Entreprises, boutiques, moyens de production…</span>
+          <span class="capital-acc-arrow">▼</span>
+        </div>
+        <div class="capital-acc-body" id="cap-body-commerce">
+          <div class="capital-grid" id="cap-grid-commerce"></div>
+          <button class="capital-add-btn" onclick="addCapItem('commerce')">+ Ajouter</button>
+        </div>
+      </div>
+
     </div>
-</div><!-- end page-capital -->
+  </div><!-- end page-capital -->
 
   <!-- PAGE PARAMÈTRES -->
   <div id="page-parametres" class="page">
@@ -1721,6 +1829,43 @@ body {
         </div>
       </div>
 
+      <!-- ACCORDÉON : Capital -->
+      <div class="param-accordion">
+        <div class="param-accordion-header" onclick="toggleAccordion(this)">
+          <span class="param-accordion-title">&#9670; Capital</span>
+          <span class="param-accordion-arrow">▼</span>
+        </div>
+        <div class="param-accordion-body">
+          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Bourse &amp; Banque</div>
+              <div class="param-fields" style="margin-top:6px;">
+                <div class="param-row"><span class="param-lbl" style="min-width:60px;">Bourse</span><input class="param-comp-input" id="cfg-cap-bourse-label" type="text" placeholder="Bourse" oninput="saveCapWalletLabel('bourse',this.value)"></div>
+                <div class="param-row" style="margin-top:4px;"><span class="param-lbl" style="min-width:60px;">Banque</span><input class="param-comp-input" id="cfg-cap-banque-label" type="text" placeholder="Compte en Banque" oninput="saveCapWalletLabel('banque',this.value)"></div>
+              </div>
+            </div>
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Section 1</div>
+              <div class="param-fields" style="margin-top:6px;">
+                <div class="param-row"><span class="param-lbl" style="min-width:60px;">Titre</span><input class="param-comp-input" id="cfg-cap-label-possession" type="text" placeholder="Possessions" oninput="saveCapLabelParam('possession',this.value)"></div>
+              </div>
+            </div>
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Section 2</div>
+              <div class="param-fields" style="margin-top:6px;">
+                <div class="param-row"><span class="param-lbl" style="min-width:60px;">Titre</span><input class="param-comp-input" id="cfg-cap-label-immobilier" type="text" placeholder="Immobilier" oninput="saveCapLabelParam('immobilier',this.value)"></div>
+              </div>
+            </div>
+            <div class="param-col">
+              <div class="param-section-title">&#9632; Section 3</div>
+              <div class="param-fields" style="margin-top:6px;">
+                <div class="param-row"><span class="param-lbl" style="min-width:60px;">Titre</span><input class="param-comp-input" id="cfg-cap-label-commerce" type="text" placeholder="Commerce" oninput="saveCapLabelParam('commerce',this.value)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- end param-layout -->
 
     <!-- Reset global -->
@@ -1909,9 +2054,11 @@ function clearAll() {
   if (!confirm('Effacer tout ?')) return;
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
-  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
+  buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
   applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
-  applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors(); persist();
+  applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
+  buildBourseRows(); refreshArmorStats();
+  persist();
 }
 
 /* ── bag normal slots ── */
@@ -2555,6 +2702,181 @@ function renderFicheLabelParams() {
   });
 }
 
+/* ══ PAGE CAPITAL ══ */
+
+function getCapBourseCount() { return getBourseCount(); }
+
+function buildCapBourseRows() {
+  const container = document.getElementById('cap-bourse-rows');
+  if (!container) return;
+  container.innerHTML = '';
+  const lbl = document.getElementById('cap-bourse-label');
+  if (lbl) lbl.textContent = data._bourseLabel || 'Bourse';
+  const count = getBourseCount();
+  for (let i = 0; i < count; i++) {
+    const row = document.createElement('div');
+    row.className = 'capital-wallet-row';
+    const val = document.createElement('input');
+    val.className = 'capital-wallet-inp'; val.type = 'text';
+    val.placeholder = '0'; val.value = data['_bourseVal'+i] || '';
+    val.oninput = () => { data['_bourseVal'+i] = val.value; persist(); syncBourseToInv(i); };
+    const dev = document.createElement('input');
+    dev.className = 'capital-wallet-dev'; dev.type = 'text';
+    dev.placeholder = 'Đ'; dev.value = data['_bourseDevise'+i] || '';
+    dev.oninput = () => { data['_bourseDevise'+i] = dev.value; persist(); syncBourseToInv(i); };
+    row.appendChild(val); row.appendChild(dev);
+    container.appendChild(row);
+  }
+}
+
+function syncBourseToInv(i) {
+  // Sync back to inventaire bourse rows
+  buildBourseRows();
+}
+
+function buildCapBanqueRows() {
+  const container = document.getElementById('cap-banque-rows');
+  if (!container) return;
+  container.innerHTML = '';
+  const count = getBourseCount(); // same count as bourse for consistency
+  for (let i = 0; i < count; i++) {
+    const row = document.createElement('div');
+    row.className = 'capital-wallet-row';
+    const val = document.createElement('input');
+    val.className = 'capital-wallet-inp'; val.type = 'text';
+    val.placeholder = '0'; val.value = data['_banqueVal'+i] || '';
+    val.oninput = () => { data['_banqueVal'+i] = val.value; persist(); };
+    const dev = document.createElement('input');
+    dev.className = 'capital-wallet-dev'; dev.type = 'text';
+    dev.placeholder = 'Đ'; dev.value = data['_banqueDevise'+i] || '';
+    dev.oninput = () => { data['_banqueDevise'+i] = dev.value; persist(); };
+    row.appendChild(val); row.appendChild(dev);
+    container.appendChild(row);
+  }
+}
+
+function saveCapBanqueLabel(val) { data._banqueLabel = val; persist(); }
+
+function saveCapWalletLabel(key, val) {
+  if (key === 'bourse') {
+    data._bourseLabel = val; persist();
+    const el = document.getElementById('cap-bourse-label');
+    if (el) el.textContent = val || 'Bourse';
+    const invLbl = document.getElementById('bourse-label');
+    if (invLbl) invLbl.value = val || 'Bourse';
+  } else if (key === 'banque') {
+    data._banqueLabel = val; persist();
+    const el = document.getElementById('cap-banque-label');
+    if (el) el.value = val || 'Compte en Banque';
+  }
+}
+
+function saveCapLabelParam(cat, val) {
+  saveCapLabel(cat, val);
+  const el = document.getElementById('cap-label-'+cat);
+  if (el) el.value = val || '';
+}
+
+function renderCapitalParams() {
+  const b = document.getElementById('cfg-cap-bourse-label');
+  if (b) b.value = data._bourseLabel || 'Bourse';
+  const bk = document.getElementById('cfg-cap-banque-label');
+  if (bk) bk.value = data._banqueLabel || 'Compte en Banque';
+  ['possession','immobilier','commerce'].forEach(cat => {
+    const inp = document.getElementById('cfg-cap-label-'+cat);
+    if (inp) inp.value = getCapLabel(cat);
+  });
+}
+
+function saveCapLabel(cat, val) {
+  if (!data._capLabels) data._capLabels = {};
+  data._capLabels[cat] = val; persist();
+}
+
+function getCapLabel(cat) {
+  const defaults = { possession: 'Possessions', immobilier: 'Immobilier', commerce: 'Commerce' };
+  return data._capLabels?.[cat] || defaults[cat] || cat;
+}
+
+function toggleCapAccordion(cat) {
+  const el = document.getElementById('cap-acc-'+cat);
+  if (el) el.classList.toggle('open');
+}
+
+function addCapItem(cat) {
+  if (!data._capital) data._capital = {};
+  if (!data._capital[cat]) data._capital[cat] = [];
+  data._capital[cat].push({ nom: '', notes: '' });
+  persist(); renderCapGrid(cat);
+}
+
+function removeCapItem(cat, idx) {
+  if (data._capital?.[cat]) {
+    data._capital[cat].splice(idx, 1);
+    persist(); renderCapGrid(cat);
+  }
+}
+
+function saveCapItem(cat, idx, field, val) {
+  if (!data._capital) data._capital = {};
+  if (!data._capital[cat]) data._capital[cat] = [];
+  if (!data._capital[cat][idx]) data._capital[cat][idx] = {};
+  data._capital[cat][idx][field] = val; persist();
+}
+
+function renderCapGrid(cat) {
+  const grid = document.getElementById('cap-grid-'+cat);
+  if (!grid) return;
+  grid.innerHTML = '';
+  const items = data._capital?.[cat] || [];
+  items.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'capital-card';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'capital-card-del'; delBtn.textContent = '✕';
+    delBtn.onclick = () => removeCapItem(cat, idx);
+    const nameInp = document.createElement('input');
+    nameInp.className = 'capital-card-name'; nameInp.type = 'text';
+    nameInp.placeholder = 'Nom…'; nameInp.value = item.nom || '';
+    nameInp.oninput = () => saveCapItem(cat, idx, 'nom', nameInp.value);
+    const typeInp = document.createElement('input');
+    typeInp.type = 'text'; typeInp.placeholder = 'Type…'; typeInp.value = item.type || '';
+    typeInp.style.cssText = 'background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:2px 4px;width:100%;outline:none;box-sizing:border-box;letter-spacing:.3px;text-transform:uppercase;';
+    typeInp.oninput = () => saveCapItem(cat, idx, 'type', typeInp.value);
+    const locInp = document.createElement('input');
+    locInp.type = 'text'; locInp.placeholder = 'Localisation…'; locInp.value = item.localisation || '';
+    locInp.style.cssText = 'background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--muted);font-family:var(--font);font-size:11px;padding:2px 4px;width:100%;outline:none;box-sizing:border-box;margin-top:2px;';
+    locInp.oninput = () => saveCapItem(cat, idx, 'localisation', locInp.value);
+    const notesInp = document.createElement('textarea');
+    notesInp.placeholder = 'Notes…'; notesInp.value = item.notes || '';
+    notesInp.style.cssText = 'background:transparent;border:none;border-top:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:12px;padding:4px;width:100%;resize:none;min-height:40px;max-height:220px;overflow-y:auto;outline:none;box-sizing:border-box;white-space:pre-wrap;line-height:1.5;';
+    notesInp.oninput = () => { saveCapItem(cat, idx, 'notes', notesInp.value); notesInp.style.height='auto'; notesInp.style.height=Math.min(notesInp.scrollHeight,220)+'px'; };
+    // Initial resize on render
+    setTimeout(() => { notesInp.style.height='auto'; notesInp.style.height=Math.min(notesInp.scrollHeight,220)+'px'; }, 0);
+    card.appendChild(delBtn);
+    card.appendChild(nameInp);
+    card.appendChild(typeInp);
+    card.appendChild(locInp);
+    card.appendChild(notesInp);
+    grid.appendChild(card);
+  });
+}
+
+function renderCapital() {
+  buildCapBourseRows();
+  buildCapBanqueRows();
+  // Restore labels
+  const banqueLbl = document.getElementById('cap-banque-label');
+  if (banqueLbl) banqueLbl.value = data._banqueLabel || 'Compte en Banque';
+  ['possession','immobilier','commerce'].forEach(cat => {
+    const inp = document.getElementById('cap-label-'+cat);
+    if (inp) inp.value = getCapLabel(cat);
+    renderCapGrid(cat);
+  });
+}
+
+function syncBourseToCapital() { buildCapBourseRows(); }
+
 function toggleAccordion(el) {
   el.closest('.param-accordion').classList.toggle('open');
 }
@@ -2631,12 +2953,12 @@ function buildBourseRows() {
     val.className = 'mun-input'; val.type = 'text';
     val.placeholder = '0'; val.style.width = '52px';
     val.value = data['_bourseVal'+i] || '';
-    val.oninput = () => { data['_bourseVal'+i] = val.value; persist(); };
+    val.oninput = () => { data['_bourseVal'+i] = val.value; persist(); buildCapBourseRows?.(); };
     const dev = document.createElement('input');
     dev.className = 'mun-input'; dev.type = 'text';
     dev.placeholder = 'Đ'; dev.style.cssText = 'width:28px;border-left:1px solid var(--border2);padding-left:4px;';
     dev.value = data['_bourseDevise'+i] || '';
-    dev.oninput = () => { data['_bourseDevise'+i] = dev.value; persist(); };
+    dev.oninput = () => { data['_bourseDevise'+i] = dev.value; persist(); buildCapBourseRows?.(); };
     row.appendChild(val); row.appendChild(dev);
     container.appendChild(row);
   }
@@ -2683,6 +3005,7 @@ function showPage(name) {
     document.getElementById('nav-'+p).classList.toggle('active', p===name);
   });
   if (name === 'competences') renderCompetences();
+  if (name === 'capital') renderCapital();
   if (name === 'parametres') renderParametres();
   if (name === 'fiche') renderFiche();
 }
@@ -2900,6 +3223,15 @@ function renderArmorParams() {
   });
 }
 
+function resizeFicheNom(el) {
+  el.style.height = 'auto';
+  const scrollH = el.scrollHeight;
+  const lineH = parseInt(getComputedStyle(el).lineHeight) || 28;
+  const maxH = lineH * 3 + 16;
+  el.style.height = Math.min(scrollH, maxH) + 'px';
+  el.style.overflowY = scrollH > maxH ? 'auto' : 'hidden';
+}
+
 function resizeFicheInp(el) {
   const len = Math.max(2.5, (el.value || '').length);
   el.style.width = Math.min(len + 2, 14) + 'ch';
@@ -3053,7 +3385,11 @@ function syncChar(field, val) {
   const ficheMap = { nom:'fiche-nom-inp', race:'fiche-race-inp', age:'fiche-age-inp', naiss:'fiche-naiss-inp', pv:'fiche-pv', pa:'fiche-pa', pe:'fiche-pe', ps:'fiche-ps', dsnc:'fiche-dsnc' };
   if (ficheMap[field]) {
     const el = document.getElementById(ficheMap[field]);
-    if (el && el !== document.activeElement) { el.value = val || ''; resizeFicheInp(el); }
+    if (el && el !== document.activeElement) {
+      el.value = val || '';
+      if (field === 'nom') resizeFicheNom(el);
+      else resizeFicheInp(el);
+    }
   }
   if (field === 'nom') {
     updateTbNom();
@@ -3761,8 +4097,6 @@ function applyI18n() {
   const titles = document.querySelectorAll('.inv-title-txt');
   if(titles[0]) titles[0].textContent = t('sac');
   if(titles[1]) titles[1].textContent = t('poches');
-  const cap = document.querySelector('#page-capital div');
-  if(cap) cap.textContent = t('capital_wip');
   buildBag(); buildPoche();
   if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
   localStorage.setItem('dnd_lang', currentLang);
@@ -4094,6 +4428,8 @@ function renderParametres() {
   // Bourse count
   const bourseCountSel = document.getElementById('cfg-bourse-count');
   if (bourseCountSel) bourseCountSel.value = getBourseCount();
+  // Capital labels
+  renderCapitalParams();
   // Quality params
   renderQualityParams();
   // Slot labels
@@ -4170,7 +4506,9 @@ function renderFiche() {
   const setT = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val||'—'; };
   const setV = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
 
-  setV('fiche-nom-inp', c.nom);
+  // Nom — textarea
+  const nomEl = document.getElementById('fiche-nom-inp');
+  if (nomEl) { nomEl.value = c.nom || ''; resizeFicheNom(nomEl); }
   setV('fiche-race-inp', c.race);
   setV('fiche-age-inp', c.age);
   setV('fiche-naiss-inp', c.naiss);
