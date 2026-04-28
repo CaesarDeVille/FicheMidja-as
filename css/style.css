@@ -933,3 +933,10 @@ body {
 .char-input.narrow {
   max-width: 28ch;
 }
+
+#slot-preview .sp-effet,
+#slot-preview .sp-effet *,
+#slot-preview .sp-effet i,
+#slot-preview .sp-effet em {
+  font-style: normal !important;
+}
