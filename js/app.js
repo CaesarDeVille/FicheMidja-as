@@ -1259,8 +1259,16 @@ function saveBourseLabel(val) { data._bourseLabel = val; persist(); }
 
 function loadChar() {
   const c = data._char || {};
-  const f = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-  const fc = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.checked = val; };
+  // Important : quand la fiche est réinitialisée, les champs absents doivent être vidés.
+  // Avant, les valeurs restaient affichées car on ne faisait rien si val était null/undefined.
+  const f = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val ?? ';
+  };
+  const fc = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!val;
+  };
 
   // Inventaire cartouche
   f('char-nom', c.nom); f('char-age', c.age); f('char-naiss', c.naiss);
