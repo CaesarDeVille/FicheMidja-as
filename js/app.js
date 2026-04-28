@@ -3051,3 +3051,213 @@ setTimeout(() => {
   document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => resizeFicheInp(el));
   resizeAllCartouche();
 }, 120);
+
+
+// === UI POLISH : sélection visuelle légère ===
+(function initUiPolishSelection(){
+  const selectable = '.slot, .free-cell, .sort-cell, .grid-cell, .spe-cell';
+  document.addEventListener('click', (ev) => {
+    const el = ev.target.closest(selectable);
+    if (!el) return;
+    document.querySelectorAll('.ui-selected').forEach(x => {
+      if (x !== el) x.classList.remove('ui-selected');
+    });
+    el.classList.add('ui-selected');
+    window.setTimeout(() => el.classList.remove('ui-selected'), 900);
+  }, true);
+})();
+
+// === UI POLISH : feedback drag/drop global ===
+(function initUiPolishDragDrop(){
+  const zoneSelector = '.slot, .free-cell, .sort-cell, .grid-cell, .spe-cell';
+
+  document.addEventListener('dragstart', (ev) => {
+    const el = ev.target.closest(zoneSelector);
+    if (el) {
+      el.classList.add('ui-dragging');
+      document.body.classList.add('ui-drag-active');
+    }
+  }, true);
+
+  document.addEventListener('dragend', () => {
+    document.querySelectorAll('.ui-dragging, .ui-drop-target, .ui-drop-denied').forEach(el => {
+      el.classList.remove('ui-dragging', 'ui-drop-target', 'ui-drop-denied');
+    });
+    document.body.classList.remove('ui-drag-active');
+  }, true);
+
+  document.addEventListener('dragenter', (ev) => {
+    const el = ev.target.closest(zoneSelector);
+    if (el && document.body.classList.contains('ui-drag-active')) {
+      el.classList.add('ui-drop-target');
+    }
+  }, true);
+
+  document.addEventListener('dragover', (ev) => {
+    const el = ev.target.closest(zoneSelector);
+    if (el && document.body.classList.contains('ui-drag-active')) {
+      el.classList.add('ui-drop-target');
+    }
+  }, true);
+
+  document.addEventListener('dragleave', (ev) => {
+    const el = ev.target.closest(zoneSelector);
+    if (el && !el.contains(ev.relatedTarget)) {
+      el.classList.remove('ui-drop-target', 'ui-drop-denied');
+    }
+  }, true);
+
+  document.addEventListener('drop', () => {
+    document.querySelectorAll('.ui-drop-target, .ui-drop-denied').forEach(el => {
+      el.classList.remove('ui-drop-target', 'ui-drop-denied');
+    });
+  }, true);
+})();
+
+
+/* === UNDO / REDO : Ctrl+Z / Ctrl+Y === */
+let undoStack = [];
+let redoStack = [];
+let undoLastSnapshot = null;
+let undoIsRestoring = false;
+const UNDO_LIMIT = 40;
+
+function undoSnapshot() {
+  try { return JSON.stringify(data); }
+  catch (e) { return null; }
+}
+
+function updateUndoRedoButtons() {
+  const u = document.getElementById('btn-undo');
+  const r = document.getElementById('btn-redo');
+  if (u) {
+    u.disabled = undoStack.length === 0;
+    u.style.opacity = undoStack.length === 0 ? '.45' : '';
+  }
+  if (r) {
+    r.disabled = redoStack.length === 0;
+    r.style.opacity = redoStack.length === 0 ? '.45' : '';
+  }
+}
+
+function refreshAfterHistoryRestore() {
+  try {
+    const bag = document.getElementById('bagSize');
+    if (bag) bag.value = data._bagSize || 'sacoche';
+
+    buildBag();
+    buildPoche();
+    buildSpe();
+    refresh();
+    loadChar();
+    renderFiche();
+
+    applyStatLabels();
+    applyCharLabels();
+    applyCatLabels();
+    applyMagieSetting();
+    applyParamShow();
+    applyStatSplits();
+    applyEffetsPlus();
+    applySlotLabels();
+    applyFicheSectionLabels();
+    applyAllQualityColors();
+    buildBourseRows();
+    refreshArmorStats();
+
+    setTimeout(() => {
+      if (typeof resizeAllCartouche === 'function') resizeAllCartouche();
+      document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => {
+        if (typeof resizeFicheInp === 'function') resizeFicheInp(el);
+      });
+    }, 30);
+  } catch (e) {
+    console.error('Erreur refresh undo/redo', e);
+  }
+}
+
+function initUndoRedo() {
+  undoLastSnapshot = undoSnapshot();
+
+  const originalPersist = persist;
+  persist = function() {
+    const current = undoSnapshot();
+
+    if (!undoIsRestoring && undoLastSnapshot !== null && current !== null && current !== undoLastSnapshot) {
+      undoStack.push(undoLastSnapshot);
+      if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+      redoStack = [];
+      undoLastSnapshot = current;
+    }
+
+    originalPersist();
+    updateUndoRedoButtons();
+  };
+
+  updateUndoRedoButtons();
+}
+
+function undoAction() {
+  if (!undoStack.length) {
+    toast('Rien à annuler');
+    return;
+  }
+
+  const current = undoSnapshot();
+  const previous = undoStack.pop();
+  if (current !== null) redoStack.push(current);
+
+  undoIsRestoring = true;
+  try {
+    data = JSON.parse(previous);
+    undoLastSnapshot = previous;
+    localStorage.setItem('dnd_inv', previous);
+    refreshAfterHistoryRestore();
+    toast('Action annulée');
+  } finally {
+    undoIsRestoring = false;
+    updateUndoRedoButtons();
+  }
+}
+
+function redoAction() {
+  if (!redoStack.length) {
+    toast('Rien à rétablir');
+    return;
+  }
+
+  const current = undoSnapshot();
+  const next = redoStack.pop();
+  if (current !== null) undoStack.push(current);
+
+  undoIsRestoring = true;
+  try {
+    data = JSON.parse(next);
+    undoLastSnapshot = next;
+    localStorage.setItem('dnd_inv', next);
+    refreshAfterHistoryRestore();
+    toast('Action rétablie');
+  } finally {
+    undoIsRestoring = false;
+    updateUndoRedoButtons();
+  }
+}
+
+document.addEventListener('keydown', (ev) => {
+  const key = ev.key.toLowerCase();
+
+  if ((ev.ctrlKey || ev.metaKey) && !ev.shiftKey && key === 'z') {
+    ev.preventDefault();
+    undoAction();
+  }
+
+  if ((ev.ctrlKey || ev.metaKey) && (key === 'y' || (ev.shiftKey && key === 'z'))) {
+    ev.preventDefault();
+    redoAction();
+  }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Laisse d'abord le script initial charger la fiche, puis branche l'historique.
+  setTimeout(initUndoRedo, 0);
+});

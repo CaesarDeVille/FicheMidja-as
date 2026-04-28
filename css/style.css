@@ -933,3 +933,116 @@ body {
 .char-input.narrow {
   max-width: 28ch;
 }
+
+
+/* === UI POLISH : hover, sélection, drag & drop === */
+
+/* Transitions plus douces */
+.slot,
+.free-cell,
+.sort-cell,
+.grid-cell,
+.spe-cell,
+.nav-btn,
+.btn,
+.btn-sm,
+.camp-player-card {
+  transition:
+    transform .12s ease,
+    box-shadow .16s ease,
+    border-color .16s ease,
+    background .16s ease,
+    color .16s ease,
+    opacity .16s ease;
+}
+
+/* Hover légèrement animé */
+.slot:hover,
+.free-cell:hover,
+.sort-cell:hover,
+.grid-cell:hover,
+.spe-cell:hover,
+.camp-player-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(240, 192, 64, .16);
+}
+
+/* Clic / sélection visuelle */
+.slot:active,
+.free-cell:active,
+.sort-cell:active,
+.grid-cell:active,
+.spe-cell:active,
+.btn:active,
+.btn-sm:active {
+  transform: translateY(0) scale(.99);
+}
+
+.slot.ui-selected,
+.free-cell.ui-selected,
+.sort-cell.ui-selected,
+.grid-cell.ui-selected,
+.spe-cell.ui-selected {
+  border-color: var(--gold) !important;
+  box-shadow:
+    0 0 0 1px rgba(240, 192, 64, .35),
+    0 0 18px rgba(240, 192, 64, .22);
+  background: linear-gradient(
+    180deg,
+    rgba(240, 192, 64, .10),
+    rgba(240, 192, 64, .035)
+  ), var(--bg3);
+}
+
+/* Drag source */
+.dragging,
+.ui-dragging {
+  opacity: .45 !important;
+  transform: scale(.985);
+  box-shadow: 0 0 18px rgba(240, 192, 64, .22);
+  cursor: grabbing !important;
+}
+
+/* Drop target */
+.drag-over,
+.ui-drop-target {
+  outline: 2px dashed var(--gold) !important;
+  outline-offset: -4px;
+  border-color: var(--gold) !important;
+  background:
+    radial-gradient(circle at center, rgba(240, 192, 64, .16), transparent 65%),
+    var(--hover) !important;
+  box-shadow:
+    inset 0 0 18px rgba(240, 192, 64, .12),
+    0 0 18px rgba(240, 192, 64, .18);
+}
+
+/* Drop target interdit / incertain */
+.ui-drop-denied {
+  outline: 2px dashed #c84040 !important;
+  outline-offset: -4px;
+  border-color: #c84040 !important;
+  background: rgba(200, 64, 64, .10) !important;
+}
+
+/* Curseur plus explicite */
+[draggable="true"] {
+  cursor: grab;
+}
+
+[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+/* Petites pulsations pour les onglets actifs */
+.nav-btn.active {
+  text-shadow: 0 0 10px rgba(240,192,64,.22);
+}
+
+
+/* === UNDO / REDO BUTTONS === */
+#btn-undo:disabled,
+#btn-redo:disabled {
+  cursor: default;
+  filter: grayscale(.35);
+}

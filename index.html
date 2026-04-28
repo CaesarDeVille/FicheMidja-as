@@ -23,6 +23,8 @@
       </label>
     </div>
     <button class="btn-sm" onclick="saveData()">&#128190; Sauvegarder</button>
+    <button class="btn-sm" id="btn-undo" onclick="undoAction()" title="Ctrl+Z">↶ Annuler</button>
+    <button class="btn-sm" id="btn-redo" onclick="redoAction()" title="Ctrl+Y">↷ Rétablir</button>
     <button class="btn-sm" onclick="exportData()">&#8679; Export</button>
     <label class="btn-sm" style="cursor:pointer;">&#8681; Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
     <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearFiche()">&#10005; Réinit. fiche</button>
