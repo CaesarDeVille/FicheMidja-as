@@ -1306,3 +1306,34 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* === CAMPAIGN V2 FORCE FIX === */
+#page-campagne.active {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#page-campagne .campaign-layout-v2 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 18px !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+#page-campagne .campaign-panel {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#page-campagne .campaign-title,
+#page-campagne [data-i18n^="campaign."] {
+  text-transform: none;
+}
+
+@media (max-width: 900px) {
+  #page-campagne .campaign-layout-v2 {
+    grid-template-columns: 1fr !important;
+  }
+}

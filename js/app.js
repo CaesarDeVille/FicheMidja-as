@@ -2426,6 +2426,22 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
+    "campaign.playerTitle": "Campagne Joueur",
+    "campaign.currentCampaign": "Campagne actuelle",
+    "campaign.playerSaveCode": "Code joueur",
+    "campaign.join": "Rejoindre",
+    "campaign.leave": "Quitter la campagne",
+    "campaign.joinInfo": "Le code campagne permet d’associer votre fiche à une campagne.",
+    "campaign.gmTitle": "Gestion MJ",
+    "campaign.create": "Créer une campagne",
+    "campaign.campaignCode": "Code Campagne",
+    "campaign.gmCode": "Code MJ",
+    "campaign.manage": "Gérer",
+    "campaign.players": "Joueurs",
+    "campaign.noCampaignLoaded": "Aucune campagne MJ chargée.",
+    "campaign.loadSheet": "Voir fiche",
+    "campaign.kick": "Expulser",
+    "campaign.noPlayers": "Aucun joueur dans cette campagne.",
     "app.title": "⚔ FICHE PERSO MIDJA'AS ⚔",
     "top.sheetOf": "Fiche de",
     "top.sheetOfEmpty": "Fiche de —",
@@ -2498,6 +2514,22 @@ const I18N = {
     sort_placeholder: 'Emplacement sort',
   },
   en: {
+    "campaign.playerTitle": "Player Campaign",
+    "campaign.currentCampaign": "Current campaign",
+    "campaign.playerSaveCode": "Player code",
+    "campaign.join": "Join",
+    "campaign.leave": "Leave campaign",
+    "campaign.joinInfo": "The campaign code links your sheet to a campaign.",
+    "campaign.gmTitle": "GM Management",
+    "campaign.create": "Create campaign",
+    "campaign.campaignCode": "Campaign Code",
+    "campaign.gmCode": "GM Code",
+    "campaign.manage": "Manage",
+    "campaign.players": "Players",
+    "campaign.noCampaignLoaded": "No GM campaign loaded.",
+    "campaign.loadSheet": "View sheet",
+    "campaign.kick": "Kick",
+    "campaign.noPlayers": "No player in this campaign.",
     "app.title": "⚔ MIDJA'AS CHARACTER SHEET ⚔",
     "top.sheetOf": "Sheet of",
     "top.sheetOfEmpty": "Sheet of —",
@@ -3656,7 +3688,7 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (!key) return;
-    const val = uiT(key, el.textContent);
+    const val = uiT(key, (typeof t === 'function' ? t(key, el.textContent) : el.textContent));
     el.textContent = val;
   });
 
