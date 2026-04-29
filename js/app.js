@@ -3451,7 +3451,11 @@ async function firebaseSaveToCode(code) {
   const payload = makeFirebaseSavePayload();
   payload._firebaseSaveCode = clean;
 
-  await ref.set(payload);
+  await ref.set({
+    payloadJson: JSON.stringify(payload),
+    savedAt: Date.now(),
+    version: 2
+  });
   setSaveCode(clean);
   toast((currentLang === 'en' ? 'Saved: ' : 'Sauvegardé : ') + formatSaveCode(clean));
   return true;
@@ -3524,7 +3528,21 @@ async function firebaseLoadByCode() {
       return;
     }
 
-    const loaded = snap.val();
+    let loaded = snap.val();
+
+    // Depuis la correction Firebase, les fiches sont stockées en texte JSON
+    // pour éviter les clés interdites par Realtime Database (. # $ / [ ]).
+    // On garde aussi la compatibilité avec d'anciennes sauvegardes objet.
+    if (loaded && typeof loaded === 'object' && typeof loaded.payloadJson === 'string') {
+      try {
+        loaded = JSON.parse(loaded.payloadJson);
+      } catch (err) {
+        console.error(err);
+        toast(uiT('toast.invalidSave','Sauvegarde invalide'));
+        return;
+      }
+    }
+
     if (!loaded || typeof loaded !== 'object') {
       toast(uiT('toast.invalidSave','Sauvegarde invalide'));
       return;
