@@ -85,6 +85,7 @@ body {
   padding: 10px 12px;
   user-select: none; overflow: hidden;
   min-height: 60px; min-width: 0;
+  position: relative;
 }
 .slot:hover  { border-color: var(--gold); background: var(--hover); }
 .slot.filled { border-color: var(--filled); background: var(--bg3); }
@@ -260,7 +261,6 @@ body {
 
 /* Mun + Spé */
 .inv-spe { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-.spe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .spe-cell {
   background: var(--bg3); border: 1.5px solid var(--border2); border-radius: 3px;
   font-size: 12px; color: var(--muted); padding: 6px 10px; height: 36px;
@@ -614,14 +614,13 @@ body {
 .camp-player-time { font-size: 10px; color: var(--dim); }
 .camp-player-load { font-size: 11px; color: var(--muted); background: transparent; border: 1px solid var(--border2); border-radius: 3px; padding: 3px 8px; cursor: pointer; }
 .camp-accordion { border: 1.5px solid var(--border2); border-radius: 5px; overflow: hidden; }
-.camp-accordion.open .camp-acc-body { display: block; }
 .camp-acc-hdr { display: flex; align-items: center; gap: 8px; background: var(--bg3); padding: 10px 12px; cursor: pointer; flex-wrap: wrap; }
 .camp-acc-name { font-size: 13px; color: var(--gold); flex: 1; min-width: 80px; }
 .camp-acc-code { font-size: 11px; color: var(--muted); letter-spacing: 2px; background: var(--bg2); padding: 2px 6px; border-radius: 3px; }
 .camp-acc-count { font-size: 11px; color: var(--dim); }
 .camp-acc-arrow { font-size: 10px; color: var(--muted); transition: transform .2s; margin-left: auto; }
 .camp-accordion.open .camp-acc-arrow { transform: rotate(180deg); }
-.camp-acc-body { display: none; padding: 8px 12px; background: var(--bg2); display: none; flex-direction: column; gap: 6px; }
+.camp-acc-body { display: none; padding: 8px 12px; background: var(--bg2); flex-direction: column; gap: 6px; }
 .camp-accordion.open .camp-acc-body { display: flex; }
 
 /* ══ PAGE CAPITAL ══ */
@@ -892,8 +891,6 @@ body {
 }
 .param-reset-btn:hover { background: #3a1010; border-color: #f04040; color: #f04040; }
 
-/* ══ SLOT IMAGE BACKGROUND ══ */
-.slot { position: relative; }
 .slot-img-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
@@ -1128,37 +1125,6 @@ body {
 }
 
 
-/* === LEGAL FOOTER === */
-.site-legal {
-  margin-top: 30px;
-  padding: 14px 10px;
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 0;
-  line-height: 1.5;
-  border-top: 1px solid rgba(240, 192, 64, 0.15);
-  letter-spacing: 0.5px;
-  transform: translateY(10px);
-  transition: opacity .7s ease, transform .7s ease;
-  white-space: pre-line;
-}
-
-.site-legal::before {
-  content: "⚜";
-  display: block;
-  font-size: 12px;
-  margin-bottom: 4px;
-  opacity: 0.6;
-}
-
-.site-legal.visible {
-  opacity: 0.7;
-  transform: translateY(0);
-}
-
-
-/* === CAMPAIGN V2 === */
 .campaign-layout-v2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1475,40 +1441,6 @@ body {
 }
 
 
-/* === LEGAL FOOTER COMPACT OVERRIDE === */
-.site-legal {
-  position: fixed !important;
-  bottom: 6px !important;
-  left: 10px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  text-align: left !important;
-  font-size: 10px !important;
-  color: var(--muted) !important;
-  opacity: .48 !important;
-  line-height: 1 !important;
-  letter-spacing: .2px !important;
-  white-space: nowrap !important;
-  transform: none !important;
-  transition: opacity .2s ease !important;
-  pointer-events: none !important;
-  user-select: none !important;
-  z-index: 9999 !important;
-}
-
-.site-legal::before {
-  content: none !important;
-  display: none !important;
-}
-
-.site-legal.visible {
-  opacity: .48 !important;
-  transform: none !important;
-}
-
-
-/* === CAMPAIGN RENAME === */
 .campaign-rename-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1863,13 +1795,7 @@ select:focus,
   box-shadow: 0 0 14px rgba(240,192,64,.08);
 }
 
-.site-legal {
-  opacity: .42 !important;
-}
 
-.site-legal:hover {
-  opacity: .65 !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -1955,36 +1881,8 @@ select::-ms-expand {
 }
 
 /* Mention légale : sous la grande case principale, non flottante */
-.site-legal {
-  position: static !important;
-  bottom: auto !important;
-  left: auto !important;
-  margin: 7px 0 0 8px !important;
-  padding: 0 !important;
-  border: none !important;
-  text-align: left !important;
-  font-size: 10px !important;
-  color: var(--muted) !important;
-  opacity: .50 !important;
-  line-height: 1.2 !important;
-  letter-spacing: .2px !important;
-  white-space: nowrap !important;
-  transform: none !important;
-  transition: opacity .2s ease !important;
-  pointer-events: none !important;
-  user-select: none !important;
-  z-index: auto !important;
-}
 
-.site-legal::before {
-  content: none !important;
-  display: none !important;
-}
 
-.site-legal.visible {
-  opacity: .50 !important;
-  transform: none !important;
-}
 
 
 /* === MOBILE TEST VERSION ===
@@ -2221,11 +2119,6 @@ select::-ms-expand {
   }
 
   /* Mention légale */
-  .site-legal {
-    white-space: normal !important;
-    margin: 8px 10px 4px !important;
-    font-size: 9px !important;
-  }
 }
 
 @media (max-width: 520px) {
@@ -3395,38 +3288,6 @@ select::-ms-expand {
 }
 
 
-/* === LEGAL FOOTER RESTORE === */
-.site-legal {
-  position: static !important;
-  display: block !important;
-  margin: 7px 0 0 8px !important;
-  padding: 0 !important;
-  border: none !important;
-  text-align: left !important;
-  font-size: 10px !important;
-  color: var(--muted) !important;
-  opacity: .50 !important;
-  line-height: 1.2 !important;
-  letter-spacing: .2px !important;
-  white-space: nowrap !important;
-  transform: none !important;
-  pointer-events: none !important;
-  user-select: none !important;
-  z-index: auto !important;
-}
-
-.site-legal::before {
-  content: none !important;
-  display: none !important;
-}
-
-.site-legal.visible {
-  opacity: .50 !important;
-  transform: none !important;
-}
-
-
-/* === PARAMS INVENTORY V2 CLEANUP === */
 .inventory-param-v2 {
   margin-top: 14px;
   padding-top: 12px;
@@ -3494,34 +3355,8 @@ select::-ms-expand {
 }
 
 /* ligne légale visible sous le cadre principal, couleur texte */
-.site-legal {
-  position: static !important;
-  display: block !important;
-  margin: 7px 0 0 8px !important;
-  padding: 0 !important;
-  border: none !important;
-  text-align: left !important;
-  font-size: 10px !important;
-  color: var(--text) !important;
-  opacity: .62 !important;
-  line-height: 1.2 !important;
-  letter-spacing: .2px !important;
-  white-space: nowrap !important;
-  transform: none !important;
-  pointer-events: none !important;
-  user-select: none !important;
-  z-index: auto !important;
-}
 
-.site-legal::before {
-  content: none !important;
-  display: none !important;
-}
 
-.site-legal.visible {
-  opacity: .62 !important;
-  transform: none !important;
-}
 
 @media (max-width: 900px) {
   .inventory-param-row {
@@ -3542,8 +3377,72 @@ select::-ms-expand {
     grid-template-columns: 1fr;
   }
 
-  .site-legal {
-    white-space: normal !important;
-    margin-right: 8px !important;
-  }
+}
+
+
+/* === CLEANUP HOTFIX FINAL OVERRIDES === */
+
+
+
+.slot-arme {
+  transform: none !important;
+  min-height: 225px !important;
+  flex-basis: 225px !important;
+}
+
+.slot-arme:hover {
+  transform: translateY(-1px) !important;
+}
+
+.prostheses-panel {
+  overflow: hidden !important;
+}
+
+#slot-preview,
+.slot-preview {
+  z-index: 20000 !important;
+}
+
+
+
+.slot-arme {
+  transform: none !important;
+  min-height: 225px !important;
+  height: 225px !important;
+  flex-basis: 225px !important;
+}
+.slot-arme:hover { transform: translateY(-1px) !important; }
+
+#slot-preview, .slot-preview { z-index: 20000 !important; }
+
+.prostheses-panel { overflow: hidden !important; }
+
+/* === LEGAL FOOTER === */
+.site-legal {
+  display: block;
+  position: static;
+  margin: 8px 0 0 8px;
+  padding: 0;
+  border: none;
+  text-align: left;
+  font-size: 10px;
+  color: var(--muted);
+  opacity: 0;
+  line-height: 1.2;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  transform: none;
+  transition: opacity .4s ease;
+  pointer-events: none;
+  user-select: none;
+  z-index: auto;
+}
+
+.site-legal::before {
+  content: none;
+  display: none;
+}
+
+.site-legal.visible {
+  opacity: .62;
 }

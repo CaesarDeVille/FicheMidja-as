@@ -103,6 +103,14 @@ const NAMED_SLOTS = ['couvre-chef','arme','armure','dos','epaule',
   'amulette','cape','anneau1','anneau2'];
 
 let data = {}, curSlot = null;
+
+var PROSTHESIS_SLOTS = [
+  'prothese_tete','prothese_oeil_g','prothese_oeil_d',
+  'prothese_bras_g','prothese_main_g','prothese_corps','prothese_bras_d','prothese_main_d',
+  'prothese_jambe_g','prothese_jambe_d',
+  'prothese_extra_1','prothese_extra_2','prothese_extra_3','prothese_extra_4','prothese_extra_5'
+];
+
 let curSortKey = null, curSortIdx = null;
 let curFreeType = null, curFreeIdx = null;
 
@@ -2458,6 +2466,7 @@ function makeSlotDraggable(slotEl, key) {
 /* ══ I18N ══ */
 let currentLang = 'fr';
 
+const BUILTIN_TRANSLATIONS = {"fr": {"app.title": "⚔ FICHE PERSO MIDJA'AS ⚔", "top.sheetOf": "Fiche de", "top.sheetOfEmpty": "Fiche de —", "top.save": "💾 Sauvegarder / Charger", "top.load": "↻ Charger", "top.undo": "↶ Annuler", "top.redo": "↷ Rétablir", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Réinit. fiche", "nav.fiche": "⚬ Fiche Perso", "nav.competences": "⚔ Compétences", "nav.inventaire": "⊞ Inventaire", "nav.capital": "◈ Capital", "nav.campagne": "⚑ Campagne", "nav.parametres": "⚙ Paramètres", "modal.firebaseSave.title": "Sauvegarde Firebase", "modal.firebaseSave.currentCode": "Code actuel", "modal.firebaseSave.noCode": "Aucun code", "modal.firebaseSave.save": "Sauvegarder", "modal.firebaseSave.saveAs": "Sauvegarder sous", "modal.firebaseSave.close": "Fermer", "modal.firebaseSave.info": "“Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.", "modal.firebaseLoad.title": "Charger une sauvegarde", "modal.firebaseLoad.code": "Code de sauvegarde", "modal.firebaseLoad.load": "Charger", "modal.firebaseLoad.close": "Fermer", "common.name": "Nom", "common.race": "Race", "common.bioAge": "Âge Bio", "common.birth": "Naissance", "common.gender": "Genre", "common.right": "Droite", "common.left": "Gauche", "common.close": "Fermer", "common.cancel": "Annuler", "common.validate": "Valider", "common.delete": "Supprimer", "common.add": "Ajouter", "inventory.amulette": "Amulette", "inventory.couvre-chef": "Couvre-Chef", "inventory.gants": "Gants", "inventory.bracelet": "Bracelet", "inventory.armure": "Armure", "inventory.cape": "Cape / Manteau", "inventory.anneau1": "Anneau", "inventory.anneau2": "Anneau", "inventory.ceinture": "Ceinture", "inventory.divers": "Divers", "inventory.bottes": "Bottes", "inventory.arme": "Arme en Main", "inventory.dos": "Dos", "inventory.epaule": "Épaule", "inventory.ceintureGauche": "Ceinture Gauche", "inventory.ceintureDroite": "Ceinture Droite", "inventory.sac": "Sac", "inventory.poches": "Poches", "inventory.munitions": "Munitions", "inventory.bourse": "Bourse", "fiche.character": "Caractère", "fiche.physical": "Physique", "fiche.history": "Histoire", "fiche.mainHand": "Main dominante", "fiche.photoHint": "Cliquer pour ajouter une image", "params.appearance": "Apparence", "params.keepColors": "Conserver mes couleurs à l'import", "params.keepColorsInfo": "Si coché, l'apparence de la fiche importée est ignorée.", "params.visualEffectsPlus": "Effets Visuels +++", "params.resetAll": "Réinitialiser tous les paramètres", "toast.saved": "Sauvegardé !", "toast.imported": "Importé !", "toast.jsonError": "Erreur JSON", "toast.nothingUndo": "Rien à annuler", "toast.nothingRedo": "Rien à rétablir", "toast.undo": "Action annulée", "toast.redo": "Action rétablie", "toast.firebaseUnavailable": "Firebase indisponible", "toast.invalidCode": "Code invalide", "toast.firebaseSaveError": "Erreur sauvegarde Firebase", "toast.firebaseLoadError": "Erreur chargement Firebase", "toast.noSaveFound": "Aucune sauvegarde trouvée", "toast.invalidSave": "Sauvegarde invalide", "toast.sheetReset": "Fiche réinitialisée.", "confirm.resetSheet": "Réinitialiser la fiche du personnage ? Les paramètres seront conservés.", "confirm.loadSave": "Charger cette sauvegarde ? La fiche actuelle sera remplacée.", "modal.firebase.title": "Sauvegarder / Charger", "modal.firebase.save": "Sauvegarder", "modal.firebase.saveAs": "Sauvegarder sous", "modal.firebase.load": "Charger", "modal.firebase.close": "Fermer", "modal.firebase.noCode": "Aucun code", "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.", "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.", "arme": "Arme en Main", "dos": "Dos", "epaule": "Épaule", "ceintureGauche": "Ceinture — Gauche", "ceintureDroite": "Ceinture — Droite", "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé", "campaign.playerTitle": "Campagne Joueur", "campaign.currentCampaign": "Campagne actuelle", "campaign.playerSaveCode": "Code joueur", "campaign.join": "Rejoindre", "campaign.leave": "Quitter la campagne", "campaign.joinInfo": "Le code campagne permet d’associer votre fiche à une campagne.", "campaign.gmTitle": "Gestion MJ", "campaign.create": "Créer", "campaign.campaignCode": "Code Campagne", "campaign.gmCode": "Code MJ", "campaign.manage": "Gérer", "campaign.players": "Joueurs", "campaign.noCampaignLoaded": "Aucune campagne MJ chargée.", "campaign.loadSheet": "Voir fiche", "campaign.kick": "Expulser", "campaign.noPlayers": "Aucun joueur dans cette campagne.", "campaign.created": "Campagne créée", "campaign.joined": "Campagne rejointe", "campaign.left": "Campagne quittée", "campaign.loaded": "Campagne chargée", "campaign.playerKicked": "Joueur expulsé", "campaign.invalidCampaignCode": "Code campagne invalide", "campaign.invalidGmCode": "Code MJ invalide", "campaign.notFound": "Campagne introuvable", "campaign.needSaveCode": "Sauvegarde d’abord ta fiche pour obtenir un code joueur.", "campaign.confirmLeave": "Quitter cette campagne ? Votre fiche ne sera pas supprimée.", "campaign.confirmKick": "Expulser ce joueur de la campagne ?", "campaign.confirmLoadPlayer": "Charger la fiche de ce joueur ? Votre fiche actuelle sera remplacée.", "campaign.playersInCampaign": "Joueurs dans la campagne", "campaign.noCampaignJoined": "Aucune campagne rejointe.", "campaign.managedCampaigns": "Campagnes gérées", "campaign.defaultName": "Campagne sans nom", "campaign.rename": "Renommer", "campaign.renamed": "Campagne renommée", "params.resetAllParams": "↺ Réinitialiser tous les paramètres", "params.clearAll": "⚠ Tout réinitialiser (fiche + params)", "confirm.resetAllParams": "Réinitialiser tous les paramètres ?", "confirm.clearAll": "Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.", "toast.paramsReset": "Paramètres réinitialisés.", "toast.allReset": "Tout réinitialisé.", "toast.reset": "Réinitialisé.", "inventory.rings": "Anneaux", "inventory.customTitle": "Inventaire personnalisé", "params.inventoryLayout": "Inventaire", "params.inventoryMode": "Mode d’inventaire", "params.inventoryDefault": "Inventaire par défaut", "params.inventoryCustom": "Inventaire personnalisé", "params.inventoryCustomInfo": "En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.", "params.addCustomSlot": "Ajouter une case", "params.customSlotName": "Nom de la case", "toast.customSlotAdded": "Case ajoutée.", "toast.customSlotRemoved": "Case supprimée.", "inventory.prostheses": "Prothèses", "inventory.separateHand": "Séparer main", "params.renameInventorySpecials": "Renommer les sections spéciales", "prostheses.head": "Tête", "prostheses.leftEye": "Œil gauche", "prostheses.rightEye": "Œil droit", "prostheses.leftArm": "Bras gauche", "prostheses.rightArm": "Bras droit", "prostheses.leftHand": "Main gauche", "prostheses.rightHand": "Main droite", "prostheses.body": "Corps", "prostheses.leftLeg": "Jambe gauche", "prostheses.rightLeg": "Jambe droite", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Renommer les capsules de prothèses", "params.resetProsthesisLabels": "Réinitialiser les noms de prothèses", "toast.prosthesisLabelsReset": "Noms de prothèses réinitialisés.", "prostheses.groupHead": "Tête", "prostheses.groupArmsBody": "Bras / Corps", "prostheses.groupLegs": "Jambes", "prostheses.groupModules": "Modules"}, "en": {"app.title": "⚔ MIDJA'AS CHARACTER SHEET ⚔", "top.sheetOf": "Sheet of", "top.sheetOfEmpty": "Sheet of —", "top.save": "💾 Save / Load", "top.load": "↻ Load", "top.undo": "↶ Undo", "top.redo": "↷ Redo", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Reset sheet", "nav.fiche": "⚬ Character Sheet", "nav.competences": "⚔ Skills", "nav.inventaire": "⊞ Inventory", "nav.capital": "◈ Capital", "nav.campagne": "⚑ Campaign", "nav.parametres": "⚙ Settings", "modal.firebaseSave.title": "Firebase Save", "modal.firebaseSave.currentCode": "Current code", "modal.firebaseSave.noCode": "No code", "modal.firebaseSave.save": "Save", "modal.firebaseSave.saveAs": "Save as", "modal.firebaseSave.close": "Close", "modal.firebaseSave.info": "“Save” overwrites the save linked to the current code. “Save as” creates a new code.", "modal.firebaseLoad.title": "Load a save", "modal.firebaseLoad.code": "Save code", "modal.firebaseLoad.load": "Load", "modal.firebaseLoad.close": "Close", "common.name": "Name", "common.race": "Race", "common.bioAge": "Bio Age", "common.birth": "Birth", "common.gender": "Gender", "common.right": "Right", "common.left": "Left", "common.close": "Close", "common.cancel": "Cancel", "common.validate": "Confirm", "common.delete": "Delete", "common.add": "Add", "inventory.amulette": "Amulet", "inventory.couvre-chef": "Headgear", "inventory.gants": "Gloves", "inventory.bracelet": "Bracelet", "inventory.armure": "Armor", "inventory.cape": "Cape / Coat", "inventory.anneau1": "Ring", "inventory.anneau2": "Ring", "inventory.ceinture": "Belt", "inventory.divers": "Misc.", "inventory.bottes": "Boots", "inventory.arme": "Main Weapon", "inventory.dos": "Back", "inventory.epaule": "Shoulder", "inventory.ceintureGauche": "Left Belt", "inventory.ceintureDroite": "Right Belt", "inventory.sac": "Bag", "inventory.poches": "Pockets", "inventory.munitions": "Ammunition", "inventory.bourse": "Purse", "fiche.character": "Personality", "fiche.physical": "Appearance", "fiche.history": "History", "fiche.mainHand": "Dominant hand", "fiche.photoHint": "Click to add an image", "params.appearance": "Appearance", "params.keepColors": "Keep my colors on import", "params.keepColorsInfo": "If checked, the imported sheet appearance is ignored.", "params.visualEffectsPlus": "Visual Effects +++", "params.resetAll": "Reset all settings", "toast.saved": "Saved!", "toast.imported": "Imported!", "toast.jsonError": "JSON error", "toast.nothingUndo": "Nothing to undo", "toast.nothingRedo": "Nothing to redo", "toast.undo": "Action undone", "toast.redo": "Action redone", "toast.firebaseUnavailable": "Firebase unavailable", "toast.invalidCode": "Invalid code", "toast.firebaseSaveError": "Firebase save error", "toast.firebaseLoadError": "Firebase load error", "toast.noSaveFound": "No save found", "toast.invalidSave": "Invalid save", "toast.sheetReset": "Sheet reset.", "confirm.resetSheet": "Reset the character sheet? Settings will be kept.", "confirm.loadSave": "Load this save? The current sheet will be replaced.", "modal.firebase.title": "Save / Load", "modal.firebase.save": "Save", "modal.firebase.saveAs": "Save as", "modal.firebase.load": "Load", "modal.firebase.close": "Close", "modal.firebase.noCode": "No code", "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.", "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.", "arme": "Main Weapon", "dos": "Back", "epaule": "Shoulder", "ceintureGauche": "Belt — Left", "ceintureDroite": "Belt — Right", "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed", "campaign.playerTitle": "Player Campaign", "campaign.currentCampaign": "Current campaign", "campaign.playerSaveCode": "Player code", "campaign.join": "Join", "campaign.leave": "Leave campaign", "campaign.joinInfo": "The campaign code links your sheet to a campaign.", "campaign.gmTitle": "GM Management", "campaign.create": "Create", "campaign.campaignCode": "Campaign Code", "campaign.gmCode": "GM Code", "campaign.manage": "Manage", "campaign.players": "Players", "campaign.noCampaignLoaded": "No GM campaign loaded.", "campaign.loadSheet": "View sheet", "campaign.kick": "Kick", "campaign.noPlayers": "No player in this campaign.", "campaign.created": "Campaign created", "campaign.joined": "Campaign joined", "campaign.left": "Campaign left", "campaign.loaded": "Campaign loaded", "campaign.playerKicked": "Player kicked", "campaign.invalidCampaignCode": "Invalid campaign code", "campaign.invalidGmCode": "Invalid GM code", "campaign.notFound": "Campaign not found", "campaign.needSaveCode": "Save your sheet first to get a player code.", "campaign.confirmLeave": "Leave this campaign? Your sheet will not be deleted.", "campaign.confirmKick": "Kick this player from the campaign?", "campaign.confirmLoadPlayer": "Load this player sheet? Your current sheet will be replaced.", "campaign.playersInCampaign": "Players in campaign", "campaign.noCampaignJoined": "No campaign joined.", "campaign.managedCampaigns": "Managed campaigns", "campaign.defaultName": "Unnamed campaign", "campaign.rename": "Rename", "campaign.renamed": "Campaign renamed", "params.resetAllParams": "↺ Reset all settings", "params.clearAll": "⚠ Reset everything (sheet + settings)", "confirm.resetAllParams": "Reset all settings?", "confirm.clearAll": "Reset EVERYTHING (sheet AND settings)? This cannot be undone.", "toast.paramsReset": "Settings reset.", "toast.allReset": "Everything reset.", "toast.reset": "Reset.", "inventory.rings": "Rings", "inventory.customTitle": "Custom inventory", "params.inventoryLayout": "Inventory", "params.inventoryMode": "Inventory mode", "params.inventoryDefault": "Default inventory", "params.inventoryCustom": "Custom inventory", "params.inventoryCustomInfo": "In custom mode, you add your own inventory slots. They display in 3 columns.", "params.addCustomSlot": "Add slot", "params.customSlotName": "Slot name", "toast.customSlotAdded": "Slot added.", "toast.customSlotRemoved": "Slot removed.", "inventory.prostheses": "Prostheses", "inventory.separateHand": "Separate hand", "params.renameInventorySpecials": "Rename special sections", "prostheses.head": "Head", "prostheses.leftEye": "Left eye", "prostheses.rightEye": "Right eye", "prostheses.leftArm": "Left arm", "prostheses.rightArm": "Right arm", "prostheses.leftHand": "Left hand", "prostheses.rightHand": "Right hand", "prostheses.body": "Body", "prostheses.leftLeg": "Left leg", "prostheses.rightLeg": "Right leg", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Rename prosthesis capsules", "params.resetProsthesisLabels": "Reset prosthesis names", "toast.prosthesisLabelsReset": "Prosthesis names reset.", "prostheses.groupHead": "Head", "prostheses.groupArmsBody": "Arms / Body", "prostheses.groupLegs": "Legs", "prostheses.groupModules": "Modules"}};
 const I18N = {
   fr: {
     "prostheses.groupHead": "Tête",
@@ -2529,7 +2538,7 @@ const I18N = {
     "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé",
     "campaign.rename": "Renommer",
     "campaign.renamed": "Campagne renommée",
-    "legal.text": "© XVI — Univers Midja’as\n\nCe site et son contenu sont protégés par le droit d’auteur.\nToute reproduction est interdite sans autorisation.\nUtilisation personnelle et adaptation autorisées.",
+    "legal.text": "© XVI — Univers Midja'as · Reproduction interdite · Usage personnel autorisé",
     "campaign.playerTitle": "Campagne Joueur",
     "campaign.currentCampaign": "Campagne actuelle",
     "campaign.playerSaveCode": "Code joueur",
@@ -2687,7 +2696,7 @@ const I18N = {
     "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed",
     "campaign.rename": "Rename",
     "campaign.renamed": "Campaign renamed",
-    "legal.text": "© XVI — Midja’as Universe\n\nThis site and its content are protected by copyright.\nAny reproduction is prohibited without permission.\nPersonal use and modification are allowed.",
+    "legal.text": "© XVI — Midja'as Universe · No reproduction · Personal use allowed",
     "campaign.playerTitle": "Player Campaign",
     "campaign.currentCampaign": "Current campaign",
     "campaign.playerSaveCode": "Player code",
@@ -3806,9 +3815,26 @@ async function firebaseLoadByCode() {
     applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
     buildBourseRows(); refreshArmorStats();
 
+    // Appliquer le thème embarqué dans la sauvegarde si présent
+    if (data._exportTheme && typeof data._exportTheme === 'object') {
+      const root = document.documentElement;
+      const t = data._exportTheme;
+      Object.entries(t).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
+      if (data._exportFont) root.style.setProperty('--font', data._exportFont);
+      const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--char-panel':'tc-char-panel'};
+      Object.entries(pickers).forEach(([cssVar, id]) => { const el = document.getElementById(id); if (el && t[cssVar]) el.value = t[cssVar]; });
+      const fontEl = document.getElementById('tc-font'); if (fontEl && data._exportFont) fontEl.value = data._exportFont;
+    }
+
     persist();
     updateFirebaseCodeFields();
     closeFirebaseSaveModal();
+
+    setTimeout(() => {
+      document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => { if (typeof resizeFicheInp === 'function') resizeFicheInp(el); });
+      if (typeof resizeAllCartouche === 'function') resizeAllCartouche();
+    }, 80);
+
     toast((currentLang === 'en' ? 'Loaded: ' : 'Chargé : ') + formatSaveCode(code));
   } catch (err) {
     console.error(err);
@@ -3839,6 +3865,9 @@ var UI18N = {};
 
 function uiT(key, fallback = '') {
   if (UI18N && UI18N[key]) return UI18N[key];
+  const lang = currentLang || localStorage.getItem('midjaas_lang') || 'fr';
+  if (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS[lang]?.[key]) return BUILTIN_TRANSLATIONS[lang][key];
+  if (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS.fr?.[key]) return BUILTIN_TRANSLATIONS.fr[key];
   if (typeof t === 'function') {
     const embedded = t(key, '');
     if (embedded && embedded !== key) return embedded;
@@ -3856,7 +3885,13 @@ async function loadTranslations(lang) {
     applyTranslations(); if (typeof applyI18n === 'function') applyI18n();
   } catch (err) {
     console.warn('Impossible de charger la traduction', lang, err);
-    if (lang !== 'fr') return loadTranslations('fr');
+    UI18N = (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS[lang])
+      || (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS.fr)
+      || UI18N
+      || {};
+    currentLang = lang || currentLang || 'fr';
+    try { localStorage.setItem('midjaas_lang', currentLang); localStorage.setItem('dnd_lang', currentLang); } catch(e) {}
+    applyTranslations();
     if (typeof applyI18n === 'function') applyI18n();
   }
 }
@@ -3913,26 +3948,12 @@ function preloadFicheImages() {
 function initLegalFooterReveal() {
   const el = document.querySelector('.site-legal');
   if (!el) return;
-
-  if (!('IntersectionObserver' in window)) {
-    el.classList.add('visible');
-    return;
-  }
-
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        el.classList.add('visible');
-        obs.disconnect();
-      }
-    });
-  }, { threshold: 0.15 });
-
-  obs.observe(el);
+  // Position statique : on ajoute visible directement, pas besoin d'IntersectionObserver
+  el.classList.add('visible');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initLegalFooterReveal, 100);
+  setTimeout(initLegalFooterReveal, 200);
 });
 
 
@@ -4290,8 +4311,22 @@ async function gmLoadPlayerSheet(playerCode) {
     applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
     applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
     buildBourseRows(); refreshArmorStats();
+
+    // Appliquer le thème embarqué si présent
+    if (data._exportTheme && typeof data._exportTheme === 'object') {
+      const root = document.documentElement;
+      const t = data._exportTheme;
+      Object.entries(t).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
+      if (data._exportFont) root.style.setProperty('--font', data._exportFont);
+    }
+
     await updateCampaignUi();
     persist();
+
+    setTimeout(() => {
+      document.querySelectorAll('#page-fiche .fiche-stat-inp').forEach(el => { if (typeof resizeFicheInp === 'function') resizeFicheInp(el); });
+      if (typeof resizeAllCartouche === 'function') resizeAllCartouche();
+    }, 80);
 
     toast(uiT('campaign.loadSheet','Voir fiche') + ' : ' + formatSaveCode(code));
   } catch (err) {
@@ -4855,13 +4890,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* === PROSTHESES PANEL + SPECIAL INVENTORY LABELS === */
 
-const PROSTHESIS_SLOTS = [
-  'prothese_tete','prothese_oeil_g','prothese_oeil_d',
-  'prothese_bras_g','prothese_main_g','prothese_corps','prothese_bras_d','prothese_main_d',
-  'prothese_jambe_g','prothese_jambe_d',
-  'prothese_extra_1','prothese_extra_2','prothese_extra_3','prothese_extra_4','prothese_extra_5'
-];
-
 function getInventorySpecialLabel(key) {
   const fallback = key === 'rings'
     ? uiT('inventory.rings','Anneaux')
@@ -4979,6 +5007,9 @@ function applyProsthesisLabels() {
 }
 
 function renderProsthesesPanel() {
+  const panel = document.getElementById('prostheses-panel');
+  if (!panel) return;
+
   const splitLeft = !!data._prosthesisSplit?.left;
   const splitRight = !!data._prosthesisSplit?.right;
 
@@ -4987,14 +5018,17 @@ function renderProsthesesPanel() {
   if (cbL) cbL.checked = splitLeft;
   if (cbR) cbR.checked = splitRight;
 
-  document.querySelector('.prost-hand-left')?.classList.toggle('visible', splitLeft);
-  document.querySelector('.prost-hand-right')?.classList.toggle('visible', splitRight);
-  document.querySelector('.prost-hand-left')?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitLeft);
-  document.querySelector('.prost-hand-right')?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitRight);
+  const leftHand = document.querySelector('.prost-hand-left');
+  const rightHand = document.querySelector('.prost-hand-right');
 
-  applyProsthesisLabels();
+  leftHand?.classList.toggle('visible', splitLeft);
+  rightHand?.classList.toggle('visible', splitRight);
+  leftHand?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitLeft);
+  rightHand?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitRight);
 
-  PROSTHESIS_SLOTS.forEach(key => {
+  if (typeof applyProsthesisLabels === 'function') applyProsthesisLabels();
+
+  (PROSTHESIS_SLOTS || []).forEach(key => {
     const d = data[key] || {};
     const sl = document.getElementById('sl-' + key);
     const n  = document.getElementById('dsp-' + key + '-nom');
@@ -5005,14 +5039,19 @@ function renderProsthesesPanel() {
     if (tp) tp.textContent = d.type || '';
     if (ef) ef.textContent = d.effet || '';
 
-    if (sl) {
-      sl.classList.toggle('filled', !!d.nom);
+    if (!sl) return;
+
+    sl.classList.toggle('filled', !!d.nom);
+
+    if (!sl.dataset.prostReady) {
       if (typeof makeDraggable === 'function') makeDraggable(sl, key);
       if (typeof makeDropTarget === 'function') makeDropTarget(sl, key);
       if (typeof attachSlotPreview === 'function') attachSlotPreview(sl, key);
-      if (d.quality !== undefined && d.quality !== null && typeof applyQualityColor === 'function') {
-        applyQualityColor(sl, d.quality);
-      }
+      sl.dataset.prostReady = '1';
+    }
+
+    if (d.quality !== undefined && d.quality !== null && typeof applyQualityColor === 'function') {
+      applyQualityColor(sl, d.quality);
     }
   });
 }
@@ -5027,3 +5066,18 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function toggleParamAccordion(el) { toggleAccordion(el); }
+
+
+
+/* === CLEAN SAFE BOOT === */
+function safeRefreshLateUi() {
+  try { if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel(); } catch(e) { console.warn(e); }
+  try { if (typeof applyInventorySpecialLabels === 'function') applyInventorySpecialLabels(); } catch(e) { console.warn(e); }
+  try { if (typeof renderProsthesisLabelParams === 'function') renderProsthesisLabelParams(); } catch(e) { console.warn(e); }
+  try { if (typeof initMidjaasEasterEgg === 'function') initMidjaasEasterEgg(); } catch(e) { console.warn(e); }
+  try { if (typeof initRingsFloatDrag === 'function') initRingsFloatDrag(); } catch(e) { console.warn(e); }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(safeRefreshLateUi, 250);
+});
