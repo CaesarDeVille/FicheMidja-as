@@ -113,7 +113,7 @@ function loadData() {
 }
 
 function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
-function saveData() { persist(); toast('Sauvegardé !'); }
+function saveData() { persist(); toast(t('toast.saved','Sauvegardé !')); }
 
 function exportData() {
   // Collect current theme values.
@@ -157,7 +157,7 @@ function importData(e) {
       parsed = JSON.parse(ev.target.result);
     } catch (err) {
       console.error(err);
-      toast('Erreur JSON');
+      toast(t('toast.jsonError','Erreur JSON'));
       e.target.value = '';
       return;
     }
@@ -241,7 +241,7 @@ function importData(e) {
       }, 50);
 
       persist();
-      toast('Importé !');
+      toast(t('toast.imported','Importé !'));
     } catch (err) {
       console.error(err);
       toast('Import incomplet : vérifie la console');
@@ -262,7 +262,7 @@ const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armo
   '_bourseCount','_bourseLabel','_banqueLabel'];
 
 function clearFiche() {
-  if (!confirm('Réinitialiser la fiche du personnage ? Les paramètres seront conservés.')) return;
+  if (!confirm(t('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
   // Keep all param keys
   const kept = {};
   PARAM_KEYS.forEach(k => { if (data[k] !== undefined) kept[k] = data[k]; });
@@ -279,7 +279,7 @@ function clearFiche() {
   applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
   buildBourseRows(); refreshArmorStats();
   persist();
-  toast('Fiche réinitialisée.');
+  toast(t('toast.sheetReset','Fiche réinitialisée.'));
 }
 
 function clearAll() {
@@ -1776,9 +1776,12 @@ function syncChar(field, val) {
 }
 
 function updateTbNom() {
-  const nom = data._char?.nom || '—';
   const el = document.getElementById('tb-fiche-nom');
-  if (el) el.textContent = 'Fiche de ' + nom;
+  if (!el) return;
+  const nom = (data._char && data._char.nom) ? data._char.nom : '';
+  const prefix = (typeof t === 'function') ? t('top.sheetOf', 'Fiche de') : 'Fiche de';
+  const empty = (typeof t === 'function') ? t('top.sheetOfEmpty', 'Fiche de —') : 'Fiche de —';
+  el.textContent = nom ? `${prefix} ${nom}` : empty;
 }
 
 function syncGender(val) {
@@ -2479,11 +2482,7 @@ function applyI18n() {
   localStorage.setItem('dnd_lang', currentLang);
 }
 
-function setLang(lang) {
-  currentLang = lang;
-  document.querySelectorAll('input[name="lang-switch"]').forEach(r => r.checked = r.value === lang);
-  applyI18n();
-}
+function setLang(lang) { loadTranslations(lang); }
 
 function loadLang() {
   const saved = localStorage.getItem('dnd_lang') || 'fr';
@@ -3199,7 +3198,7 @@ function initUndoRedo() {
 
 function undoAction() {
   if (!undoStack.length) {
-    toast('Rien à annuler');
+    toast(t('toast.nothingUndo','Rien à annuler'));
     return;
   }
 
@@ -3213,7 +3212,7 @@ function undoAction() {
     undoLastSnapshot = previous;
     localStorage.setItem('dnd_inv', previous);
     refreshAfterHistoryRestore();
-    toast('Action annulée');
+    toast(t('toast.undo','Action annulée'));
   } finally {
     undoIsRestoring = false;
     updateUndoRedoButtons();
@@ -3222,7 +3221,7 @@ function undoAction() {
 
 function redoAction() {
   if (!redoStack.length) {
-    toast('Rien à rétablir');
+    toast(t('toast.nothingRedo','Rien à rétablir'));
     return;
   }
 
@@ -3236,7 +3235,7 @@ function redoAction() {
     undoLastSnapshot = next;
     localStorage.setItem('dnd_inv', next);
     refreshAfterHistoryRestore();
-    toast('Action rétablie');
+    toast(t('toast.redo','Action rétablie'));
   } finally {
     undoIsRestoring = false;
     updateUndoRedoButtons();
@@ -3321,7 +3320,7 @@ function makeFirebaseSavePayload() {
 function openFirebaseSaveModal() {
   const m = document.getElementById('firebase-save-modal');
   const input = document.getElementById('firebase-current-code');
-  if (input) input.value = formatSaveCode(getSaveCode()) || 'Aucun code';
+  if (input) input.value = formatSaveCode(getSaveCode()) || t('modal.firebaseSave.noCode','Aucun code');
   if (m) m.classList.add('open');
 }
 
@@ -3346,13 +3345,13 @@ function closeFirebaseLoadModal() {
 async function firebaseSaveToCode(code) {
   const db = getFirebaseDbCompat();
   if (!db) {
-    toast('Firebase indisponible');
+    toast(t('toast.firebaseUnavailable','Firebase indisponible'));
     return false;
   }
 
   const clean = normalizeSaveCode(code);
   if (clean.length !== 9) {
-    toast('Code invalide');
+    toast(t('toast.invalidCode','Code invalide'));
     return false;
   }
 
@@ -3378,7 +3377,7 @@ async function firebaseSaveCurrent() {
     await firebaseSaveToCode(code);
   } catch (err) {
     console.error(err);
-    toast('Erreur sauvegarde Firebase');
+    toast(t('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
   }
 }
 
@@ -3387,7 +3386,7 @@ async function firebaseSaveAs() {
     let code = generateSaveCode();
     const db = getFirebaseDbCompat();
     if (!db) {
-      toast('Firebase indisponible');
+      toast(t('toast.firebaseUnavailable','Firebase indisponible'));
       return;
     }
 
@@ -3401,7 +3400,7 @@ async function firebaseSaveAs() {
     await firebaseSaveToCode(code);
   } catch (err) {
     console.error(err);
-    toast('Erreur sauvegarde Firebase');
+    toast(t('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
   }
 }
 
@@ -3411,29 +3410,29 @@ async function firebaseLoadByCode() {
     const code = normalizeSaveCode(raw);
 
     if (code.length !== 9) {
-      toast('Code invalide');
+      toast(t('toast.invalidCode','Code invalide'));
       return;
     }
 
     const db = getFirebaseDbCompat();
     if (!db) {
-      toast('Firebase indisponible');
+      toast(t('toast.firebaseUnavailable','Firebase indisponible'));
       return;
     }
 
     const snap = await db.ref('saves/' + code).get();
     if (!snap.exists()) {
-      toast('Aucune sauvegarde trouvée');
+      toast(t('toast.noSaveFound','Aucune sauvegarde trouvée'));
       return;
     }
 
     const loaded = snap.val();
     if (!loaded || typeof loaded !== 'object') {
-      toast('Sauvegarde invalide');
+      toast(t('toast.invalidSave','Sauvegarde invalide'));
       return;
     }
 
-    if (!confirm('Charger cette sauvegarde ? La fiche actuelle sera remplacée.')) return;
+    if (!confirm(t('confirm.loadSave','Charger cette sauvegarde ? La fiche actuelle sera remplacée.'))) return;
 
     data = loaded;
     data._firebaseSaveCode = code;
@@ -3452,7 +3451,7 @@ async function firebaseLoadByCode() {
     toast('Sauvegarde chargée : ' + formatSaveCode(code));
   } catch (err) {
     console.error(err);
-    toast('Erreur chargement Firebase');
+    toast(t('toast.firebaseLoadError','Erreur chargement Firebase'));
   }
 }
 
@@ -3464,4 +3463,59 @@ window.addEventListener('DOMContentLoaded', () => {
       input.value = formatSaveCode(input.value);
     });
   }
+});
+
+
+/* === I18N JSON === */
+let I18N = {};
+let CURRENT_LANG = localStorage.getItem('midjaas_lang') || 'fr';
+
+function t(key, fallback = '') {
+  return (I18N && I18N[key]) || fallback || key;
+}
+
+async function loadTranslations(lang) {
+  try {
+    const res = await fetch(`lang/${lang}.json`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Lang file not found');
+    I18N = await res.json();
+    CURRENT_LANG = lang;
+    localStorage.setItem('midjaas_lang', lang);
+    applyTranslations();
+  } catch (err) {
+    console.warn('Impossible de charger la traduction', lang, err);
+    if (lang !== 'fr') return loadTranslations('fr');
+  }
+}
+
+function applyTranslations() {
+  document.documentElement.lang = CURRENT_LANG;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!key) return;
+    const val = t(key, el.textContent);
+    el.textContent = val;
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (!key) return;
+    el.setAttribute('placeholder', t(key, el.getAttribute('placeholder') || ''));
+  });
+
+  const fr = document.querySelector('input[name="lang-switch"][value="fr"]');
+  const en = document.querySelector('input[name="lang-switch"][value="en"]');
+  if (fr) fr.checked = CURRENT_LANG === 'fr';
+  if (en) en.checked = CURRENT_LANG === 'en';
+
+  if (typeof updateTbNom === 'function') updateTbNom();
+}
+
+function setLang(lang) {
+  loadTranslations(lang);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadTranslations(CURRENT_LANG);
 });

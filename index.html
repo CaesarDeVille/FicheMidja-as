@@ -12,7 +12,7 @@
 <!-- ══ THEME BAR ══ -->
 <div class="theme-bar">
   <span class="tb-fiche-nom" id="tb-fiche-nom">Fiche de —</span>
-  <span class="tb-title">⚔ FICHE PERSO MIDJA'AS ⚔</span>
+  <span class="tb-title" data-i18n="app.title">⚔ FICHE PERSO MIDJA'AS ⚔</span>
   <div class="tb-right">
     <div class="gender-wrap">
       <label class="gender-lbl" title="Français">
@@ -22,13 +22,13 @@
         <input type="radio" name="lang-switch" value="en" onchange="setLang('en')"> EN
       </label>
     </div>
-    <button class="btn-sm" onclick="openFirebaseSaveModal()">&#128190; Sauvegarder</button>
-    <button class="btn-sm" onclick="openFirebaseLoadModal()">&#8635; Charger</button>
-    <button class="btn-sm" id="btn-undo" onclick="undoAction()" title="Ctrl+Z">↶ Annuler</button>
-    <button class="btn-sm" id="btn-redo" onclick="redoAction()" title="Ctrl+Y">↷ Rétablir</button>
-    <button class="btn-sm" onclick="exportData()">&#8679; Export</button>
-    <label class="btn-sm" style="cursor:pointer;">&#8681; Import<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearFiche()">&#10005; Réinit. fiche</button>
+    <button class="btn-sm" onclick="openFirebaseSaveModal()" data-i18n="top.save">&#128190; Sauvegarder</button>
+    <button class="btn-sm" onclick="openFirebaseLoadModal()" data-i18n="top.load">&#8635; Charger</button>
+    <button class="btn-sm" id="btn-undo" onclick="undoAction()" title="Ctrl+Z" data-i18n="top.undo">↶ Annuler</button>
+    <button class="btn-sm" id="btn-redo" onclick="redoAction()" title="Ctrl+Y" data-i18n="top.redo">↷ Rétablir</button>
+    <button class="btn-sm" onclick="exportData()" data-i18n="top.export">&#8679; Export</button>
+    <label class="btn-sm" style="cursor:pointer;"><span data-i18n="top.import">&#8681; Import</span><input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="btn-sm" style="color:#f08080;border-color:#5a2010;" onclick="clearFiche()" data-i18n="top.resetSheet">&#10005; Réinit. fiche</button>
   </div>
 </div>
 
@@ -36,12 +36,12 @@
 <div class="aspect-wrap">
 <div class="app">
   <div class="nav-bar">
-    <button class="nav-btn active" id="nav-fiche" onclick="showPage('fiche')">⚬ Fiche Perso</button>
-    <button class="nav-btn" id="nav-competences" onclick="showPage('competences')">⚔ Compétences</button>
-    <button class="nav-btn" id="nav-inventaire" onclick="showPage('inventaire')">⊞ Inventaire</button>
-    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')">◈ Capital</button>
-    <button class="nav-btn" id="nav-campagne" onclick="showPage('campagne')">⚑ Campagne</button>
-    <button class="nav-btn" id="nav-parametres" onclick="showPage('parametres')">⚙ Paramètres</button>
+    <button class="nav-btn active" id="nav-fiche" onclick="showPage('fiche')" data-i18n="nav.fiche">⚬ Fiche Perso</button>
+    <button class="nav-btn" id="nav-competences" onclick="showPage('competences')" data-i18n="nav.competences">⚔ Compétences</button>
+    <button class="nav-btn" id="nav-inventaire" onclick="showPage('inventaire')" data-i18n="nav.inventaire">⊞ Inventaire</button>
+    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')" data-i18n="nav.capital">◈ Capital</button>
+    <button class="nav-btn" id="nav-campagne" onclick="showPage('campagne')" data-i18n="nav.campagne">⚑ Campagne</button>
+    <button class="nav-btn" id="nav-parametres" onclick="showPage('parametres')" data-i18n="nav.parametres">⚙ Paramètres</button>
   </div>
 
   <!-- PAGE INVENTAIRE -->
@@ -52,13 +52,13 @@
       <!-- R1: Amulette | Couvre-Chef -->
       <div class="eq-r1">
         <div class="slot" style="width:140px;" id="sl-amulette" onclick="open_('amulette')">
-          <span class="lbl" data-i18n="amulette">Amulette</span>
+          <span class="lbl" data-i18n="inventory.amulette">Amulette</span>
           <span class="val" id="dsp-amulette-nom">—</span>
           <span class="val-type" id="dsp-amulette-type"></span>
           <span class="val-effet" id="dsp-amulette-effet"></span>
         </div>
         <div class="slot" style="flex:1;" id="sl-couvre-chef" onclick="open_('couvre-chef')">
-          <span class="lbl" data-i18n="couvre-chef">Couvre-Chef</span>
+          <span class="lbl" data-i18n="inventory.couvre-chef">Couvre-Chef</span>
           <span class="val" id="dsp-couvre-chef-nom">—</span>
           <span class="val-type" id="dsp-couvre-chef-type"></span>
           <span class="val-effet" id="dsp-couvre-chef-effet"></span>
@@ -69,26 +69,26 @@
       <div class="eq-r2">
         <div class="eq-r2-left">
           <div class="slot slot-gants" id="sl-gants" onclick="open_('gants')">
-            <span class="lbl" data-i18n="gants">Gants</span>
+            <span class="lbl" data-i18n="inventory.gants">Gants</span>
             <span class="val" id="dsp-gants-nom">—</span>
             <span class="val-type" id="dsp-gants-type"></span>
             <span class="val-effet" id="dsp-gants-effet"></span>
           </div>
           <div class="slot slot-bracelet" id="sl-bracelet" onclick="open_('bracelet')">
-            <span class="lbl" data-i18n="bracelet">Bracelet</span>
+            <span class="lbl" data-i18n="inventory.bracelet">Bracelet</span>
             <span class="val" id="dsp-bracelet-nom">—</span>
             <span class="val-type" id="dsp-bracelet-type"></span>
             <span class="val-effet" id="dsp-bracelet-effet"></span>
           </div>
         </div>
         <div class="slot slot-armure" id="sl-armure" onclick="open_('armure')">
-          <span class="lbl" data-i18n="armure">Armure</span>
+          <span class="lbl" data-i18n="inventory.armure">Armure</span>
           <span class="val" id="dsp-armure-nom">—</span>
           <span class="val-type" id="dsp-armure-type"></span>
           <span class="val-effet" id="dsp-armure-effet"></span>
         </div>
         <div class="slot" style="width:140px;" id="sl-cape" onclick="open_('cape')">
-          <span class="lbl" data-i18n="cape">Cape / Manteau</span>
+          <span class="lbl" data-i18n="inventory.cape">Cape / Manteau</span>
           <span class="val" id="dsp-cape-nom">—</span>
           <span class="val-type" id="dsp-cape-type"></span>
           <span class="val-effet" id="dsp-cape-effet"></span>
@@ -98,19 +98,19 @@
       <!-- R3: Anneau Gauche | Anneau Droit | Ceinture -->
       <div class="eq-r3">
         <div class="slot slot-anneau" id="sl-anneau1" onclick="open_('anneau1')">
-          <span class="lbl" data-i18n="anneau1">Anneau</span>
+          <span class="lbl" data-i18n="inventory.anneau1">Anneau</span>
           <span class="val" id="dsp-anneau1-nom">—</span>
           <span class="val-type" id="dsp-anneau1-type"></span>
           <span class="val-effet" id="dsp-anneau1-effet"></span>
         </div>
         <div class="slot slot-anneau" id="sl-anneau2" onclick="open_('anneau2')">
-          <span class="lbl" data-i18n="anneau2">Anneau</span>
+          <span class="lbl" data-i18n="inventory.anneau2">Anneau</span>
           <span class="val" id="dsp-anneau2-nom">—</span>
           <span class="val-type" id="dsp-anneau2-type"></span>
           <span class="val-effet" id="dsp-anneau2-effet"></span>
         </div>
         <div class="slot slot-ceinture" id="sl-ceinture" onclick="open_('ceinture')">
-          <span class="lbl" data-i18n="ceinture">Ceinture</span>
+          <span class="lbl" data-i18n="inventory.ceinture">Ceinture</span>
           <span class="val" id="dsp-ceinture-nom">—</span>
           <span class="val-type" id="dsp-ceinture-type"></span>
           <span class="val-effet" id="dsp-ceinture-effet"></span>
@@ -120,13 +120,13 @@
       <!-- R4: Bottes -->
       <div class="eq-r4">
         <div class="slot slot-divers" id="sl-divers" onclick="open_('divers')">
-          <span class="lbl" data-i18n="divers">Divers</span>
+          <span class="lbl" data-i18n="inventory.divers">Divers</span>
           <span class="val" id="dsp-divers-nom">—</span>
           <span class="val-type" id="dsp-divers-type"></span>
           <span class="val-effet" id="dsp-divers-effet"></span>
         </div>
         <div class="slot slot-bottes" id="sl-bottes" onclick="open_('bottes')">
-          <span class="lbl" data-i18n="bottes">Bottes</span>
+          <span class="lbl" data-i18n="inventory.bottes">Bottes</span>
           <span class="val" id="dsp-bottes-nom">—</span>
           <span class="val-type" id="dsp-bottes-type"></span>
           <span class="val-effet" id="dsp-bottes-effet"></span>
@@ -753,10 +753,10 @@
                 <div class="param-row" style="margin-top:6px;">
                   <label class="param-toggle-lbl">
                     <input type="checkbox" id="cfg-keep-theme" class="blessure-cb" onchange="saveKeepTheme(this.checked)" style="accent-color:var(--gold);" checked>
-                    Conserver mes couleurs à l'import
+                    <span data-i18n="params.keepColors">Conserver mes couleurs à l'import</span>
                   </label>
                 </div>
-                <div class="param-info">Si coché, l'apparence de la fiche importée est ignorée.</div>
+                <div class="param-info"><span data-i18n="params.keepColorsInfo">Si coché, l'apparence de la fiche importée est ignorée.</span></div>
                 <div class="param-row" style="margin-top:6px;">
                   <label class="param-toggle-lbl">
                     <input type="checkbox" id="cfg-effets-plus" class="blessure-cb" onchange="saveEffetsPlus(this.checked)" style="accent-color:var(--gold);">
@@ -1175,37 +1175,37 @@
 <!-- ══ FIREBASE SAVE / LOAD MODALS ══ -->
 <div class="modal-overlay" id="firebase-save-modal">
   <div class="modal">
-    <div class="modal-title">Sauvegarde Firebase</div>
+    <div class="modal-title" data-i18n="modal.firebaseSave.title">Sauvegarde Firebase</div>
 
     <div class="mfield">
-      <label>Code actuel</label>
+      <label data-i18n="modal.firebaseSave.currentCode">Code actuel</label>
       <input id="firebase-current-code" type="text" readonly placeholder="Aucun code">
     </div>
 
     <div class="modal-btns" style="justify-content:space-between;flex-wrap:wrap;">
-      <button class="btn" onclick="firebaseSaveCurrent()">Sauvegarder</button>
-      <button class="btn" onclick="firebaseSaveAs()">Sauvegarder sous</button>
-      <button class="btn" onclick="closeFirebaseSaveModal()">Fermer</button>
+      <button class="btn" onclick="firebaseSaveCurrent()" data-i18n="modal.firebaseSave.save">Sauvegarder</button>
+      <button class="btn" onclick="firebaseSaveAs()" data-i18n="modal.firebaseSave.saveAs">Sauvegarder sous</button>
+      <button class="btn" onclick="closeFirebaseSaveModal()" data-i18n="modal.firebaseSave.close">Fermer</button>
     </div>
 
     <div class="param-info" style="margin-top:12px;">
-      “Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.
+      <span data-i18n="modal.firebaseSave.info">“Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.</span>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="firebase-load-modal">
   <div class="modal">
-    <div class="modal-title">Charger une sauvegarde</div>
+    <div class="modal-title" data-i18n="modal.firebaseLoad.title">Charger une sauvegarde</div>
 
     <div class="mfield">
-      <label>Code de sauvegarde</label>
+      <label data-i18n="modal.firebaseLoad.code">Code de sauvegarde</label>
       <input id="firebase-load-code" type="text" placeholder="ABC DEF GHI" maxlength="11">
     </div>
 
     <div class="modal-btns">
-      <button class="btn" onclick="firebaseLoadByCode()">Charger</button>
-      <button class="btn" onclick="closeFirebaseLoadModal()">Fermer</button>
+      <button class="btn" onclick="firebaseLoadByCode()" data-i18n="modal.firebaseLoad.load">Charger</button>
+      <button class="btn" onclick="closeFirebaseLoadModal()" data-i18n="modal.firebaseLoad.close">Fermer</button>
     </div>
   </div>
 </div>
