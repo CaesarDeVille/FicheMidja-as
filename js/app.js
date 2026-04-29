@@ -106,7 +106,7 @@ let data = {}, curSlot = null;
 
 var PROSTHESIS_SLOTS = [
   'prothese_tete','prothese_oeil_g','prothese_oeil_d',
-  'prothese_bras_g','prothese_main_g','prothese_corps','prothese_bras_d','prothese_main_d',
+  'prothese_bras_g','prothese_corps','prothese_bras_d',
   'prothese_jambe_g','prothese_jambe_d',
   'prothese_extra_1','prothese_extra_2','prothese_extra_3','prothese_extra_4','prothese_extra_5'
 ];
@@ -612,7 +612,6 @@ function refresh() {
   if (bl) bl.value = data._bourseLabel || 'Bourse';
   buildBourseRows();
   if (typeof renderRingsSlot === 'function') renderRingsSlot();
-  if (typeof applyInventoryMode === 'function') applyInventoryMode();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
   if (typeof applyInventorySpecialLabels === 'function') applyInventorySpecialLabels();
 }
@@ -670,7 +669,6 @@ function saveSlot() {
   else if (k.startsWith('poche_')) buildPoche();
   else refresh(); // refresh already calls refreshArmorStats
   if (typeof renderRingsSlot === 'function') renderRingsSlot();
-  if (typeof renderCustomInventory === 'function') renderCustomInventory();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
 }
@@ -695,7 +693,6 @@ function clearSlot() {
   else if (k.startsWith('poche_')) buildPoche();
   else refresh();
   if (typeof renderRingsSlot === 'function') renderRingsSlot();
-  if (typeof renderCustomInventory === 'function') renderCustomInventory();
 }
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
@@ -4714,110 +4711,18 @@ function closeRingsPanel() {
 }
 
 
-function getInventoryMode() {
-  return data._inventoryMode || 'default';
-}
 
-function setInventoryMode(mode) {
-  data._inventoryMode = mode === 'custom' ? 'custom' : 'default';
-  persist();
-  applyInventoryMode();
-  renderCustomInventoryParams();
-}
 
-function applyInventoryMode() {
-  const isCustom = getInventoryMode() === 'custom';
-  const main = document.querySelector('#page-inventaire .main-body');
-  const custom = document.getElementById('custom-inventory-page');
-  if (main) main.style.display = isCustom ? 'none' : '';
-  if (custom) custom.style.display = isCustom ? 'flex' : 'none';
-  if (isCustom) renderCustomInventory();
-}
 
-function getCustomInvSlots() {
-  if (!Array.isArray(data._customInvSlots)) data._customInvSlots = [];
-  return data._customInvSlots;
-}
 
-function addCustomInventorySlot() {
-  const inp = document.getElementById('custom-slot-label-input');
-  const label = (inp?.value || '').trim() || uiT('params.customSlotName','Nom de la case');
-  const slots = getCustomInvSlots();
-  const id = 'customInv_' + Date.now().toString(36);
-  slots.push({ id, label });
-  data._customInvSlots = slots;
-  if (inp) inp.value = '';
-  persist();
-  renderCustomInventoryParams();
-  renderCustomInventory();
-  toast(uiT('toast.customSlotAdded','Case ajoutée.'));
-}
 
-function removeCustomInventorySlot(id) {
-  data._customInvSlots = getCustomInvSlots().filter(s => s.id !== id);
-  delete data[id];
-  persist();
-  renderCustomInventoryParams();
-  renderCustomInventory();
-  toast(uiT('toast.customSlotRemoved','Case supprimée.'));
-}
 
-function renameCustomInventorySlot(id, val) {
-  const slots = getCustomInvSlots();
-  const s = slots.find(x => x.id === id);
-  if (s) {
-    s.label = val || uiT('params.customSlotName','Nom de la case');
-    persist();
-    renderCustomInventory();
-  }
-}
 
-function renderCustomInventoryParams() {
-  const mode = document.getElementById('cfg-inventory-mode');
-  if (mode) mode.value = getInventoryMode();
 
-  const list = document.getElementById('custom-slot-param-list');
-  if (!list) return;
-
-  const slots = getCustomInvSlots();
-  list.innerHTML = slots.map(s => `
-    <div class="custom-slot-param-row">
-      <input class="param-input" value="${escapeHtml(s.label)}" oninput="renameCustomInventorySlot('${s.id}', this.value)">
-      <button class="param-reset-btn" onclick="removeCustomInventorySlot('${s.id}')">×</button>
-    </div>
-  `).join('');
-}
-
-function renderCustomInventory() {
-  const grid = document.getElementById('custom-inventory-grid');
-  if (!grid) return;
-
-  const slots = getCustomInvSlots();
-  grid.innerHTML = slots.map(s => {
-    const d = data[s.id] || {};
-    return `<div class="grid-cell custom-slot-cell ${d.nom ? 'filled' : ''}" id="sl-${s.id}" data-slot-key="${s.id}" onclick="open_('${s.id}')">
-      <span class="lbl">${escapeHtml(s.label)}</span>
-      <span class="val">${escapeHtml(d.nom || '—')}</span>
-      ${d.type ? `<span class="val-type">${escapeHtml(d.type)}</span>` : ''}
-      ${d.effet ? `<span class="val-effet">${escapeHtml(d.effet)}</span>` : ''}
-    </div>`;
-  }).join('');
-
-  slots.forEach(s => {
-    const el = document.getElementById('sl-' + s.id);
-    if (el) {
-      makeDraggable(el, s.id);
-      makeDropTarget(el, s.id);
-      attachSlotPreview(el, s.id);
-      if (data[s.id]?.quality !== undefined && data[s.id]?.quality !== null) applyQualityColor(el, data[s.id].quality);
-    }
-  });
-}
 
 function initInventoryRefactor() {
   renderRingsSlot();
-  applyInventoryMode();
-  renderCustomInventoryParams();
+  if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -4938,12 +4843,6 @@ function toggleProsthesesPanel(force) {
   }
 }
 
-function setProsthesisSplit(side, checked) {
-  if (!data._prosthesisSplit) data._prosthesisSplit = {};
-  data._prosthesisSplit[side] = !!checked;
-  persist();
-  renderProsthesesPanel();
-}
 
 function getDefaultProsthesisLabel(key) {
   const map = {
@@ -4952,8 +4851,6 @@ function getDefaultProsthesisLabel(key) {
     oeilD: uiT('prostheses.rightEye','Œil droit'),
     brasG: uiT('prostheses.leftArm','Bras gauche'),
     brasD: uiT('prostheses.rightArm','Bras droit'),
-    mainG: uiT('prostheses.leftHand','Main gauche'),
-    mainD: uiT('prostheses.rightHand','Main droite'),
     corps: uiT('prostheses.body','Corps'),
     jambeG: uiT('prostheses.leftLeg','Jambe gauche'),
     jambeD: uiT('prostheses.rightLeg','Jambe droite'),
@@ -4981,14 +4878,62 @@ function saveProsthesisLabel(key, val) {
 
 function resetProsthesisLabels() {
   delete data._prosthesisLabels;
+  delete data._prosthesisGroupLabels;
   persist();
   applyProsthesisLabels();
+  applyProsthesisGroupLabels();
   setTimeout(() => { renderProsthesisLabelParams(); }, 120);
   toast(uiT('toast.prosthesisLabelsReset','Noms de prothèses réinitialisés.'));
 }
 
+// ── Renommage des groupes de prothèses ──
+function getDefaultProsthesisGroupLabel(key) {
+  const map = {
+    tete:    uiT('prostheses.groupHead','Tête'),
+    bras:    uiT('prostheses.groupArmsBody','Bras / Corps'),
+    jambes:  uiT('prostheses.groupLegs','Jambes'),
+    modules: uiT('prostheses.groupModules','Modules'),
+  };
+  return map[key] || key;
+}
+
+function getProsthesisGroupLabel(key) {
+  return data._prosthesisGroupLabels?.[key] || getDefaultProsthesisGroupLabel(key);
+}
+
+function saveProsthesisGroupLabel(key, val) {
+  if (!data._prosthesisGroupLabels) data._prosthesisGroupLabels = {};
+  const clean = String(val || '').trim();
+  if (clean) data._prosthesisGroupLabels[key] = clean;
+  else delete data._prosthesisGroupLabels[key];
+  persist();
+  applyProsthesisGroupLabels();
+}
+
+function applyProsthesisGroupLabels() {
+  const map = {
+    tete:    { i18n: 'prostheses.groupHead',     inp: 'cfg-group-tete' },
+    bras:    { i18n: 'prostheses.groupArmsBody',  inp: 'cfg-group-bras' },
+    jambes:  { i18n: 'prostheses.groupLegs',      inp: 'cfg-group-jambes' },
+    modules: { i18n: 'prostheses.groupModules',   inp: 'cfg-group-modules' },
+  };
+  Object.entries(map).forEach(([key, cfg]) => {
+    const label = getProsthesisGroupLabel(key);
+    // Mettre à jour les titres de groupes dans l'inventaire
+    document.querySelectorAll('[data-i18n="' + cfg.i18n + '"]').forEach(el => {
+      el.textContent = label;
+    });
+    // Mettre à jour le champ de saisie dans Paramètres
+    const inp = document.getElementById(cfg.inp);
+    if (inp && document.activeElement !== inp) {
+      inp.value = data._prosthesisGroupLabels?.[key] || '';
+      inp.placeholder = getDefaultProsthesisGroupLabel(key);
+    }
+  });
+}
+
 function renderProsthesisLabelParams() {
-  const keys = ['tete','oeilG','oeilD','brasG','corps','brasD','mainG','mainD','jambeG','jambeD','extra1','extra2','extra3','extra4','extra5'];
+  const keys = ['tete','oeilG','oeilD','brasG','corps','brasD','jambeG','jambeD','extra1','extra2','extra3','extra4','extra5'];
   keys.forEach(key => {
     const el = document.getElementById('cfg-prost-' + key);
     if (el && document.activeElement !== el) {
@@ -5003,28 +4948,13 @@ function applyProsthesisLabels() {
     const key = el.getAttribute('data-prost-label');
     el.textContent = getProsthesisLabel(key);
   });
+  applyProsthesisGroupLabels();
   setTimeout(() => { renderProsthesisLabelParams(); }, 120);
 }
 
 function renderProsthesesPanel() {
   const panel = document.getElementById('prostheses-panel');
   if (!panel) return;
-
-  const splitLeft = !!data._prosthesisSplit?.left;
-  const splitRight = !!data._prosthesisSplit?.right;
-
-  const cbL = document.getElementById('prost-split-left');
-  const cbR = document.getElementById('prost-split-right');
-  if (cbL) cbL.checked = splitLeft;
-  if (cbR) cbR.checked = splitRight;
-
-  const leftHand = document.querySelector('.prost-hand-left');
-  const rightHand = document.querySelector('.prost-hand-right');
-
-  leftHand?.classList.toggle('visible', splitLeft);
-  rightHand?.classList.toggle('visible', splitRight);
-  leftHand?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitLeft);
-  rightHand?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitRight);
 
   if (typeof applyProsthesisLabels === 'function') applyProsthesisLabels();
 
@@ -5058,6 +4988,7 @@ function renderProsthesesPanel() {
 
 function initProsthesesSystem() {
   applyInventorySpecialLabels();
+  applyProsthesisGroupLabels();
   renderProsthesesPanel();
 }
 
@@ -5073,6 +5004,7 @@ function toggleParamAccordion(el) { toggleAccordion(el); }
 function safeRefreshLateUi() {
   try { if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel(); } catch(e) { console.warn(e); }
   try { if (typeof applyInventorySpecialLabels === 'function') applyInventorySpecialLabels(); } catch(e) { console.warn(e); }
+  try { if (typeof applyProsthesisGroupLabels === 'function') applyProsthesisGroupLabels(); } catch(e) { console.warn(e); }
   try { if (typeof renderProsthesisLabelParams === 'function') renderProsthesisLabelParams(); } catch(e) { console.warn(e); }
   try { if (typeof initMidjaasEasterEgg === 'function') initMidjaasEasterEgg(); } catch(e) { console.warn(e); }
   try { if (typeof initRingsFloatDrag === 'function') initRingsFloatDrag(); } catch(e) { console.warn(e); }

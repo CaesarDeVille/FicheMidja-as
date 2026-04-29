@@ -2651,14 +2651,6 @@ select::-ms-expand {
   min-height: 0;
 }
 
-.prost-split-toggle {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  color: var(--muted);
-  font-size: 10px;
-  user-select: none;
-}
 
 .prost-limb,
 .prost-body,
@@ -2671,14 +2663,7 @@ select::-ms-expand {
   min-height: 150px;
 }
 
-.prost-hand {
-  min-height: 48px;
-  display: none;
-}
 
-.prost-hand.visible {
-  display: flex;
-}
 
 @media (max-width: 900px) {
   .prostheses-panel {
@@ -2777,9 +2762,6 @@ select::-ms-expand {
   min-height: 138px !important;
 }
 
-.prost-hand {
-  min-height: 56px !important;
-}
 
 .prost-legs-row {
   display: grid !important;
@@ -2968,16 +2950,8 @@ select::-ms-expand {
 }
 
 /* Séparer main/bras divise la colonne sans agrandir le bloc global */
-.prost-arm-col {
-  height: 170px !important;
-  display: grid !important;
-  grid-template-rows: auto 1fr;
-  gap: 6px;
-}
 
-.prost-arm-col.has-hand {
-  grid-template-rows: auto 1fr 1fr;
-}
+
 
 .prost-arm-col .prost-limb {
   min-height: 0 !important;
@@ -2985,11 +2959,6 @@ select::-ms-expand {
   flex: initial !important;
 }
 
-.prost-arm-col .prost-hand {
-  min-height: 0 !important;
-  height: auto !important;
-  flex: initial !important;
-}
 
 /* Fenêtre anneaux : barre vraiment déplaçable */
 .rings-float-head {
@@ -3023,9 +2992,7 @@ select::-ms-expand {
   flex: 0 0 340px !important;
 }
 
-.prost-arm-col {
-  height: 340px !important;
-}
+
 
 /* Demande : doubler Arme en main */
 .slot-arme {
@@ -3094,10 +3061,6 @@ select::-ms-expand {
 }
 
 /* mode main séparée */
-.prost-arm-col.has-hand {
-  display: grid;
-  grid-template-rows: 22% 16%;
-}
 
 /* éviter overlap */
 .prost-slot {
@@ -3188,7 +3151,6 @@ select::-ms-expand {
 .prost-legs-row {
   min-height: 0 !important;
   height: auto !important;
-  overflow: hidden !important;
 }
 
 .prost-eyes-row {
@@ -3217,47 +3179,16 @@ select::-ms-expand {
 .prost-limb,
 .prost-body,
 .prost-leg,
-.prost-hand {
-  min-height: 0 !important;
-  height: auto !important;
-  flex: initial !important;
-  box-sizing: border-box !important;
-}
 
-/* Bras/main : la checkbox ne doit pas prendre de hauteur dans le calcul */
 .prost-arm-col {
   position: relative !important;
   min-height: 0 !important;
   height: auto !important;
-  display: grid !important;
-  grid-template-rows: 1fr !important;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 6px !important;
 }
 
-.prost-arm-col.has-hand {
-  grid-template-rows: minmax(0, 22fr) minmax(0, 16fr) !important;
-}
-
-/* Checkbox en overlay, sans agrandir la colonne */
-.prost-split-toggle {
-  position: absolute !important;
-  left: 0 !important;
-  top: -20px !important;
-  height: 16px !important;
-  z-index: 2 !important;
-  background: rgba(0,0,0,.22);
-  padding-right: 4px;
-  border-radius: 3px;
-}
-
-/* Les mains restent cachées si non activées, puis partagent l'espace si activées */
-.prost-hand {
-  display: none !important;
-}
-
-.prost-hand.visible {
-  display: flex !important;
-}
 
 /* Colonne modules : pas de débordement, modules carrés autant que possible */
 .prost-side-col {
@@ -3415,7 +3346,104 @@ select::-ms-expand {
 
 #slot-preview, .slot-preview { z-index: 20000 !important; }
 
-.prostheses-panel { overflow: hidden !important; }
+.prostheses-panel { overflow: visible !important; }
+
+
+
+/* === PARAMS INVENTAIRE : sections spéciales + capsules implants === */
+
+/* Anneaux / Implants : 2 items côte à côte avec label + input */
+.inv-specials-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  margin-top: 8px;
+}
+
+.inv-special-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.inv-special-lbl {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .4px;
+  white-space: nowrap;
+  opacity: .8;
+}
+
+/* Grille capsules implants : 4 groupes côte à côte */
+.prost-params-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.prost-params-group {
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 8px 10px;
+  background: var(--bg3);
+}
+
+/* En-tête du groupe : nom de groupe à gauche, input de renommage à droite */
+.prost-params-group-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.prost-params-group-lbl {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: .9;
+  flex-shrink: 0;
+}
+
+.prost-group-name-inp {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+  opacity: .8;
+}
+
+/* Chaque ligne capsule : label à gauche, input à droite */
+.prost-params-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.prost-params-slot-row {
+  display: grid;
+  grid-template-columns: minmax(60px, auto) 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.prost-params-slot-lbl {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  letter-spacing: .3px;
+}
+
+@media (max-width: 1100px) {
+  .prost-params-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
 /* === LEGAL FOOTER === */
 .site-legal {

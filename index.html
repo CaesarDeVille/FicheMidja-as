@@ -176,21 +176,11 @@
 
             <div class="prost-mid-row">
               <div class="prost-arm-col">
-                <label class="prost-split-toggle">
-                  <input type="checkbox" id="prost-split-left" onchange="setProsthesisSplit('left', this.checked)">
-                  <span data-i18n="inventory.separateHand">Séparer main</span>
-                </label>
                 <div class="prost-slot prost-limb" id="sl-prothese_bras_g" data-slot-key="prothese_bras_g" onclick="open_('prothese_bras_g')">
                   <span class="lbl" data-prost-label="brasG">Bras gauche</span>
                   <span class="val" id="dsp-prothese_bras_g-nom">—</span>
                   <span class="val-type" id="dsp-prothese_bras_g-type"></span>
                   <span class="val-effet" id="dsp-prothese_bras_g-effet"></span>
-                </div>
-                <div class="prost-slot prost-hand prost-hand-left" id="sl-prothese_main_g" data-slot-key="prothese_main_g" onclick="open_('prothese_main_g')">
-                  <span class="lbl" data-prost-label="mainG">Main gauche</span>
-                  <span class="val" id="dsp-prothese_main_g-nom">—</span>
-                  <span class="val-type" id="dsp-prothese_main_g-type"></span>
-                  <span class="val-effet" id="dsp-prothese_main_g-effet"></span>
                 </div>
               </div>
 
@@ -202,21 +192,11 @@
               </div>
 
               <div class="prost-arm-col">
-                <label class="prost-split-toggle">
-                  <input type="checkbox" id="prost-split-right" onchange="setProsthesisSplit('right', this.checked)">
-                  <span data-i18n="inventory.separateHand">Séparer main</span>
-                </label>
                 <div class="prost-slot prost-limb" id="sl-prothese_bras_d" data-slot-key="prothese_bras_d" onclick="open_('prothese_bras_d')">
                   <span class="lbl" data-prost-label="brasD">Bras droit</span>
                   <span class="val" id="dsp-prothese_bras_d-nom">—</span>
                   <span class="val-type" id="dsp-prothese_bras_d-type"></span>
                   <span class="val-effet" id="dsp-prothese_bras_d-effet"></span>
-                </div>
-                <div class="prost-slot prost-hand prost-hand-right" id="sl-prothese_main_d" data-slot-key="prothese_main_d" onclick="open_('prothese_main_d')">
-                  <span class="lbl" data-prost-label="mainD">Main droite</span>
-                  <span class="val" id="dsp-prothese_main_d-nom">—</span>
-                  <span class="val-type" id="dsp-prothese_main_d-type"></span>
-                  <span class="val-effet" id="dsp-prothese_main_d-effet"></span>
                 </div>
               </div>
             </div>
@@ -547,13 +527,6 @@
       </div>
     </div>
   </div>
-
-  
-  <div id="custom-inventory-page" class="custom-inventory-page" style="display:none;">
-    <div class="custom-inventory-head">
-      <span data-i18n="inventory.customTitle">Inventaire personnalisé</span>
-    </div>
-    <div id="custom-inventory-grid" class="custom-inventory-grid"></div>
   </div>
 
   <div id="rings-float" class="rings-float">
@@ -1185,9 +1158,10 @@
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
-<div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
 
-            <!-- Stats d'Armure -->
+          <!-- 4 colonnes : Armure / Sacs / Emplacements spéciaux / Intitulés slots -->
+          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+
             <div class="param-col">
               <div class="param-section-title">&#9632; Stats d'Armure</div>
               <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
@@ -1205,23 +1179,26 @@
               </div>
             </div>
 
-            <!-- Types de Sacs -->
             <div class="param-col">
               <div class="param-section-title">&#9632; Types de Sacs</div>
               <div class="param-info">Renomme, modifie les emplacements, ou ajoute un type.</div>
               <div id="cfg-bags-list" class="param-list" style="margin-top:6px;"></div>
-              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;"><button class="param-add-btn" onclick="addCustomBag()">+ Ajouter un type de sac</button><button class="param-add-btn" onclick="resetParamSection('bags')">&#8635; Défaut</button></div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
+                <button class="param-add-btn" onclick="addCustomBag()">+ Ajouter un type de sac</button>
+                <button class="param-add-btn" onclick="resetParamSection('bags')">&#8635; Défaut</button>
+              </div>
             </div>
 
-            <!-- Emplacements Spéciaux -->
             <div class="param-col">
               <div class="param-section-title">&#10022; Emplacements Spéciaux</div>
               <div class="param-info">Configure chaque emplacement spécial.</div>
               <div id="cfg-spe-list" class="param-list" style="margin-top:6px;"></div>
-              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;"><button class="param-add-btn" onclick="addCustomSpe()">+ Ajouter un emplacement</button><button class="param-add-btn" onclick="resetParamSection('spe')">&#8635; Défaut</button></div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
+                <button class="param-add-btn" onclick="addCustomSpe()">+ Ajouter un emplacement</button>
+                <button class="param-add-btn" onclick="resetParamSection('spe')">&#8635; Défaut</button>
+              </div>
             </div>
 
-            <!-- Labels des slots d'inventaire -->
             <div class="param-col">
               <div class="param-section-title">&#9632; Intitulés des slots</div>
               <div class="param-info">Renomme chaque case de l'inventaire.</div>
@@ -1231,81 +1208,84 @@
 
           </div>
 
+          <!-- Sections spéciales + capsules implants -->
+          <div class="inv-specials-block">
 
-          <div class="inventory-param-v2">
-            <div class="param-section-title" data-i18n="params.inventoryLayout">Inventaire</div>
+            <div class="param-section-title" style="margin-top:16px; border-top:1px solid var(--border2); padding-top:12px;">&#9632; Sections spéciales de l'inventaire</div>
 
-            <div class="inventory-param-row">
-              <label class="param-toggle-lbl" data-i18n="params.inventoryMode">Mode d’inventaire</label>
-              <select class="param-select" id="cfg-inventory-mode" onchange="setInventoryMode(this.value)">
-                <option value="default" data-i18n="params.inventoryDefault">Inventaire par défaut</option>
-                <option value="custom" data-i18n="params.inventoryCustom">Inventaire personnalisé</option>
-              </select>
+            <div class="inv-specials-grid">
+              <div class="inv-special-item">
+                <span class="inv-special-lbl">◯ Anneaux</span>
+                <input class="param-input" id="cfg-label-rings" type="text" placeholder="Anneaux"
+                  oninput="saveInventorySpecialLabel('rings', this.value)">
+              </div>
+              <div class="inv-special-item">
+                <span class="inv-special-lbl">⊕ Implants</span>
+                <input class="param-input" id="cfg-label-prostheses" type="text" placeholder="Prothèses / Implants"
+                  oninput="saveInventorySpecialLabel('prostheses', this.value)">
+              </div>
             </div>
 
-            <div class="param-info" data-i18n="params.inventoryCustomInfo">
-              En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.
+            <div class="param-section-title" style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+              &#9632; Capsules d'implants
+              <button class="param-add-btn" onclick="resetProsthesisLabels()">&#8635; Réinitialiser</button>
             </div>
 
-            <div class="inventory-param-row">
-              <input class="param-input" id="custom-slot-label-input" type="text" placeholder="Nom de la case">
-              <button class="param-add-btn" onclick="addCustomInventorySlot()" data-i18n="params.addCustomSlot">Ajouter une case</button>
-            </div>
+            <div class="prost-params-grid">
 
-            <div id="custom-slot-param-list" class="custom-slot-param-list"></div>
-
-            <div class="param-section-title" data-i18n="params.renameInventorySpecials">Renommer les sections spéciales</div>
-
-            <div class="inventory-special-label-row">
-              <input class="param-input" id="cfg-label-rings" type="text" placeholder="Anneaux" oninput="saveInventorySpecialLabel('rings', this.value)">
-              <input class="param-input" id="cfg-label-prostheses" type="text" placeholder="Prothèses" oninput="saveInventorySpecialLabel('prostheses', this.value)">
-            </div>
-
-            <div class="param-section-title" data-i18n="params.renameProsthesisCapsules">Renommer les capsules de prothèses</div>
-
-            <div class="prost-label-layout-v2">
-              <div class="prost-label-group">
-                <div class="prost-label-group-title" data-i18n="prostheses.groupHead">Tête</div>
-                <input class="param-input" id="cfg-prost-tete" placeholder="Tête" oninput="saveProsthesisLabel('tete', this.value)">
-                <div class="prost-label-two">
-                  <input class="param-input" id="cfg-prost-oeilG" placeholder="Œil gauche" oninput="saveProsthesisLabel('oeilG', this.value)">
-                  <input class="param-input" id="cfg-prost-oeilD" placeholder="Œil droit" oninput="saveProsthesisLabel('oeilD', this.value)">
+              <div class="prost-params-group">
+                <div class="prost-params-group-hd">
+                  <span class="prost-params-group-lbl">Tête</span>
+                  <input class="param-input prost-group-name-inp" id="cfg-group-tete" type="text" placeholder="Tête"
+                    oninput="saveProsthesisGroupLabel('tete', this.value)">
+                </div>
+                <div class="prost-params-slots">
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Capsule</span><input class="param-input" id="cfg-prost-tete" placeholder="Tête" oninput="saveProsthesisLabel('tete', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Œil gauche</span><input class="param-input" id="cfg-prost-oeilG" placeholder="Œil gauche" oninput="saveProsthesisLabel('oeilG', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Œil droit</span><input class="param-input" id="cfg-prost-oeilD" placeholder="Œil droit" oninput="saveProsthesisLabel('oeilD', this.value)"></div>
                 </div>
               </div>
 
-              <div class="prost-label-group">
-                <div class="prost-label-group-title" data-i18n="prostheses.groupArmsBody">Bras / Corps</div>
-                <div class="prost-label-three">
-                  <input class="param-input" id="cfg-prost-brasG" placeholder="Bras gauche" oninput="saveProsthesisLabel('brasG', this.value)">
-                  <input class="param-input" id="cfg-prost-corps" placeholder="Corps" oninput="saveProsthesisLabel('corps', this.value)">
-                  <input class="param-input" id="cfg-prost-brasD" placeholder="Bras droit" oninput="saveProsthesisLabel('brasD', this.value)">
+              <div class="prost-params-group">
+                <div class="prost-params-group-hd">
+                  <span class="prost-params-group-lbl">Bras / Corps</span>
+                  <input class="param-input prost-group-name-inp" id="cfg-group-bras" type="text" placeholder="Bras / Corps"
+                    oninput="saveProsthesisGroupLabel('bras', this.value)">
                 </div>
-                <div class="prost-label-two">
-                  <input class="param-input" id="cfg-prost-mainG" placeholder="Main gauche" oninput="saveProsthesisLabel('mainG', this.value)">
-                  <input class="param-input" id="cfg-prost-mainD" placeholder="Main droite" oninput="saveProsthesisLabel('mainD', this.value)">
-                </div>
-              </div>
-
-              <div class="prost-label-group">
-                <div class="prost-label-group-title" data-i18n="prostheses.groupLegs">Jambes</div>
-                <div class="prost-label-two">
-                  <input class="param-input" id="cfg-prost-jambeG" placeholder="Jambe gauche" oninput="saveProsthesisLabel('jambeG', this.value)">
-                  <input class="param-input" id="cfg-prost-jambeD" placeholder="Jambe droite" oninput="saveProsthesisLabel('jambeD', this.value)">
+                <div class="prost-params-slots">
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Bras gauche</span><input class="param-input" id="cfg-prost-brasG" placeholder="Bras gauche" oninput="saveProsthesisLabel('brasG', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Corps</span><input class="param-input" id="cfg-prost-corps" placeholder="Corps" oninput="saveProsthesisLabel('corps', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Bras droit</span><input class="param-input" id="cfg-prost-brasD" placeholder="Bras droit" oninput="saveProsthesisLabel('brasD', this.value)"></div>
                 </div>
               </div>
 
-              <div class="prost-label-group">
-                <div class="prost-label-group-title" data-i18n="prostheses.groupModules">Modules</div>
-                <div class="prost-label-five">
-                  <input class="param-input" id="cfg-prost-extra1" placeholder="Module 1" oninput="saveProsthesisLabel('extra1', this.value)">
-                  <input class="param-input" id="cfg-prost-extra2" placeholder="Module 2" oninput="saveProsthesisLabel('extra2', this.value)">
-                  <input class="param-input" id="cfg-prost-extra3" placeholder="Module 3" oninput="saveProsthesisLabel('extra3', this.value)">
-                  <input class="param-input" id="cfg-prost-extra4" placeholder="Module 4" oninput="saveProsthesisLabel('extra4', this.value)">
-                  <input class="param-input" id="cfg-prost-extra5" placeholder="Module 5" oninput="saveProsthesisLabel('extra5', this.value)">
+              <div class="prost-params-group">
+                <div class="prost-params-group-hd">
+                  <span class="prost-params-group-lbl">Jambes</span>
+                  <input class="param-input prost-group-name-inp" id="cfg-group-jambes" type="text" placeholder="Jambes"
+                    oninput="saveProsthesisGroupLabel('jambes', this.value)">
+                </div>
+                <div class="prost-params-slots">
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Jambe gauche</span><input class="param-input" id="cfg-prost-jambeG" placeholder="Jambe gauche" oninput="saveProsthesisLabel('jambeG', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Jambe droite</span><input class="param-input" id="cfg-prost-jambeD" placeholder="Jambe droite" oninput="saveProsthesisLabel('jambeD', this.value)"></div>
                 </div>
               </div>
 
-              <button class="param-reset-btn prost-label-reset" onclick="resetProsthesisLabels()" data-i18n="params.resetProsthesisLabels">Réinitialiser les noms de prothèses</button>
+              <div class="prost-params-group">
+                <div class="prost-params-group-hd">
+                  <span class="prost-params-group-lbl">Modules</span>
+                  <input class="param-input prost-group-name-inp" id="cfg-group-modules" type="text" placeholder="Modules"
+                    oninput="saveProsthesisGroupLabel('modules', this.value)">
+                </div>
+                <div class="prost-params-slots">
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Module 1</span><input class="param-input" id="cfg-prost-extra1" placeholder="Module 1" oninput="saveProsthesisLabel('extra1', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Module 2</span><input class="param-input" id="cfg-prost-extra2" placeholder="Module 2" oninput="saveProsthesisLabel('extra2', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Module 3</span><input class="param-input" id="cfg-prost-extra3" placeholder="Module 3" oninput="saveProsthesisLabel('extra3', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Module 4</span><input class="param-input" id="cfg-prost-extra4" placeholder="Module 4" oninput="saveProsthesisLabel('extra4', this.value)"></div>
+                  <div class="prost-params-slot-row"><span class="prost-params-slot-lbl">Module 5</span><input class="param-input" id="cfg-prost-extra5" placeholder="Module 5" oninput="saveProsthesisLabel('extra5', this.value)"></div>
+                </div>
+              </div>
+
             </div>
           </div>
 
