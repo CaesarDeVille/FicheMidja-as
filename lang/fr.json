@@ -97,7 +97,7 @@
   "epaule": "Épaule",
   "ceintureGauche": "Ceinture — Gauche",
   "ceintureDroite": "Ceinture — Droite",
-  "legal.text": "© XVI — Univers Midja’as\n\nCe site et son contenu sont protégés par le droit d’auteur.\nToute reproduction est interdite sans autorisation.\nUtilisation personnelle et adaptation autorisées.",
+  "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé",
   "campaign.playerTitle": "Campagne Joueur",
   "campaign.currentCampaign": "Campagne actuelle",
   "campaign.playerSaveCode": "Code joueur",
@@ -129,5 +129,14 @@
   "campaign.playersInCampaign": "Joueurs dans la campagne",
   "campaign.noCampaignJoined": "Aucune campagne rejointe.",
   "campaign.managedCampaigns": "Campagnes gérées",
-  "campaign.defaultName": "Campagne sans nom"
+  "campaign.defaultName": "Campagne sans nom",
+  "campaign.rename": "Renommer",
+  "campaign.renamed": "Campagne renommée",
+  "params.resetAllParams": "↺ Réinitialiser tous les paramètres",
+  "params.clearAll": "⚠ Tout réinitialiser (fiche + params)",
+  "confirm.resetAllParams": "Réinitialiser tous les paramètres ?",
+  "confirm.clearAll": "Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.",
+  "toast.paramsReset": "Paramètres réinitialisés.",
+  "toast.allReset": "Tout réinitialisé.",
+  "toast.reset": "Réinitialisé."
 }

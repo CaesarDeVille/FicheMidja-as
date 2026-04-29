@@ -1473,3 +1473,102 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* === LEGAL FOOTER COMPACT OVERRIDE === */
+.site-legal {
+  position: fixed !important;
+  bottom: 6px !important;
+  left: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  text-align: left !important;
+  font-size: 10px !important;
+  color: var(--muted) !important;
+  opacity: .48 !important;
+  line-height: 1 !important;
+  letter-spacing: .2px !important;
+  white-space: nowrap !important;
+  transform: none !important;
+  transition: opacity .2s ease !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  z-index: 9999 !important;
+}
+
+.site-legal::before {
+  content: none !important;
+  display: none !important;
+}
+
+.site-legal.visible {
+  opacity: .48 !important;
+  transform: none !important;
+}
+
+
+/* === CAMPAIGN RENAME === */
+.campaign-rename-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.campaign-rename-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--gold);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 9px;
+  border-radius: 3px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.campaign-rename-input:focus {
+  border-color: var(--gold);
+}
+
+
+/* === MIDJA'AS EASTER EGG === */
+#midjaas-title-egg {
+  cursor: pointer;
+}
+
+#midjaas-title-egg.egg-pulse {
+  animation: eggPulse .55s ease;
+}
+
+@keyframes eggPulse {
+  0% { text-shadow: 0 0 0 rgba(240,192,64,0); transform: translateX(-50%) scale(1); }
+  35% { text-shadow: 0 0 18px rgba(240,192,64,.65); transform: translateX(-50%) scale(1.035); }
+  100% { text-shadow: 0 0 0 rgba(240,192,64,0); transform: translateX(-50%) scale(1); }
+}
+
+
+/* === RESET BUTTONS ROW === */
+.param-reset-global-row {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.param-reset-global-row .param-reset-btn {
+  padding: 10px 16px;
+  font-size: 12px;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .param-reset-global-row {
+    grid-template-columns: 1fr;
+  }
+}

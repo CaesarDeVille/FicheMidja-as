@@ -283,8 +283,18 @@ function clearFiche() {
   toast(uiT('toast.sheetReset','Fiche réinitialisée.'));
 }
 
+
+function resetAllParams() {
+  if (!confirm(uiT('confirm.resetAllParams','Réinitialiser tous les paramètres ?'))) return;
+  ['qualities','ficheSections','slotLabels','charLabels','catLabels','statLabels','armorStats','capLabels','theme'].forEach(s => {
+    try { resetParamSection(s, true); } catch(e) { console.warn(e); }
+  });
+  persist();
+  toast(uiT('toast.paramsReset','Paramètres réinitialisés.'));
+}
+
 function clearAll() {
-  if (!confirm('Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.')) return;
+  if (!confirm(uiT('confirm.clearAll','Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.'))) return;
   data = {};
   document.getElementById('bagSize').value = 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar(); renderFiche();
@@ -292,11 +302,11 @@ function clearAll() {
   applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
   buildBourseRows(); refreshArmorStats();
   persist();
-  toast('Tout réinitialisé.');
+  toast(uiT('toast.allReset','Tout réinitialisé.'));
 }
 
 // Reset individuel de sections de paramètres
-function resetParamSection(section) {
+function resetParamSection(section, skipConfirm = false) {
   const labels = {
     qualities:'les Qualités/Raretés', ficheSections:'les titres de la Fiche Perso',
     slotLabels:'les noms des slots', charLabels:'le Cartouche Joueur',
@@ -311,7 +321,7 @@ function resetParamSection(section) {
     bags:'les types de Sacs', spe:'les Emplacements Spéciaux',
     capital:'les données Capital',
   };
-  if (!confirm('Réinitialiser '+(labels[section]||section)+' ?')) return;
+  if (!skipConfirm && !confirm('Réinitialiser '+(labels[section]||section)+' ?')) return;
   const map = {
     qualities:    () => { delete data._qualities; renderQualityParams(); applyAllQualityColors(); },
     ficheSections:() => { delete data._ficheSectionLabels; applyFicheSectionLabels(); renderFicheLabelParams(); },
@@ -337,7 +347,7 @@ function resetParamSection(section) {
     spe:     () => { delete data._customSpe; buildSpe(); renderParametres(); },
     capital: () => { delete data._capital; delete data._capLabels; delete data._capWalletLabels; delete data._banqueLabel; Object.keys(data).filter(k=>k.startsWith('_banqueVal')||k.startsWith('_banqueDevise')).forEach(k=>delete data[k]); renderCapital(); renderCapitalParams(); },
   };
-  if (map[section]) { map[section](); persist(); toast('Réinitialisé.'); }
+  if (map[section]) { map[section](); persist(); toast(uiT('toast.reset','Réinitialisé.')); }
 }
 
 /* ── bag normal slots ── */
@@ -2428,6 +2438,16 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
+    "params.resetAllParams": "↺ Réinitialiser tous les paramètres",
+    "params.clearAll": "⚠ Tout réinitialiser (fiche + params)",
+    "confirm.resetAllParams": "Réinitialiser tous les paramètres ?",
+    "confirm.clearAll": "Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.",
+    "toast.paramsReset": "Paramètres réinitialisés.",
+    "toast.allReset": "Tout réinitialisé.",
+    "toast.reset": "Réinitialisé.",
+    "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé",
+    "campaign.rename": "Renommer",
+    "campaign.renamed": "Campagne renommée",
     "legal.text": "© XVI — Univers Midja’as\n\nCe site et son contenu sont protégés par le droit d’auteur.\nToute reproduction est interdite sans autorisation.\nUtilisation personnelle et adaptation autorisées.",
     "campaign.playerTitle": "Campagne Joueur",
     "campaign.currentCampaign": "Campagne actuelle",
@@ -2517,6 +2537,16 @@ const I18N = {
     sort_placeholder: 'Emplacement sort',
   },
   en: {
+    "params.resetAllParams": "↺ Reset all settings",
+    "params.clearAll": "⚠ Reset everything (sheet + settings)",
+    "confirm.resetAllParams": "Reset all settings?",
+    "confirm.clearAll": "Reset EVERYTHING (sheet AND settings)? This cannot be undone.",
+    "toast.paramsReset": "Settings reset.",
+    "toast.allReset": "Everything reset.",
+    "toast.reset": "Reset.",
+    "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed",
+    "campaign.rename": "Rename",
+    "campaign.renamed": "Campaign renamed",
     "legal.text": "© XVI — Midja’as Universe\n\nThis site and its content are protected by copyright.\nAny reproduction is prohibited without permission.\nPersonal use and modification are allowed.",
     "campaign.playerTitle": "Player Campaign",
     "campaign.currentCampaign": "Current campaign",
@@ -4051,6 +4081,10 @@ async function renderManagedCampaigns() {
           <div class="campaign-accordion-arrow-v3">▾</div>
         </div>
         <div class="campaign-accordion-body-v3">
+          <div class="campaign-rename-row">
+            <input class="campaign-rename-input" id="campaign-rename-${campaignCode}" value="${escapeHtml(name)}">
+            <button class="btn-sm" onclick="gmRenameCampaign('${campaignCode}')">${uiT('campaign.rename','Renommer')}</button>
+          </div>
           ${players.length ? players.map(p => renderGmPlayerCard(p)).join('') : `<div class="param-info">${uiT('campaign.noPlayers','Aucun joueur dans cette campagne.')}</div>`}
         </div>
       </div>
@@ -4155,6 +4189,37 @@ async function gmKickPlayer(playerCode) {
   }
 }
 
+
+async function gmRenameCampaign(campaignCode) {
+  const clean = normalizeCampaignCode(campaignCode);
+  const input = document.getElementById('campaign-rename-' + clean);
+  const newName = (input?.value || '').trim() || uiT('campaign.defaultName','Campagne sans nom');
+
+  try {
+    const campRef = campaignRef('campaigns/' + clean + '/name');
+    if (!campRef) return;
+    await campRef.set(newName);
+
+    const managed = data._managedCampaigns || {};
+    if (managed[clean]) managed[clean].name = newName;
+    data._managedCampaigns = managed;
+
+    const gmCode = managed[clean]?.gmCode;
+    if (gmCode) {
+      const gmNameRef = campaignRef('gmCampaigns/' + gmCode + '/name');
+      if (gmNameRef) await gmNameRef.set(newName);
+    }
+
+    persist();
+    await renderManagedCampaigns();
+    await updateCampaignUi();
+    toast(uiT('campaign.renamed','Campagne renommée'));
+  } catch (err) {
+    console.error(err);
+    toast(uiT('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
+  }
+}
+
 function initCampaignInputs() {
   [
     ['campaign-join-code', formatCampaignCode],
@@ -4171,4 +4236,145 @@ function initCampaignInputs() {
 
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(initCampaignInputs, 0);
+});
+
+
+/* === MIDJA'AS EASTER EGG : POINT DE QI === */
+let midjaasEggClicks = 0;
+let midjaasEggTimer = null;
+
+function playQuestSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.85);
+    master.connect(ctx.destination);
+
+    const notes = [
+      [523.25, 0.00, 0.16], // C5
+      [659.25, 0.14, 0.16], // E5
+      [783.99, 0.28, 0.20], // G5
+      [1046.5, 0.46, 0.30]  // C6
+    ];
+
+    notes.forEach(([freq, start, dur]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + start);
+      gain.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + dur);
+
+      osc.connect(gain);
+      gain.connect(master);
+
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.04);
+    });
+
+    setTimeout(() => ctx.close?.(), 1200);
+  } catch (err) {
+    console.warn('Son easter egg impossible', err);
+  }
+}
+
+function getPocheKeys() {
+  // On essaie d'abord les éléments DOM, pour respecter la taille actuelle des poches.
+  const keys = [...document.querySelectorAll('[id^="poche-"], [data-key^="poche"]')]
+    .map(el => el.dataset?.key || el.id)
+    .filter(Boolean);
+
+  const normalized = keys
+    .map(k => String(k).replace(/^cell-/, '').replace(/^slot-/, ''))
+    .filter(k => k.startsWith('poche'));
+
+  if (normalized.length) return [...new Set(normalized)];
+
+  // Fallback : formats fréquents selon les versions.
+  const fallback = [];
+  for (let i = 1; i <= 12; i++) {
+    fallback.push('poche' + i, 'poche-' + i);
+  }
+  return fallback;
+}
+
+function findEmptyPocheKey() {
+  const keys = getPocheKeys();
+
+  for (const key of keys) {
+    const v = data[key];
+    if (!v || !v.nom) return key;
+  }
+
+  // Dernier fallback : créer un slot poche logique.
+  for (let i = 1; i <= 20; i++) {
+    const key = 'poche' + i;
+    if (!data[key] || !data[key].nom) return key;
+  }
+
+  return null;
+}
+
+function addPointDeQi() {
+  const key = findEmptyPocheKey();
+  if (!key) {
+    toast('Aucune poche libre');
+    return;
+  }
+
+  data[key] = {
+    nom: 'Point de QI.',
+    type: 'Point de QI.',
+    effet: 'Augmente de 1 le QI du joueur.',
+    img: 'https://media.discordapp.net/attachments/348605443314024460/1498876298293149826/unknown.png?ex=69f2c0d5&is=69f16f55&hm=e8772f5e0adcf792220a0d306185e630146fadf84b80365023f948a65329b9c1&=&format=webp&quality=lossless'
+  };
+
+  buildPoche();
+  refresh();
+  persist();
+  toast('Objet obtenu : Point de QI.');
+}
+
+function triggerMidjaasEgg() {
+  const title = document.getElementById('midjaas-title-egg') || document.querySelector('.tb-title');
+  title?.classList.remove('egg-pulse');
+  void title?.offsetWidth;
+  title?.classList.add('egg-pulse');
+
+  playQuestSound();
+  addPointDeQi();
+}
+
+function initMidjaasEasterEgg() {
+  const title = document.getElementById('midjaas-title-egg') || document.querySelector('.tb-title');
+  if (!title || title.dataset.eggReady) return;
+
+  title.addEventListener('click', () => {
+    midjaasEggClicks++;
+
+    clearTimeout(midjaasEggTimer);
+    midjaasEggTimer = setTimeout(() => {
+      midjaasEggClicks = 0;
+    }, 1200);
+
+    if (midjaasEggClicks >= 3) {
+      midjaasEggClicks = 0;
+      clearTimeout(midjaasEggTimer);
+      triggerMidjaasEgg();
+    }
+  });
+
+  title.dataset.eggReady = '1';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initMidjaasEasterEgg, 100);
 });

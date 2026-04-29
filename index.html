@@ -12,7 +12,7 @@
 <!-- ══ THEME BAR ══ -->
 <div class="theme-bar">
   <span class="tb-fiche-nom" id="tb-fiche-nom">Fiche de —</span>
-  <span class="tb-title" data-i18n="app.title">⚔ FICHE PERSO MIDJA'AS ⚔</span>
+  <span class="tb-title" id="midjaas-title-egg" data-i18n="app.title" title="Midja’as">⚔ FICHE PERSO MIDJA'AS ⚔</span>
   <div class="tb-right">
     <div class="gender-wrap">
       <label class="gender-lbl" title="Français">
@@ -1117,11 +1117,11 @@
     </div><!-- end param-layout -->
 
     <!-- Reset global -->
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;" onclick="if(confirm('Réinitialiser tous les paramètres ?')){['qualities','ficheSections','slotLabels','charLabels','catLabels','statLabels','armorStats','capLabels','theme'].forEach(s=>{try{resetParamSection(s);}catch(e){}});}">
+    <div class="param-reset-global-row">
+      <button class="param-reset-btn" onclick="resetAllParams()" data-i18n="params.resetAllParams">
         &#8635; Réinitialiser tous les paramètres
       </button>
-      <button class="param-reset-btn" style="padding:10px 24px;font-size:12px;border-color:#c04040;color:#f08080;" onclick="clearAll()">
+      <button class="param-reset-btn" style="border-color:#c04040;color:#f08080;" onclick="clearAll()" data-i18n="params.clearAll">
         &#9888; Tout réinitialiser (fiche + params)
       </button>
     </div>
@@ -1211,13 +1211,7 @@
 </div>
 
 
-<div class="site-legal" data-i18n="legal.text">
-  © XVI — Univers Midja’as
-
-  Ce site et son contenu sont protégés par le droit d’auteur.
-  Toute reproduction est interdite sans autorisation.
-  Utilisation personnelle et adaptation autorisées.
-</div>
+<div class="site-legal" data-i18n="legal.text"></div>
 
 </body>
 </html>

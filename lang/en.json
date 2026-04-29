@@ -97,7 +97,7 @@
   "epaule": "Shoulder",
   "ceintureGauche": "Belt — Left",
   "ceintureDroite": "Belt — Right",
-  "legal.text": "© XVI — Midja’as Universe\n\nThis site and its content are protected by copyright.\nAny reproduction is prohibited without permission.\nPersonal use and modification are allowed.",
+  "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed",
   "campaign.playerTitle": "Player Campaign",
   "campaign.currentCampaign": "Current campaign",
   "campaign.playerSaveCode": "Player code",
@@ -129,5 +129,14 @@
   "campaign.playersInCampaign": "Players in campaign",
   "campaign.noCampaignJoined": "No campaign joined.",
   "campaign.managedCampaigns": "Managed campaigns",
-  "campaign.defaultName": "Unnamed campaign"
+  "campaign.defaultName": "Unnamed campaign",
+  "campaign.rename": "Rename",
+  "campaign.renamed": "Campaign renamed",
+  "params.resetAllParams": "↺ Reset all settings",
+  "params.clearAll": "⚠ Reset everything (sheet + settings)",
+  "confirm.resetAllParams": "Reset all settings?",
+  "confirm.clearAll": "Reset EVERYTHING (sheet AND settings)? This cannot be undone.",
+  "toast.paramsReset": "Settings reset.",
+  "toast.allReset": "Everything reset.",
+  "toast.reset": "Reset."
 }
