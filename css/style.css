@@ -1101,3 +1101,28 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* === IMAGE LOADING FIX === */
+.slot.img-loading::after {
+  content: "image...";
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 9px;
+  color: var(--dim);
+  opacity: .75;
+  pointer-events: none;
+}
+
+.slot-img-bg {
+  transition: opacity .18s ease;
+}
+
+.slot-img-bg.loading {
+  opacity: 0 !important;
+}
+
+.slot-img-bg.loaded {
+  opacity: .28;
+}

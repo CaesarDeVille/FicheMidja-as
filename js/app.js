@@ -196,6 +196,7 @@ function importData(e) {
 
       // Import des données de la fiche
       data = parsed;
+      preloadFicheImages();
       data._keepThemeOnImport = keepTheme;
 
       if (keepTheme) {
@@ -503,23 +504,57 @@ function setSlotDisplay(key) {
   const n  = document.getElementById('dsp-' + key + '-nom');
   const tp = document.getElementById('dsp-' + key + '-type');
   const ef = document.getElementById('dsp-' + key + '-effet');
+
   if (n)  n.textContent  = d.nom   || '—';
   if (tp) tp.textContent = d.type  || '';
   if (ef) ef.textContent = d.effet || '';
+
   const sl = document.getElementById('sl-' + key);
   if (sl) {
     const hasSomething = !!(d.nom);
     sl.classList.toggle('filled', hasSomething);
     sl.style.background = hasSomething ? 'var(--bg3)' : 'var(--slot-empty)';
+
     // Quality border color
     applyQualityColor(sl, d.quality !== undefined ? d.quality : null);
-    // background image
+
+    // Background image with preload:
+    // important for Firebase loads where base64 images can take a moment.
     let bg = sl.querySelector('.slot-img-bg');
+
     if (d.img) {
-      if (!bg) { bg = document.createElement('div'); bg.className = 'slot-img-bg'; sl.insertBefore(bg, sl.firstChild); }
-      bg.style.backgroundImage = `url('${d.img}')`;
+      if (!bg) {
+        bg = document.createElement('div');
+        bg.className = 'slot-img-bg loading';
+        sl.insertBefore(bg, sl.firstChild);
+      }
+
+      if (bg.dataset.src !== d.img) {
+        bg.dataset.src = d.img;
+        bg.classList.remove('loaded');
+        bg.classList.add('loading');
+        sl.classList.add('img-loading');
+
+        const img = new Image();
+        img.onload = () => {
+          bg.style.backgroundImage = `url('${d.img}')`;
+          bg.classList.remove('loading');
+          bg.classList.add('loaded');
+          sl.classList.remove('img-loading');
+        };
+        img.onerror = () => {
+          bg.classList.remove('loading');
+          sl.classList.remove('img-loading');
+        };
+        img.src = d.img;
+      } else {
+        bg.classList.remove('loading');
+        bg.classList.add('loaded');
+        sl.classList.remove('img-loading');
+      }
     } else if (bg) {
       bg.remove();
+      sl.classList.remove('img-loading');
     }
   }
 }
@@ -3552,6 +3587,7 @@ async function firebaseLoadByCode() {
 
     data = loaded;
     data._firebaseSaveCode = code;
+    preloadFicheImages();
     localStorage.setItem('midjaas_save_code', code);
 
     const bag = document.getElementById('bagSize');
@@ -3640,3 +3676,21 @@ function applyTranslations() {
 window.addEventListener('DOMContentLoaded', () => {
   loadTranslations(currentLang || localStorage.getItem('midjaas_lang') || localStorage.getItem('dnd_lang') || 'fr');
 });
+
+
+function preloadFicheImages() {
+  try {
+    const imgKeys = [];
+    Object.values(data || {}).forEach(v => {
+      if (v && typeof v === 'object' && typeof v.img === 'string' && v.img) imgKeys.push(v.img);
+    });
+    if (data?._fiche?.photoUrl) imgKeys.push(data._fiche.photoUrl);
+
+    imgKeys.forEach(src => {
+      const im = new Image();
+      im.src = src;
+    });
+  } catch (e) {
+    console.warn('Préchargement images impossible', e);
+  }
+}
