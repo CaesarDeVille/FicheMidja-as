@@ -1572,3 +1572,12 @@ body {
     grid-template-columns: 1fr;
   }
 }
+#midjaas-title-egg {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 50 !important;
+}
+
+.tb-title {
+  pointer-events: auto !important;
+}
