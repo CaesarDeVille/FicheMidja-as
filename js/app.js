@@ -4287,39 +4287,17 @@ function playQuestSound() {
 }
 
 function getPocheKeys() {
-  // On essaie d'abord les éléments DOM, pour respecter la taille actuelle des poches.
-  const keys = [...document.querySelectorAll('[id^="poche-"], [data-key^="poche"]')]
-    .map(el => el.dataset?.key || el.id)
-    .filter(Boolean);
-
-  const normalized = keys
-    .map(k => String(k).replace(/^cell-/, '').replace(/^slot-/, ''))
-    .filter(k => k.startsWith('poche'));
-
-  if (normalized.length) return [...new Set(normalized)];
-
-  // Fallback : formats fréquents selon les versions.
-  const fallback = [];
-  for (let i = 1; i <= 12; i++) {
-    fallback.push('poche' + i, 'poche-' + i);
-  }
-  return fallback;
+  // Les vraies poches du code sont nommées poche_0, poche_1, etc.
+  const n = (typeof POCKET_N === 'number' && POCKET_N > 0) ? POCKET_N : 6;
+  return Array.from({ length: n }, (_, i) => 'poche_' + i);
 }
 
 function findEmptyPocheKey() {
   const keys = getPocheKeys();
-
   for (const key of keys) {
     const v = data[key];
     if (!v || !v.nom) return key;
   }
-
-  // Dernier fallback : créer un slot poche logique.
-  for (let i = 1; i <= 20; i++) {
-    const key = 'poche' + i;
-    if (!data[key] || !data[key].nom) return key;
-  }
-
   return null;
 }
 
@@ -4377,4 +4355,58 @@ function initMidjaasEasterEgg() {
 
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(initMidjaasEasterEgg, 100);
+});
+
+
+/* === EASTER EGG CLICK FIX : hitbox centrale === */
+let midjaasEggHitboxClicks = 0;
+let midjaasEggHitboxTimer = null;
+
+function isInsideMidjaasTitleHitbox(ev) {
+  const title = document.getElementById('midjaas-title-egg') || document.querySelector('.tb-title');
+  if (!title) return false;
+
+  const r = title.getBoundingClientRect();
+
+  // Hitbox un peu plus large que le texte, mais centrée sur lui.
+  const padX = 24;
+  const padY = 8;
+
+  return (
+    ev.clientX >= r.left - padX &&
+    ev.clientX <= r.right + padX &&
+    ev.clientY >= r.top - padY &&
+    ev.clientY <= r.bottom + padY
+  );
+}
+
+function initMidjaasEasterEggHitboxFix() {
+  if (window.__midjaasEggHitboxFixReady) return;
+  window.__midjaasEggHitboxFixReady = true;
+
+  document.addEventListener('click', (ev) => {
+    if (!isInsideMidjaasTitleHitbox(ev)) return;
+
+    // Empêche le clic de tomber sur Sauvegarder / Charger ou autres boutons.
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+
+    midjaasEggHitboxClicks++;
+
+    clearTimeout(midjaasEggHitboxTimer);
+    midjaasEggHitboxTimer = setTimeout(() => {
+      midjaasEggHitboxClicks = 0;
+    }, 1200);
+
+    if (midjaasEggHitboxClicks >= 3) {
+      midjaasEggHitboxClicks = 0;
+      clearTimeout(midjaasEggHitboxTimer);
+      triggerMidjaasEgg();
+    }
+  }, true);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initMidjaasEasterEggHitboxFix, 150);
 });

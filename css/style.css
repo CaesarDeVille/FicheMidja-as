@@ -1572,12 +1572,30 @@ body {
     grid-template-columns: 1fr;
   }
 }
-#midjaas-title-egg {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  z-index: 50 !important;
-}
 
+
+/* === EASTER EGG CLICK FIX === */
+#midjaas-title-egg,
 .tb-title {
   pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  z-index: 120 !important;
+}
+
+.theme-bar {
+  position: relative;
+  overflow: visible !important;
+}
+
+.tb-right {
+  position: relative;
+  z-index: 90;
+}
+
+
+/* === EASTER EGG CURSOR NORMAL === */
+#midjaas-title-egg,
+.tb-title {
+  cursor: default !important;
 }
