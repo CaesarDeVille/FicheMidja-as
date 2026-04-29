@@ -2,7 +2,7 @@
   "app.title": "⚔ FICHE PERSO MIDJA'AS ⚔",
   "top.sheetOf": "Fiche de",
   "top.sheetOfEmpty": "Fiche de —",
-  "top.save": "💾 Sauvegarder",
+  "top.save": "💾 Sauvegarder / Charger",
   "top.load": "↻ Charger",
   "top.undo": "↶ Annuler",
   "top.redo": "↷ Rétablir",
@@ -83,5 +83,13 @@
   "toast.invalidSave": "Sauvegarde invalide",
   "toast.sheetReset": "Fiche réinitialisée.",
   "confirm.resetSheet": "Réinitialiser la fiche du personnage ? Les paramètres seront conservés.",
-  "confirm.loadSave": "Charger cette sauvegarde ? La fiche actuelle sera remplacée."
+  "confirm.loadSave": "Charger cette sauvegarde ? La fiche actuelle sera remplacée.",
+  "modal.firebase.title": "Sauvegarder / Charger",
+  "modal.firebase.save": "Sauvegarder",
+  "modal.firebase.saveAs": "Sauvegarder sous",
+  "modal.firebase.load": "Charger",
+  "modal.firebase.close": "Fermer",
+  "modal.firebase.noCode": "Aucun code",
+  "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.",
+  "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code."
 }

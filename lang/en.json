@@ -2,7 +2,7 @@
   "app.title": "⚔ MIDJA'AS CHARACTER SHEET ⚔",
   "top.sheetOf": "Sheet of",
   "top.sheetOfEmpty": "Sheet of —",
-  "top.save": "💾 Save",
+  "top.save": "💾 Save / Load",
   "top.load": "↻ Load",
   "top.undo": "↶ Undo",
   "top.redo": "↷ Redo",
@@ -83,5 +83,13 @@
   "toast.invalidSave": "Invalid save",
   "toast.sheetReset": "Sheet reset.",
   "confirm.resetSheet": "Reset the character sheet? Settings will be kept.",
-  "confirm.loadSave": "Load this save? The current sheet will be replaced."
+  "confirm.loadSave": "Load this save? The current sheet will be replaced.",
+  "modal.firebase.title": "Save / Load",
+  "modal.firebase.save": "Save",
+  "modal.firebase.saveAs": "Save as",
+  "modal.firebase.load": "Load",
+  "modal.firebase.close": "Close",
+  "modal.firebase.noCode": "No code",
+  "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.",
+  "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code."
 }

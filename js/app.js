@@ -113,7 +113,7 @@ function loadData() {
 }
 
 function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
-function saveData() { persist(); toast(t('toast.saved','Sauvegardé !')); }
+function saveData() { persist(); toast(uiT('toast.saved','Sauvegardé !')); }
 
 function exportData() {
   // Collect current theme values.
@@ -157,7 +157,7 @@ function importData(e) {
       parsed = JSON.parse(ev.target.result);
     } catch (err) {
       console.error(err);
-      toast(t('toast.jsonError','Erreur JSON'));
+      toast(uiT('toast.jsonError','Erreur JSON'));
       e.target.value = '';
       return;
     }
@@ -241,7 +241,7 @@ function importData(e) {
       }, 50);
 
       persist();
-      toast(t('toast.imported','Importé !'));
+      toast(uiT('toast.imported','Importé !'));
     } catch (err) {
       console.error(err);
       toast('Import incomplet : vérifie la console');
@@ -262,7 +262,7 @@ const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armo
   '_bourseCount','_bourseLabel','_banqueLabel'];
 
 function clearFiche() {
-  if (!confirm(t('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
+  if (!confirm(uiT('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
   // Keep all param keys
   const kept = {};
   PARAM_KEYS.forEach(k => { if (data[k] !== undefined) kept[k] = data[k]; });
@@ -279,7 +279,7 @@ function clearFiche() {
   applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
   buildBourseRows(); refreshArmorStats();
   persist();
-  toast(t('toast.sheetReset','Fiche réinitialisée.'));
+  toast(uiT('toast.sheetReset','Fiche réinitialisée.'));
 }
 
 function clearAll() {
@@ -2450,7 +2450,7 @@ const I18N = {
   }
 };
 
-function t(key) { return (I18N[currentLang]||I18N.fr)[key] || I18N.fr[key] || key; }
+function t(key) { return (I18N[currentLang]||I18N.fr)[key] || I18N.fr[key] || (typeof UI18N !== 'undefined' && UI18N[key]) || key; }
 
 function applyI18n() {
   document.getElementById('nav-competences').textContent = t('nav_competences');
@@ -2482,7 +2482,7 @@ function applyI18n() {
   localStorage.setItem('dnd_lang', currentLang);
 }
 
-function setLang(lang) { loadTranslations(lang); }
+function setLang(lang) { currentLang = lang; applyI18n(); loadTranslations(lang); }
 
 function loadLang() {
   const saved = localStorage.getItem('dnd_lang') || 'fr';
@@ -3198,7 +3198,7 @@ function initUndoRedo() {
 
 function undoAction() {
   if (!undoStack.length) {
-    toast(t('toast.nothingUndo','Rien à annuler'));
+    toast(uiT('toast.nothingUndo','Rien à annuler'));
     return;
   }
 
@@ -3212,7 +3212,7 @@ function undoAction() {
     undoLastSnapshot = previous;
     localStorage.setItem('dnd_inv', previous);
     refreshAfterHistoryRestore();
-    toast(t('toast.undo','Action annulée'));
+    toast(uiT('toast.undo','Action annulée'));
   } finally {
     undoIsRestoring = false;
     updateUndoRedoButtons();
@@ -3221,7 +3221,7 @@ function undoAction() {
 
 function redoAction() {
   if (!redoStack.length) {
-    toast(t('toast.nothingRedo','Rien à rétablir'));
+    toast(uiT('toast.nothingRedo','Rien à rétablir'));
     return;
   }
 
@@ -3235,7 +3235,7 @@ function redoAction() {
     undoLastSnapshot = next;
     localStorage.setItem('dnd_inv', next);
     refreshAfterHistoryRestore();
-    toast(t('toast.redo','Action rétablie'));
+    toast(uiT('toast.redo','Action rétablie'));
   } finally {
     undoIsRestoring = false;
     updateUndoRedoButtons();
@@ -3292,14 +3292,25 @@ function setSaveCode(code) {
   data._firebaseSaveCode = clean;
   localStorage.setItem('midjaas_save_code', clean);
   persist();
+  updateFirebaseCodeFields();
   return clean;
 }
 
 function getFirebaseDbCompat() {
   try {
-    if (window.firebase && firebase.database) return firebase.database();
-  } catch(e) {}
+    if (window.firebase && typeof firebase.database === 'function') {
+      return firebase.database();
+    }
+  } catch(e) {
+    console.error(e);
+  }
   return null;
+}
+
+function firebaseRef(path) {
+  const db = getFirebaseDbCompat();
+  if (!db) return null;
+  return db.ref(path);
 }
 
 function makeFirebaseSavePayload() {
@@ -3317,90 +3328,93 @@ function makeFirebaseSavePayload() {
   });
 }
 
+function updateFirebaseCodeFields() {
+  const current = document.getElementById('firebase-current-code');
+  if (current) current.value = formatSaveCode(getSaveCode()) || uiT('modal.firebase.noCode','Aucun code');
+}
+
 function openFirebaseSaveModal() {
-  const m = document.getElementById('firebase-save-modal');
-  const input = document.getElementById('firebase-current-code');
-  if (input) input.value = formatSaveCode(getSaveCode()) || t('modal.firebaseSave.noCode','Aucun code');
-  if (m) m.classList.add('open');
+  updateFirebaseCodeFields();
+  const saveAs = document.getElementById('firebase-save-as-code');
+  const load = document.getElementById('firebase-load-code');
+  if (saveAs) saveAs.value = '';
+  if (load) load.value = '';
+  document.getElementById('firebase-save-modal')?.classList.add('open');
 }
 
 function closeFirebaseSaveModal() {
-  const m = document.getElementById('firebase-save-modal');
-  if (m) m.classList.remove('open');
+  document.getElementById('firebase-save-modal')?.classList.remove('open');
 }
 
 function openFirebaseLoadModal() {
-  const m = document.getElementById('firebase-load-modal');
-  const input = document.getElementById('firebase-load-code');
-  if (input) input.value = '';
-  if (m) m.classList.add('open');
-  setTimeout(() => input?.focus(), 50);
-}
-
-function closeFirebaseLoadModal() {
-  const m = document.getElementById('firebase-load-modal');
-  if (m) m.classList.remove('open');
+  openFirebaseSaveModal();
+  setTimeout(() => document.getElementById('firebase-load-code')?.focus(), 50);
 }
 
 async function firebaseSaveToCode(code) {
-  const db = getFirebaseDbCompat();
-  if (!db) {
-    toast(t('toast.firebaseUnavailable','Firebase indisponible'));
+  const clean = normalizeSaveCode(code);
+  if (clean.length !== 9) {
+    toast(uiT('toast.invalidCode','Code invalide'));
     return false;
   }
 
-  const clean = normalizeSaveCode(code);
-  if (clean.length !== 9) {
-    toast(t('toast.invalidCode','Code invalide'));
+  const ref = firebaseRef('saves/' + clean);
+  if (!ref) {
+    toast(uiT('toast.firebaseUnavailable','Firebase indisponible'));
     return false;
   }
 
   const payload = makeFirebaseSavePayload();
   payload._firebaseSaveCode = clean;
 
-  await db.ref('saves/' + clean).set(payload);
+  await ref.set(payload);
   setSaveCode(clean);
-
-  const input = document.getElementById('firebase-current-code');
-  if (input) input.value = formatSaveCode(clean);
-
-  toast('Sauvegardé : ' + formatSaveCode(clean));
+  toast((currentLang === 'en' ? 'Saved: ' : 'Sauvegardé : ') + formatSaveCode(clean));
   return true;
 }
 
 async function firebaseSaveCurrent() {
   try {
     let code = getSaveCode();
-    if (!code) {
-      code = generateSaveCode();
-    }
+    if (!code) code = generateSaveCode();
     await firebaseSaveToCode(code);
   } catch (err) {
     console.error(err);
-    toast(t('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
+    toast(uiT('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
   }
 }
 
 async function firebaseSaveAs() {
   try {
-    let code = generateSaveCode();
+    const input = document.getElementById('firebase-save-as-code');
+    let code = normalizeSaveCode(input?.value || '');
+
     const db = getFirebaseDbCompat();
     if (!db) {
-      toast(t('toast.firebaseUnavailable','Firebase indisponible'));
+      toast(uiT('toast.firebaseUnavailable','Firebase indisponible'));
       return;
     }
 
-    // Évite de réutiliser un code existant.
-    for (let i = 0; i < 8; i++) {
-      const snap = await db.ref('saves/' + code).get();
-      if (!snap.exists()) break;
+    if (!code) {
       code = generateSaveCode();
+      // Évite de réutiliser un code existant.
+      for (let i = 0; i < 8; i++) {
+        const snap = await db.ref('saves/' + code).get();
+        if (!snap.exists()) break;
+        code = generateSaveCode();
+      }
+    }
+
+    if (code.length !== 9) {
+      toast(uiT('toast.invalidCode','Code invalide'));
+      return;
     }
 
     await firebaseSaveToCode(code);
+    if (input) input.value = formatSaveCode(code);
   } catch (err) {
     console.error(err);
-    toast(t('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
+    toast(uiT('toast.firebaseSaveError','Erreur sauvegarde Firebase'));
   }
 }
 
@@ -3410,29 +3424,29 @@ async function firebaseLoadByCode() {
     const code = normalizeSaveCode(raw);
 
     if (code.length !== 9) {
-      toast(t('toast.invalidCode','Code invalide'));
+      toast(uiT('toast.invalidCode','Code invalide'));
       return;
     }
 
-    const db = getFirebaseDbCompat();
-    if (!db) {
-      toast(t('toast.firebaseUnavailable','Firebase indisponible'));
+    const ref = firebaseRef('saves/' + code);
+    if (!ref) {
+      toast(uiT('toast.firebaseUnavailable','Firebase indisponible'));
       return;
     }
 
-    const snap = await db.ref('saves/' + code).get();
+    const snap = await ref.get();
     if (!snap.exists()) {
-      toast(t('toast.noSaveFound','Aucune sauvegarde trouvée'));
+      toast(uiT('toast.noSaveFound','Aucune sauvegarde trouvée'));
       return;
     }
 
     const loaded = snap.val();
     if (!loaded || typeof loaded !== 'object') {
-      toast(t('toast.invalidSave','Sauvegarde invalide'));
+      toast(uiT('toast.invalidSave','Sauvegarde invalide'));
       return;
     }
 
-    if (!confirm(t('confirm.loadSave','Charger cette sauvegarde ? La fiche actuelle sera remplacée.'))) return;
+    if (!confirm(uiT('confirm.loadSave','Charger cette sauvegarde ? La fiche actuelle sera remplacée.'))) return;
 
     data = loaded;
     data._firebaseSaveCode = code;
@@ -3447,40 +3461,47 @@ async function firebaseLoadByCode() {
     buildBourseRows(); refreshArmorStats();
 
     persist();
-    closeFirebaseLoadModal();
-    toast('Sauvegarde chargée : ' + formatSaveCode(code));
+    updateFirebaseCodeFields();
+    closeFirebaseSaveModal();
+    toast((currentLang === 'en' ? 'Loaded: ' : 'Chargé : ') + formatSaveCode(code));
   } catch (err) {
     console.error(err);
-    toast(t('toast.firebaseLoadError','Erreur chargement Firebase'));
+    toast(uiT('toast.firebaseLoadError','Erreur chargement Firebase'));
   }
 }
 
-// Format automatique du champ code
-window.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('firebase-load-code');
-  if (input) {
+function initFirebaseCodeInputs() {
+  ['firebase-load-code', 'firebase-save-as-code'].forEach(id => {
+    const input = document.getElementById(id);
+    if (!input || input.dataset.codeReady) return;
     input.addEventListener('input', () => {
+      const pos = input.selectionStart;
       input.value = formatSaveCode(input.value);
     });
-  }
+    input.dataset.codeReady = '1';
+  });
+  updateFirebaseCodeFields();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initFirebaseCodeInputs, 0);
 });
 
-
 /* === I18N JSON === */
-let I18N = {};
-let CURRENT_LANG = localStorage.getItem('midjaas_lang') || 'fr';
+var UI18N = {};
+/* UI language is synced with currentLang */
 
-function t(key, fallback = '') {
-  return (I18N && I18N[key]) || fallback || key;
+function uiT(key, fallback = '') {
+  return (UI18N && UI18N[key]) || fallback || key;
 }
 
 async function loadTranslations(lang) {
   try {
     const res = await fetch(`lang/${lang}.json`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Lang file not found');
-    I18N = await res.json();
-    CURRENT_LANG = lang;
-    localStorage.setItem('midjaas_lang', lang);
+    UI18N = await res.json();
+    currentLang = lang;
+    localStorage.setItem('midjaas_lang', lang); localStorage.setItem('dnd_lang', lang);
     applyTranslations();
   } catch (err) {
     console.warn('Impossible de charger la traduction', lang, err);
@@ -3489,33 +3510,30 @@ async function loadTranslations(lang) {
 }
 
 function applyTranslations() {
-  document.documentElement.lang = CURRENT_LANG;
+  document.documentElement.lang = currentLang;
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (!key) return;
-    const val = t(key, el.textContent);
+    const val = uiT(key, el.textContent);
     el.textContent = val;
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (!key) return;
-    el.setAttribute('placeholder', t(key, el.getAttribute('placeholder') || ''));
+    el.setAttribute('placeholder', uiT(key, el.getAttribute('placeholder') || ''));
   });
 
   const fr = document.querySelector('input[name="lang-switch"][value="fr"]');
   const en = document.querySelector('input[name="lang-switch"][value="en"]');
-  if (fr) fr.checked = CURRENT_LANG === 'fr';
-  if (en) en.checked = CURRENT_LANG === 'en';
+  if (fr) fr.checked = currentLang === 'fr';
+  if (en) en.checked = currentLang === 'en';
 
   if (typeof updateTbNom === 'function') updateTbNom();
 }
 
-function setLang(lang) {
-  loadTranslations(lang);
-}
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadTranslations(CURRENT_LANG);
+  loadTranslations(currentLang || localStorage.getItem('midjaas_lang') || localStorage.getItem('dnd_lang') || 'fr');
 });

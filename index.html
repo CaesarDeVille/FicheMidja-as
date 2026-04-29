@@ -23,7 +23,6 @@
       </label>
     </div>
     <button class="btn-sm" onclick="openFirebaseSaveModal()" data-i18n="top.save">&#128190; Sauvegarder</button>
-    <button class="btn-sm" onclick="openFirebaseLoadModal()" data-i18n="top.load">&#8635; Charger</button>
     <button class="btn-sm" id="btn-undo" onclick="undoAction()" title="Ctrl+Z" data-i18n="top.undo">↶ Annuler</button>
     <button class="btn-sm" id="btn-redo" onclick="redoAction()" title="Ctrl+Y" data-i18n="top.redo">↷ Rétablir</button>
     <button class="btn-sm" onclick="exportData()" data-i18n="top.export">&#8679; Export</button>
@@ -1172,40 +1171,34 @@
   </div>
 </div>
 
-<!-- ══ FIREBASE SAVE / LOAD MODALS ══ -->
+<!-- ══ FIREBASE SAVE / LOAD MODAL ══ -->
 <div class="modal-overlay" id="firebase-save-modal">
-  <div class="modal">
-    <div class="modal-title" data-i18n="modal.firebaseSave.title">Sauvegarde Firebase</div>
+  <div class="modal firebase-save-load-modal">
+    <div class="modal-title" data-i18n="modal.firebase.title">Sauvegarde Firebase</div>
 
-    <div class="mfield">
-      <label data-i18n="modal.firebaseSave.currentCode">Code actuel</label>
-      <input id="firebase-current-code" type="text" readonly placeholder="Aucun code">
+    <div class="firebase-row">
+      <button class="btn firebase-action-btn" onclick="firebaseSaveCurrent()" data-i18n="modal.firebase.save">Sauvegarder</button>
+      <input id="firebase-current-code" class="firebase-code-input" type="text" readonly placeholder="Aucun code" data-i18n-placeholder="modal.firebase.noCode">
+    </div>
+    <div class="param-info" data-i18n="modal.firebase.saveInfo">
+      Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.
     </div>
 
-    <div class="modal-btns" style="justify-content:space-between;flex-wrap:wrap;">
-      <button class="btn" onclick="firebaseSaveCurrent()" data-i18n="modal.firebaseSave.save">Sauvegarder</button>
-      <button class="btn" onclick="firebaseSaveAs()" data-i18n="modal.firebaseSave.saveAs">Sauvegarder sous</button>
-      <button class="btn" onclick="closeFirebaseSaveModal()" data-i18n="modal.firebaseSave.close">Fermer</button>
+    <div class="firebase-row">
+      <button class="btn firebase-action-btn" onclick="firebaseSaveAs()" data-i18n="modal.firebase.saveAs">Sauvegarder sous</button>
+      <input id="firebase-save-as-code" class="firebase-code-input" type="text" placeholder="ABC DEF GHI" maxlength="11">
+    </div>
+    <div class="param-info" data-i18n="modal.firebase.saveAsInfo">
+      Laisse vide pour générer un nouveau code, ou entre ton propre code.
     </div>
 
-    <div class="param-info" style="margin-top:12px;">
-      <span data-i18n="modal.firebaseSave.info">“Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.</span>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="firebase-load-modal">
-  <div class="modal">
-    <div class="modal-title" data-i18n="modal.firebaseLoad.title">Charger une sauvegarde</div>
-
-    <div class="mfield">
-      <label data-i18n="modal.firebaseLoad.code">Code de sauvegarde</label>
-      <input id="firebase-load-code" type="text" placeholder="ABC DEF GHI" maxlength="11">
+    <div class="firebase-row">
+      <button class="btn firebase-action-btn" onclick="firebaseLoadByCode()" data-i18n="modal.firebase.load">Charger</button>
+      <input id="firebase-load-code" class="firebase-code-input" type="text" placeholder="ABC DEF GHI" maxlength="11">
     </div>
 
     <div class="modal-btns">
-      <button class="btn" onclick="firebaseLoadByCode()" data-i18n="modal.firebaseLoad.load">Charger</button>
-      <button class="btn" onclick="closeFirebaseLoadModal()" data-i18n="modal.firebaseLoad.close">Fermer</button>
+      <button class="btn" onclick="closeFirebaseSaveModal()" data-i18n="modal.firebase.close">Fermer</button>
     </div>
   </div>
 </div>
