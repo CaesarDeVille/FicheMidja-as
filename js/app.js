@@ -2389,6 +2389,48 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
+    "app.title": "⚔ FICHE PERSO MIDJA'AS ⚔",
+    "top.sheetOf": "Fiche de",
+    "top.sheetOfEmpty": "Fiche de —",
+    "top.save": "💾 Sauvegarder / Charger",
+    "top.load": "↻ Charger",
+    "top.undo": "↶ Annuler",
+    "top.redo": "↷ Rétablir",
+    "top.export": "⇧ Export",
+    "top.import": "⇩ Import",
+    "top.resetSheet": "✕ Réinit. fiche",
+    "nav.fiche": "⚬ Fiche Perso",
+    "nav.competences": "⚔ Compétences",
+    "nav.inventaire": "⊞ Inventaire",
+    "nav.capital": "◈ Capital",
+    "nav.campagne": "⚑ Campagne",
+    "nav.parametres": "⚙ Paramètres",
+    "inventory.amulette": "Amulette",
+    "inventory.couvre-chef": "Couvre-Chef",
+    "inventory.gants": "Gants",
+    "inventory.bracelet": "Bracelet",
+    "inventory.armure": "Armure",
+    "inventory.cape": "Cape / Manteau",
+    "inventory.anneau1": "Anneau",
+    "inventory.anneau2": "Anneau",
+    "inventory.ceinture": "Ceinture",
+    "inventory.divers": "Divers",
+    "inventory.bottes": "Bottes",
+    "arme": "Arme en Main",
+    "dos": "Dos",
+    "epaule": "Épaule",
+    "ceintureGauche": "Ceinture — Gauche",
+    "ceintureDroite": "Ceinture — Droite",
+    "modal.firebase.title": "Sauvegarder / Charger",
+    "modal.firebase.save": "Sauvegarder",
+    "modal.firebase.saveAs": "Sauvegarder sous",
+    "modal.firebase.load": "Charger",
+    "modal.firebase.close": "Fermer",
+    "modal.firebase.noCode": "Aucun code",
+    "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.",
+    "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.",
+    "params.keepColors": "Conserver mes couleurs à l'import",
+    "params.keepColorsInfo": "Si coché, l'apparence de la fiche importée est ignorée.",
     nav_competences: '⚔ Compétences', nav_inventaire: '⊞ Inventaire', nav_capital: '◈ Capital',
     amulette: 'Amulette', 'couvre-chef': 'Couvre-Chef', gants: 'Gants',
     bracelet: 'Bracelet', armure: 'Armure', cape: 'Cape / Manteau',
@@ -2419,6 +2461,48 @@ const I18N = {
     sort_placeholder: 'Emplacement sort',
   },
   en: {
+    "app.title": "⚔ MIDJA'AS CHARACTER SHEET ⚔",
+    "top.sheetOf": "Sheet of",
+    "top.sheetOfEmpty": "Sheet of —",
+    "top.save": "💾 Save / Load",
+    "top.load": "↻ Load",
+    "top.undo": "↶ Undo",
+    "top.redo": "↷ Redo",
+    "top.export": "⇧ Export",
+    "top.import": "⇩ Import",
+    "top.resetSheet": "✕ Reset sheet",
+    "nav.fiche": "⚬ Character Sheet",
+    "nav.competences": "⚔ Skills",
+    "nav.inventaire": "⊞ Inventory",
+    "nav.capital": "◈ Capital",
+    "nav.campagne": "⚑ Campaign",
+    "nav.parametres": "⚙ Settings",
+    "inventory.amulette": "Amulet",
+    "inventory.couvre-chef": "Headgear",
+    "inventory.gants": "Gloves",
+    "inventory.bracelet": "Bracelet",
+    "inventory.armure": "Armor",
+    "inventory.cape": "Cape / Coat",
+    "inventory.anneau1": "Ring",
+    "inventory.anneau2": "Ring",
+    "inventory.ceinture": "Belt",
+    "inventory.divers": "Misc.",
+    "inventory.bottes": "Boots",
+    "arme": "Main Weapon",
+    "dos": "Back",
+    "epaule": "Shoulder",
+    "ceintureGauche": "Belt — Left",
+    "ceintureDroite": "Belt — Right",
+    "modal.firebase.title": "Save / Load",
+    "modal.firebase.save": "Save",
+    "modal.firebase.saveAs": "Save as",
+    "modal.firebase.load": "Load",
+    "modal.firebase.close": "Close",
+    "modal.firebase.noCode": "No code",
+    "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.",
+    "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.",
+    "params.keepColors": "Keep my colors on import",
+    "params.keepColorsInfo": "If checked, the imported sheet appearance is ignored.",
     nav_competences: '⚔ Skills', nav_inventaire: '⊞ Inventory', nav_capital: '◈ Capital',
     amulette: 'Amulet', 'couvre-chef': 'Headgear', gants: 'Gloves',
     bracelet: 'Bracelet', armure: 'Armor', cape: 'Cape / Cloak',
@@ -2450,7 +2534,7 @@ const I18N = {
   }
 };
 
-function t(key) { return (I18N[currentLang]||I18N.fr)[key] || I18N.fr[key] || (typeof UI18N !== 'undefined' && UI18N[key]) || key; }
+function t(key, fallback = '') { return (I18N[currentLang]||I18N.fr)[key] || I18N.fr[key] || (typeof UI18N !== 'undefined' && UI18N[key]) || fallback || key; }
 
 function applyI18n() {
   document.getElementById('nav-competences').textContent = t('nav_competences');
@@ -3502,10 +3586,11 @@ async function loadTranslations(lang) {
     UI18N = await res.json();
     currentLang = lang;
     localStorage.setItem('midjaas_lang', lang); localStorage.setItem('dnd_lang', lang);
-    applyTranslations();
+    applyTranslations(); if (typeof applyI18n === 'function') applyI18n();
   } catch (err) {
     console.warn('Impossible de charger la traduction', lang, err);
     if (lang !== 'fr') return loadTranslations('fr');
+    if (typeof applyI18n === 'function') applyI18n();
   }
 }
 

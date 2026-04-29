@@ -91,5 +91,10 @@
   "modal.firebase.close": "Fermer",
   "modal.firebase.noCode": "Aucun code",
   "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.",
-  "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code."
+  "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.",
+  "arme": "Arme en Main",
+  "dos": "Dos",
+  "epaule": "Épaule",
+  "ceintureGauche": "Ceinture — Gauche",
+  "ceintureDroite": "Ceinture — Droite"
 }

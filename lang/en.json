@@ -91,5 +91,10 @@
   "modal.firebase.close": "Close",
   "modal.firebase.noCode": "No code",
   "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.",
-  "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code."
+  "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.",
+  "arme": "Main Weapon",
+  "dos": "Back",
+  "epaule": "Shoulder",
+  "ceintureGauche": "Belt — Left",
+  "ceintureDroite": "Belt — Right"
 }
