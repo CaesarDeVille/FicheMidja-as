@@ -620,61 +620,58 @@
 
   <!-- PAGE CAMPAGNE -->
   <div id="page-campagne" class="page">
-    <div class="camp-layout">
+    <div class="campaign-layout-v2">
+      <div class="campaign-panel">
+        <div class="campaign-title" data-i18n="campaign.playerTitle">Campagne Joueur</div>
 
-      <!-- COL MJ -->
-      <div class="camp-col">
-        <div class="camp-col-title">&#9812; Maître du Jeu</div>
-
-        <!-- Créer -->
-        <div class="camp-section">
-          <div class="camp-section-title">Créer une campagne</div>
-          <input type="text" id="camp-name" class="camp-input" placeholder="Nom de la campagne…">
-          <button class="camp-btn" onclick="createCampagne()">+ Créer et obtenir un code</button>
-          <div id="camp-code-display" style="display:none;margin-top:10px;text-align:center;"></div>
-        </div>
-
-        <!-- Rejoindre comme MJ -->
-        <div class="camp-section" style="margin-top:10px;">
-          <div class="camp-section-title">Rejoindre comme Maître du Jeu</div>
-          <div style="display:flex;gap:6px;">
-            <input type="text" id="camp-mj-join-code" class="camp-input" placeholder="Code joueur…" maxlength="6"
-              style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:15px;flex:1;">
-            <input type="text" id="camp-mj-join-mjcode" class="camp-input" placeholder="Code MJ secret…" maxlength="6"
-              style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:15px;flex:1;border-color:#c04040;">
-            <button class="camp-btn" style="width:auto;padding:8px 14px;flex-shrink:0;" onclick="mjJoinCampagne()">Rejoindre</button>
+        <div class="campaign-current">
+          <div>
+            <span data-i18n="campaign.currentCampaign">Campagne actuelle</span>
+            <strong id="campaign-current-code">—</strong>
           </div>
-          <div id="camp-mj-join-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
-        </div>
-
-        <!-- Campagnes MJ en accordéons -->
-        <div id="camp-mj-campagnes" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;"></div>
-      </div>
-
-      <!-- COL JOUEUR -->
-      <div class="camp-col">
-        <div class="camp-col-title">&#9817; Joueur</div>
-
-        <!-- Rejoindre -->
-        <div class="camp-section">
-          <div class="camp-section-title">Rejoindre une campagne</div>
-          <div style="display:flex;gap:6px;">
-            <input type="text" id="camp-join-code" class="camp-input" placeholder="Code…" maxlength="6"
-              style="text-transform:uppercase;letter-spacing:3px;text-align:center;font-size:16px;flex:1;">
-            <button class="camp-btn" style="width:auto;padding:8px 14px;flex-shrink:0;" onclick="joinCampagne()">Rejoindre</button>
+          <div>
+            <span data-i18n="campaign.playerSaveCode">Code joueur</span>
+            <strong id="campaign-player-code">—</strong>
           </div>
-          <div id="camp-join-status" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
         </div>
 
-        <!-- Publier -->
-        <div class="camp-section" id="camp-publish-section" style="margin-top:10px;display:none;">
-          <div class="camp-section-title">Campagne active : <span id="camp-joined-name" style="color:var(--gold);"></span></div>
-          <button class="camp-btn camp-btn-publish" onclick="publishFiche()">&#8679; Publier ma fiche</button>
-          <div id="camp-publish-status" style="font-size:11px;color:var(--muted);margin-top:4px;text-align:center;"></div>
-          <button class="camp-btn-sm" style="margin-top:8px;color:#f08080;border-color:#5a2010;width:100%;" onclick="leaveCampagne()">Quitter la campagne</button>
+        <div class="campaign-row">
+          <button class="btn campaign-btn" onclick="joinCampaignFromInput()" data-i18n="campaign.join">Rejoindre</button>
+          <input id="campaign-join-code" class="campaign-code-input" type="text" maxlength="7" placeholder="ABC DEF">
+        </div>
+
+        <button class="btn danger campaign-wide" onclick="leaveCampaign()" data-i18n="campaign.leave">Quitter la campagne</button>
+        <div class="param-info" data-i18n="campaign.joinInfo">
+          Le code campagne permet d’associer votre fiche à une campagne.
         </div>
       </div>
 
+      <div class="campaign-panel">
+        <div class="campaign-title" data-i18n="campaign.gmTitle">Gestion MJ</div>
+
+        <button class="btn campaign-wide" onclick="createCampaign()" data-i18n="campaign.create">Créer une campagne</button>
+
+        <div class="campaign-current">
+          <div>
+            <span data-i18n="campaign.campaignCode">Code Campagne</span>
+            <strong id="campaign-created-code">—</strong>
+          </div>
+          <div>
+            <span data-i18n="campaign.gmCode">Code MJ</span>
+            <strong id="campaign-created-gm-code">—</strong>
+          </div>
+        </div>
+
+        <div class="campaign-row">
+          <button class="btn campaign-btn" onclick="gmLoadCampaignFromInput()" data-i18n="campaign.manage">Gérer</button>
+          <input id="campaign-gm-code-input" class="campaign-code-input" type="text" maxlength="8" placeholder="ABC DEFG">
+        </div>
+
+        <div class="campaign-list-title" data-i18n="campaign.players">Joueurs</div>
+        <div id="campaign-players-list" class="campaign-players-list">
+          <div class="param-info" data-i18n="campaign.noCampaignLoaded">Aucune campagne MJ chargée.</div>
+        </div>
+      </div>
     </div>
   </div><!-- end page-campagne -->
 
@@ -1201,6 +1198,15 @@
       <button class="btn" onclick="closeFirebaseSaveModal()" data-i18n="modal.firebase.close">Fermer</button>
     </div>
   </div>
+</div>
+
+
+<div class="site-legal" data-i18n="legal.text">
+  © XVI — Univers Midja’as
+
+  Ce site et son contenu sont protégés par le droit d’auteur.
+  Toute reproduction est interdite sans autorisation.
+  Utilisation personnelle et adaptation autorisées.
 </div>
 
 </body>
