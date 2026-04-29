@@ -1337,3 +1337,139 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* === CAMPAIGN V3 : named campaigns + accordions === */
+#page-campagne.active {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.campaign-layout-v3 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.campaign-name-input {
+  text-align: left !important;
+  letter-spacing: .5px !important;
+  font-weight: normal !important;
+}
+
+.campaign-current small {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.campaign-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.campaign-accordion-v3 {
+  border: 1.5px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+.campaign-accordion-head-v3 {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: var(--bg3);
+  border-bottom: 1px solid transparent;
+}
+
+.campaign-accordion-v3.open .campaign-accordion-head-v3 {
+  border-bottom-color: var(--border2);
+}
+
+.campaign-accordion-name-v3 {
+  color: var(--gold);
+  font-size: 14px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-accordion-code-v3 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.campaign-accordion-arrow-v3 {
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform .18s ease;
+}
+
+.campaign-accordion-v3.open .campaign-accordion-arrow-v3 {
+  transform: rotate(180deg);
+}
+
+.campaign-accordion-body-v3 {
+  display: none;
+  padding: 10px 12px;
+}
+
+.campaign-accordion-v3.open .campaign-accordion-body-v3 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campaign-player-card-v3 {
+  background: var(--bg2);
+  border: 1.5px solid var(--border2);
+  border-radius: 5px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.campaign-player-card-public {
+  grid-template-columns: 1fr;
+}
+
+.campaign-player-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.campaign-player-name-v2 {
+  color: var(--gold);
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-player-code-v2 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 900px) {
+  .campaign-layout-v3 {
+    grid-template-columns: 1fr !important;
+  }
+}

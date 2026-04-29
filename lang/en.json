@@ -105,7 +105,7 @@
   "campaign.leave": "Leave campaign",
   "campaign.joinInfo": "The campaign code links your sheet to a campaign.",
   "campaign.gmTitle": "GM Management",
-  "campaign.create": "Create campaign",
+  "campaign.create": "Create",
   "campaign.campaignCode": "Campaign Code",
   "campaign.gmCode": "GM Code",
   "campaign.manage": "Manage",
@@ -125,5 +125,9 @@
   "campaign.needSaveCode": "Save your sheet first to get a player code.",
   "campaign.confirmLeave": "Leave this campaign? Your sheet will not be deleted.",
   "campaign.confirmKick": "Kick this player from the campaign?",
-  "campaign.confirmLoadPlayer": "Load this player sheet? Your current sheet will be replaced."
+  "campaign.confirmLoadPlayer": "Load this player sheet? Your current sheet will be replaced.",
+  "campaign.playersInCampaign": "Players in campaign",
+  "campaign.noCampaignJoined": "No campaign joined.",
+  "campaign.managedCampaigns": "Managed campaigns",
+  "campaign.defaultName": "Unnamed campaign"
 }

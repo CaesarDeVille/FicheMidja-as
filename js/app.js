@@ -1364,6 +1364,8 @@ function showPage(name) {
   if (name === 'fiche') renderFiche();
 
   if (name === 'campagne') { initCampaignInputs(); if (data._gmCampaignCode) renderGmCampaign(data._gmCampaignCode); }
+
+  if (name === 'campagne') { initCampaignInputs(); renderManagedCampaigns(); updateCampaignUi(); }
 }
 
 /* ══ SYNC CHAR ══ */
@@ -2426,6 +2428,7 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
+    "legal.text": "© XVI — Univers Midja’as\n\nCe site et son contenu sont protégés par le droit d’auteur.\nToute reproduction est interdite sans autorisation.\nUtilisation personnelle et adaptation autorisées.",
     "campaign.playerTitle": "Campagne Joueur",
     "campaign.currentCampaign": "Campagne actuelle",
     "campaign.playerSaveCode": "Code joueur",
@@ -2514,6 +2517,7 @@ const I18N = {
     sort_placeholder: 'Emplacement sort',
   },
   en: {
+    "legal.text": "© XVI — Midja’as Universe\n\nThis site and its content are protected by copyright.\nAny reproduction is prohibited without permission.\nPersonal use and modification are allowed.",
     "campaign.playerTitle": "Player Campaign",
     "campaign.currentCampaign": "Current campaign",
     "campaign.playerSaveCode": "Player code",
@@ -3757,7 +3761,15 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/* === CAMPAIGN V2 === */
+
+
+/* === CAMPAIGN V3 === */
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[<>&"']/g, c => ({
+    '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
 
 function normalizeCampaignCode(code) {
   return String(code || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 6);
@@ -3793,19 +3805,42 @@ function campaignRef(path) {
   return db.ref(path);
 }
 
-function updateCampaignUi() {
-  const camp = normalizeCampaignCode(data._campaignCode || '');
+async function getCampaignData(campaignCode) {
+  const ref = campaignRef('campaigns/' + normalizeCampaignCode(campaignCode));
+  if (!ref) return null;
+  const snap = await ref.get();
+  return snap.exists() ? snap.val() : null;
+}
+
+function getCampaignName(camp) {
+  return camp?.name || uiT('campaign.defaultName','Campagne sans nom');
+}
+
+async function updateCampaignUi() {
+  const campCode = normalizeCampaignCode(data._campaignCode || '');
   const player = normalizeSaveCode(data._firebaseSaveCode || localStorage.getItem('midjaas_save_code') || '');
 
-  const cur = document.getElementById('campaign-current-code');
+  const curName = document.getElementById('campaign-current-name');
+  const curCode = document.getElementById('campaign-current-code');
   const pl = document.getElementById('campaign-player-code');
   const created = document.getElementById('campaign-created-code');
   const createdGm = document.getElementById('campaign-created-gm-code');
 
-  if (cur) cur.textContent = camp ? formatCampaignCode(camp) : '—';
   if (pl) pl.textContent = player ? formatSaveCode(player) : '—';
   if (created && data._lastCreatedCampaignCode) created.textContent = formatCampaignCode(data._lastCreatedCampaignCode);
   if (createdGm && data._lastCreatedGmCode) createdGm.textContent = formatGmCode(data._lastCreatedGmCode);
+
+  if (campCode) {
+    const camp = await getCampaignData(campCode);
+    if (curName) curName.textContent = getCampaignName(camp);
+    if (curCode) curCode.textContent = formatCampaignCode(campCode);
+    await renderPlayerCampaignList(campCode);
+  } else {
+    if (curName) curName.textContent = '—';
+    if (curCode) curCode.textContent = '—';
+    const list = document.getElementById('campaign-player-visible-list');
+    if (list) list.innerHTML = `<div class="param-info">${uiT('campaign.noCampaignJoined','Aucune campagne rejointe.')}</div>`;
+  }
 }
 
 async function createCampaign() {
@@ -3824,7 +3859,11 @@ async function createCampaign() {
     }
 
     const gmCode = generateLetters(7);
+    const nameInput = document.getElementById('campaign-create-name');
+    const name = (nameInput?.value || '').trim() || uiT('campaign.defaultName','Campagne sans nom');
+
     const payload = {
+      name,
       code: campaignCode,
       gmCode,
       createdAt: Date.now(),
@@ -3832,13 +3871,18 @@ async function createCampaign() {
     };
 
     await db.ref('campaigns/' + campaignCode).set(payload);
-    await db.ref('gmCampaigns/' + gmCode).set({ campaignCode, createdAt: Date.now() });
+    await db.ref('gmCampaigns/' + gmCode).set({ campaignCode, name, createdAt: Date.now() });
 
     data._lastCreatedCampaignCode = campaignCode;
     data._lastCreatedGmCode = gmCode;
+    if (!data._managedCampaigns) data._managedCampaigns = {};
+    data._managedCampaigns[campaignCode] = { campaignCode, gmCode, name };
+    data._gmCampaignCode = campaignCode;
     persist();
 
-    updateCampaignUi();
+    if (nameInput) nameInput.value = '';
+    await updateCampaignUi();
+    await renderManagedCampaigns();
     toast(uiT('campaign.created','Campagne créée') + ' : ' + formatCampaignCode(campaignCode));
   } catch (err) {
     console.error(err);
@@ -3861,17 +3905,13 @@ async function joinCampaignFromInput() {
   }
 
   try {
-    const ref = campaignRef('campaigns/' + campaignCode);
-    if (!ref) return;
-
-    const snap = await ref.get();
-    if (!snap.exists()) {
+    const camp = await getCampaignData(campaignCode);
+    if (!camp) {
       toast(uiT('campaign.notFound','Campagne introuvable'));
       return;
     }
 
-    // Si le joueur était déjà dans une autre campagne, on le retire.
-    if (data._campaignCode && data._campaignCode !== campaignCode) {
+    if (data._campaignCode && normalizeCampaignCode(data._campaignCode) !== campaignCode) {
       const oldRef = campaignRef('campaigns/' + normalizeCampaignCode(data._campaignCode) + '/players/' + playerCode);
       if (oldRef) await oldRef.remove();
     }
@@ -3887,7 +3927,7 @@ async function joinCampaignFromInput() {
     persist();
     await firebaseSaveToCode(playerCode);
 
-    updateCampaignUi();
+    await updateCampaignUi();
     toast(uiT('campaign.joined','Campagne rejointe') + ' : ' + formatCampaignCode(campaignCode));
   } catch (err) {
     console.error(err);
@@ -3912,7 +3952,7 @@ async function leaveCampaign() {
     persist();
     if (playerCode) await firebaseSaveToCode(playerCode);
 
-    updateCampaignUi();
+    await updateCampaignUi();
     toast(uiT('campaign.left','Campagne quittée'));
   } catch (err) {
     console.error(err);
@@ -3941,11 +3981,19 @@ async function gmLoadCampaignFromInput() {
       return;
     }
 
+    const camp = await getCampaignData(campaignCode);
+    if (!camp) {
+      toast(uiT('campaign.notFound','Campagne introuvable'));
+      return;
+    }
+
+    if (!data._managedCampaigns) data._managedCampaigns = {};
+    data._managedCampaigns[campaignCode] = { campaignCode, gmCode, name: getCampaignName(camp) };
     data._gmCampaignCode = campaignCode;
     data._gmCode = gmCode;
     persist();
 
-    await renderGmCampaign(campaignCode);
+    await renderManagedCampaigns();
     toast(uiT('campaign.loaded','Campagne chargée') + ' : ' + formatCampaignCode(campaignCode));
   } catch (err) {
     console.error(err);
@@ -3953,39 +4001,84 @@ async function gmLoadCampaignFromInput() {
   }
 }
 
-async function renderGmCampaign(campaignCode = data._gmCampaignCode) {
-  const list = document.getElementById('campaign-players-list');
+async function renderPlayerCampaignList(campaignCode = data._campaignCode) {
+  const list = document.getElementById('campaign-player-visible-list');
   if (!list) return;
 
-  const clean = normalizeCampaignCode(campaignCode || '');
-  if (!clean) {
-    list.innerHTML = `<div class="param-info">${uiT('campaign.noCampaignLoaded','Aucune campagne MJ chargée.')}</div>`;
-    return;
-  }
-
-  const snap = await campaignRef('campaigns/' + clean + '/players').get();
-  const players = snap.exists() ? snap.val() : {};
-  const entries = Object.values(players || {});
+  const camp = await getCampaignData(campaignCode);
+  const players = camp?.players || {};
+  const entries = Object.values(players);
 
   if (!entries.length) {
     list.innerHTML = `<div class="param-info">${uiT('campaign.noPlayers','Aucun joueur dans cette campagne.')}</div>`;
     return;
   }
 
-  list.innerHTML = entries.map(p => {
-    const code = normalizeSaveCode(p.playerCode);
-    const name = (p.name || code).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-    return `
-      <div class="campaign-player-card-v2">
-        <div class="campaign-player-main">
-          <div class="campaign-player-name-v2">${name}</div>
-          <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
-        </div>
-        <button class="btn-sm" onclick="gmLoadPlayerSheet('${code}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
-        <button class="btn-sm danger" onclick="gmKickPlayer('${code}')">${uiT('campaign.kick','Expulser')}</button>
+  list.innerHTML = entries.map(p => `
+    <div class="campaign-player-card-v3 campaign-player-card-public">
+      <div class="campaign-player-main">
+        <div class="campaign-player-name-v2">${escapeHtml(p.name || uiT('campaign.defaultName','Campagne sans nom'))}</div>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
+}
+
+async function renderManagedCampaigns() {
+  const list = document.getElementById('campaign-managed-list');
+  if (!list) return;
+
+  const managed = data._managedCampaigns || {};
+  const entries = Object.values(managed);
+
+  if (!entries.length) {
+    list.innerHTML = `<div class="param-info">${uiT('campaign.noCampaignLoaded','Aucune campagne MJ chargée.')}</div>`;
+    return;
+  }
+
+  const chunks = [];
+  for (const entry of entries) {
+    const campaignCode = normalizeCampaignCode(entry.campaignCode);
+    const camp = await getCampaignData(campaignCode);
+    const name = getCampaignName(camp || entry);
+    const players = Object.values(camp?.players || {});
+    const isOpen = data._gmCampaignCode === campaignCode;
+
+    chunks.push(`
+      <div class="campaign-accordion-v3 ${isOpen ? 'open' : ''}" data-campaign="${campaignCode}">
+        <div class="campaign-accordion-head-v3" onclick="toggleManagedCampaign('${campaignCode}')">
+          <div class="campaign-accordion-name-v3">${escapeHtml(name)}</div>
+          <div class="campaign-accordion-code-v3">${formatCampaignCode(campaignCode)} · ${formatGmCode(entry.gmCode || camp?.gmCode || '')}</div>
+          <div class="campaign-accordion-arrow-v3">▾</div>
+        </div>
+        <div class="campaign-accordion-body-v3">
+          ${players.length ? players.map(p => renderGmPlayerCard(p)).join('') : `<div class="param-info">${uiT('campaign.noPlayers','Aucun joueur dans cette campagne.')}</div>`}
+        </div>
+      </div>
+    `);
+  }
+
+  list.innerHTML = chunks.join('');
+}
+
+function renderGmPlayerCard(p) {
+  const code = normalizeSaveCode(p.playerCode);
+  return `
+    <div class="campaign-player-card-v3">
+      <div class="campaign-player-main">
+        <div class="campaign-player-name-v2">${escapeHtml(p.name || code)}</div>
+        <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
+      </div>
+      <button class="btn-sm" onclick="gmLoadPlayerSheet('${code}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
+      <button class="btn-sm danger" onclick="gmKickPlayer('${code}')">${uiT('campaign.kick','Expulser')}</button>
+    </div>
+  `;
+}
+
+function toggleManagedCampaign(campaignCode) {
+  const clean = normalizeCampaignCode(campaignCode);
+  data._gmCampaignCode = clean;
+  persist();
+  renderManagedCampaigns();
 }
 
 async function gmLoadPlayerSheet(playerCode) {
@@ -4009,7 +4102,7 @@ async function gmLoadPlayerSheet(playerCode) {
     data._firebaseSaveCode = code;
     localStorage.setItem('midjaas_save_code', code);
 
-    preloadFicheImages?.();
+    if (typeof preloadFicheImages === 'function') preloadFicheImages();
 
     const bag = document.getElementById('bagSize');
     if (bag) bag.value = data._bagSize || 'sacoche';
@@ -4018,7 +4111,7 @@ async function gmLoadPlayerSheet(playerCode) {
     applyStatLabels(); applyCharLabels(); applyCatLabels(); applyMagieSetting(); applyParamShow(); applyStatSplits();
     applyEffetsPlus(); applySlotLabels(); applyFicheSectionLabels(); applyAllQualityColors();
     buildBourseRows(); refreshArmorStats();
-    updateCampaignUi();
+    await updateCampaignUi();
     persist();
 
     toast(uiT('campaign.loadSheet','Voir fiche') + ' : ' + formatSaveCode(code));
@@ -4053,7 +4146,8 @@ async function gmKickPlayer(playerCode) {
       }
     }
 
-    await renderGmCampaign(campaignCode);
+    await renderManagedCampaigns();
+    await updateCampaignUi();
     toast(uiT('campaign.playerKicked','Joueur expulsé'));
   } catch (err) {
     console.error(err);
@@ -4072,6 +4166,7 @@ function initCampaignInputs() {
     input.dataset.campaignReady = '1';
   });
   updateCampaignUi();
+  renderManagedCampaigns();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

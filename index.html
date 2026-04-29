@@ -621,14 +621,15 @@
   <!-- PAGE CAMPAGNE -->
   <!-- campaign-v2-fix -->
   <div id="page-campagne" class="page">
-    <div class="campaign-layout-v2">
+    <div class="campaign-layout-v3">
       <div class="campaign-panel">
         <div class="campaign-title" data-i18n="campaign.playerTitle">Campagne Joueur</div>
 
         <div class="campaign-current">
           <div>
             <span data-i18n="campaign.currentCampaign">Campagne actuelle</span>
-            <strong id="campaign-current-code">—</strong>
+            <strong id="campaign-current-name">—</strong>
+            <small id="campaign-current-code">—</small>
           </div>
           <div>
             <span data-i18n="campaign.playerSaveCode">Code joueur</span>
@@ -645,12 +646,20 @@
         <div class="param-info" data-i18n="campaign.joinInfo">
           Le code campagne permet d’associer votre fiche à une campagne.
         </div>
+
+        <div class="campaign-list-title" data-i18n="campaign.playersInCampaign">Joueurs dans la campagne</div>
+        <div id="campaign-player-visible-list" class="campaign-players-list">
+          <div class="param-info" data-i18n="campaign.noCampaignJoined">Aucune campagne rejointe.</div>
+        </div>
       </div>
 
       <div class="campaign-panel">
         <div class="campaign-title" data-i18n="campaign.gmTitle">Gestion MJ</div>
 
-        <button class="btn campaign-wide" onclick="createCampaign()" data-i18n="campaign.create">Créer une campagne</button>
+        <div class="campaign-row">
+          <button class="btn campaign-btn" onclick="createCampaign()" data-i18n="campaign.create">Créer</button>
+          <input id="campaign-create-name" class="campaign-code-input campaign-name-input" type="text" placeholder="Nom de campagne">
+        </div>
 
         <div class="campaign-current">
           <div>
@@ -668,8 +677,8 @@
           <input id="campaign-gm-code-input" class="campaign-code-input" type="text" maxlength="8" placeholder="ABC DEFG">
         </div>
 
-        <div class="campaign-list-title" data-i18n="campaign.players">Joueurs</div>
-        <div id="campaign-players-list" class="campaign-players-list">
+        <div class="campaign-list-title" data-i18n="campaign.managedCampaigns">Campagnes gérées</div>
+        <div id="campaign-managed-list" class="campaign-accordion-list">
           <div class="param-info" data-i18n="campaign.noCampaignLoaded">Aucune campagne MJ chargée.</div>
         </div>
       </div>
