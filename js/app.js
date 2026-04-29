@@ -603,6 +603,10 @@ function refresh() {
   const bl = document.getElementById('bourse-label');
   if (bl) bl.value = data._bourseLabel || 'Bourse';
   buildBourseRows();
+  if (typeof renderRingsSlot === 'function') renderRingsSlot();
+  if (typeof applyInventoryMode === 'function') applyInventoryMode();
+  if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
+  if (typeof applyInventorySpecialLabels === 'function') applyInventorySpecialLabels();
 }
 
 function open_(key, speLabel) {
@@ -610,6 +614,7 @@ function open_(key, speLabel) {
   const label = key.startsWith('bag_') ? 'Sac — Emplacement ' + (+key.split('_')[1] + 1)
     : key.startsWith('poche_') ? 'Poche ' + (+key.split('_')[1] + 1)
     : key.startsWith('spe_') ? (speLabel || 'Emplacement spécial')
+    : key.startsWith('prothese_') ? (document.querySelector('#sl-' + key + ' .lbl')?.textContent || getInventorySpecialLabel('prostheses'))
     : getSlotLabel(key) || key;
   document.getElementById('modalTitle').textContent = label;
   const d = data[key] || {};
@@ -656,6 +661,10 @@ function saveSlot() {
   if (k.startsWith('bag_') || k.startsWith('spe_')) { buildBag(); setTimeout(() => refreshArmorStats(), 0); }
   else if (k.startsWith('poche_')) buildPoche();
   else refresh(); // refresh already calls refreshArmorStats
+  if (typeof renderRingsSlot === 'function') renderRingsSlot();
+  if (typeof renderCustomInventory === 'function') renderCustomInventory();
+  if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
+  if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
 }
 
 function clearSlot() {
@@ -677,6 +686,8 @@ function clearSlot() {
   if (k.startsWith('bag_') || k.startsWith('spe_')) buildBag();
   else if (k.startsWith('poche_')) buildPoche();
   else refresh();
+  if (typeof renderRingsSlot === 'function') renderRingsSlot();
+  if (typeof renderCustomInventory === 'function') renderCustomInventory();
 }
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
@@ -1361,7 +1372,15 @@ function loadChar() {
 }
 
 /* ══ PAGE NAVIGATION ══ */
+
+function closeAllFloatingUI() {
+  if (typeof closeRingsPanel === 'function') closeRingsPanel();
+  if (typeof toggleProsthesesPanel === 'function') toggleProsthesesPanel(false);
+}
+
 function showPage(name) {
+  closeAllFloatingUI();
+
   ['fiche','inventaire','competences','capital','campagne','parametres'].forEach(p => {
     const pageEl = document.getElementById('page-'+p);
     const navEl  = document.getElementById('nav-'+p);
@@ -1376,7 +1395,10 @@ function showPage(name) {
   if (name === 'campagne') { initCampaignInputs(); if (data._gmCampaignCode) renderGmCampaign(data._gmCampaignCode); }
 
   if (name === 'campagne') { initCampaignInputs(); renderManagedCampaigns(); updateCampaignUi(); }
+
+  if (name === 'inventaire' && typeof initInventoryRefactor === 'function') initInventoryRefactor();
 }
+
 
 /* ══ SYNC CHAR ══ */
 const CHAR_FIELDS = ['nom','age','naiss','pv','pa','ps','pe','race','dsnc','pv-max','pa-max','ps-max','pe-max','dsnc-max'];
@@ -1637,7 +1659,7 @@ function attachSlotPreview(el, key) {
     if (e.button !== 2) return;
     e.preventDefault();
     const d = data[key] || {};
-    showSlotPreview(e, d, d.armorStats || null);
+    showSlotPreview(e, d, d.armorStats || null); document.querySelector('.slot-preview')?.style?.setProperty('z-index','9999');
   });
   el.addEventListener('mouseup', e => { if (e.button === 2) hideSlotPreview(); });
   el.addEventListener('mouseleave', hideSlotPreview);
@@ -2438,6 +2460,65 @@ let currentLang = 'fr';
 
 const I18N = {
   fr: {
+    "prostheses.groupHead": "Tête",
+    "prostheses.groupArmsBody": "Bras / Corps",
+    "prostheses.groupLegs": "Jambes",
+    "prostheses.groupModules": "Modules",
+    "params.renameProsthesisCapsules": "Renommer les capsules de prothèses",
+    "params.resetProsthesisLabels": "Réinitialiser les noms de prothèses",
+    "toast.prosthesisLabelsReset": "Noms de prothèses réinitialisés.",
+    "prostheses.extra1": "Module 1",
+    "prostheses.extra2": "Module 2",
+    "prostheses.extra3": "Module 3",
+    "prostheses.extra4": "Module 4",
+    "prostheses.extra5": "Module 5",
+    "inventory.prostheses": "Prothèses",
+    "inventory.separateHand": "Séparer main",
+    "params.renameInventorySpecials": "Renommer les sections spéciales",
+    "prostheses.head": "Tête",
+    "prostheses.leftEye": "Œil gauche",
+    "prostheses.rightEye": "Œil droit",
+    "prostheses.leftArm": "Bras gauche",
+    "prostheses.rightArm": "Bras droit",
+    "prostheses.leftHand": "Main gauche",
+    "prostheses.rightHand": "Main droite",
+    "prostheses.body": "Corps",
+    "prostheses.leftLeg": "Jambe gauche",
+    "prostheses.rightLeg": "Jambe droite",
+    "inventory.rings": "Anneaux",
+    "inventory.customTitle": "Inventaire personnalisé",
+    "params.inventoryLayout": "Inventaire",
+    "params.inventoryMode": "Mode d’inventaire",
+    "params.inventoryDefault": "Inventaire par défaut",
+    "params.inventoryCustom": "Inventaire personnalisé",
+    "params.inventoryCustomInfo": "En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.",
+    "params.addCustomSlot": "Ajouter une case",
+    "params.customSlotName": "Nom de la case",
+    "toast.customSlotAdded": "Case ajoutée.",
+    "toast.customSlotRemoved": "Case supprimée.",
+    "campaign.playerTitle": "Campagne Joueur",
+    "campaign.currentCampaign": "Campagne actuelle",
+    "campaign.playerSaveCode": "Code joueur",
+    "campaign.join": "Rejoindre",
+    "campaign.leave": "Quitter la campagne",
+    "campaign.joinInfo": "Le code campagne permet d’associer votre fiche à une campagne.",
+    "campaign.playersInCampaign": "Joueurs dans la campagne",
+    "campaign.noCampaignJoined": "Aucune campagne rejointe.",
+    "campaign.gmTitle": "Gestion MJ",
+    "campaign.create": "Créer",
+    "campaign.campaignCode": "Code Campagne",
+    "campaign.gmCode": "Code MJ",
+    "campaign.manage": "Gérer",
+    "campaign.managedCampaigns": "Campagnes gérées",
+    "campaign.players": "Joueurs",
+    "campaign.noCampaignLoaded": "Aucune campagne MJ chargée.",
+    "campaign.loadSheet": "Voir fiche",
+    "campaign.kick": "Expulser",
+    "campaign.noPlayers": "Aucun joueur dans cette campagne.",
+    "campaign.defaultName": "Campagne sans nom",
+    "campaign.rename": "Renommer",
+    "campaign.renamed": "Campagne renommée",
+    "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé",
     "params.resetAllParams": "↺ Réinitialiser tous les paramètres",
     "params.clearAll": "⚠ Tout réinitialiser (fiche + params)",
     "confirm.resetAllParams": "Réinitialiser tous les paramètres ?",
@@ -2537,6 +2618,65 @@ const I18N = {
     sort_placeholder: 'Emplacement sort',
   },
   en: {
+    "prostheses.groupHead": "Head",
+    "prostheses.groupArmsBody": "Arms / Body",
+    "prostheses.groupLegs": "Legs",
+    "prostheses.groupModules": "Modules",
+    "params.renameProsthesisCapsules": "Rename prosthesis capsules",
+    "params.resetProsthesisLabels": "Reset prosthesis names",
+    "toast.prosthesisLabelsReset": "Prosthesis names reset.",
+    "prostheses.extra1": "Module 1",
+    "prostheses.extra2": "Module 2",
+    "prostheses.extra3": "Module 3",
+    "prostheses.extra4": "Module 4",
+    "prostheses.extra5": "Module 5",
+    "inventory.prostheses": "Prostheses",
+    "inventory.separateHand": "Separate hand",
+    "params.renameInventorySpecials": "Rename special sections",
+    "prostheses.head": "Head",
+    "prostheses.leftEye": "Left eye",
+    "prostheses.rightEye": "Right eye",
+    "prostheses.leftArm": "Left arm",
+    "prostheses.rightArm": "Right arm",
+    "prostheses.leftHand": "Left hand",
+    "prostheses.rightHand": "Right hand",
+    "prostheses.body": "Body",
+    "prostheses.leftLeg": "Left leg",
+    "prostheses.rightLeg": "Right leg",
+    "inventory.rings": "Rings",
+    "inventory.customTitle": "Custom inventory",
+    "params.inventoryLayout": "Inventory",
+    "params.inventoryMode": "Inventory mode",
+    "params.inventoryDefault": "Default inventory",
+    "params.inventoryCustom": "Custom inventory",
+    "params.inventoryCustomInfo": "In custom mode, you add your own inventory slots. They display in 3 columns.",
+    "params.addCustomSlot": "Add slot",
+    "params.customSlotName": "Slot name",
+    "toast.customSlotAdded": "Slot added.",
+    "toast.customSlotRemoved": "Slot removed.",
+    "campaign.playerTitle": "Player Campaign",
+    "campaign.currentCampaign": "Current campaign",
+    "campaign.playerSaveCode": "Player code",
+    "campaign.join": "Join",
+    "campaign.leave": "Leave campaign",
+    "campaign.joinInfo": "The campaign code links your sheet to a campaign.",
+    "campaign.playersInCampaign": "Players in campaign",
+    "campaign.noCampaignJoined": "No campaign joined.",
+    "campaign.gmTitle": "GM Management",
+    "campaign.create": "Create",
+    "campaign.campaignCode": "Campaign Code",
+    "campaign.gmCode": "GM Code",
+    "campaign.manage": "Manage",
+    "campaign.managedCampaigns": "Managed campaigns",
+    "campaign.players": "Players",
+    "campaign.noCampaignLoaded": "No GM campaign loaded.",
+    "campaign.loadSheet": "View sheet",
+    "campaign.kick": "Kick",
+    "campaign.noPlayers": "No player in this campaign.",
+    "campaign.defaultName": "Unnamed campaign",
+    "campaign.rename": "Rename",
+    "campaign.renamed": "Campaign renamed",
+    "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed",
     "params.resetAllParams": "↺ Reset all settings",
     "params.clearAll": "⚠ Reset everything (sheet + settings)",
     "confirm.resetAllParams": "Reset all settings?",
@@ -3698,7 +3838,12 @@ var UI18N = {};
 /* UI language is synced with currentLang */
 
 function uiT(key, fallback = '') {
-  return (UI18N && UI18N[key]) || fallback || key;
+  if (UI18N && UI18N[key]) return UI18N[key];
+  if (typeof t === 'function') {
+    const embedded = t(key, '');
+    if (embedded && embedded !== key) return embedded;
+  }
+  return fallback || key;
 }
 
 async function loadTranslations(lang) {
@@ -4410,3 +4555,475 @@ function initMidjaasEasterEggHitboxFix() {
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(initMidjaasEasterEggHitboxFix, 150);
 });
+
+
+/* === INVENTORY REFACTOR TEST : rings + custom inventory === */
+
+function getRingCount() {
+  const n = parseInt(data._ringCount || 2, 10);
+  return [1,2,4,6,8,10].includes(n) ? n : 2;
+}
+
+function setRingCount(v) {
+  data._ringCount = parseInt(v, 10) || 2;
+  persist();
+  renderRingsSlot();
+
+  const panel = document.getElementById('rings-float');
+  if (panel?.classList.contains('open')) {
+    openRingsPanel({ currentTarget: document.getElementById('sl-rings'), keepPosition: true });
+  }
+}
+
+function ringKey(i) {
+  return 'anneau' + i;
+}
+
+function renderRingMini(i, large = false) {
+  const key = ringKey(i);
+  const d = data[key] || {};
+  const label = d.nom ? escapeHtml(d.nom) : (uiT('inventory.rings','Anneaux') + ' ' + i);
+  const cls = d.nom ? 'ring-mini-name' : 'ring-mini-empty';
+  return `<div class="ring-mini ${d.nom ? 'filled' : ''}" id="sl-${key}" data-slot-key="${key}" onclick="event.stopPropagation(); open_('${key}')">
+    <span class="${cls}">${label}</span>
+    ${large && d.type ? `<span class="val-type">${escapeHtml(d.type)}</span>` : ''}
+    ${large && d.effet ? `<span class="val-effet">${escapeHtml(d.effet)}</span>` : ''}
+  </div>`;
+}
+
+function renderRingsSlot() {
+  const select = document.getElementById('ring-count-select');
+  const inline = document.getElementById('rings-inline');
+  const hint = document.getElementById('rings-more-hint');
+  const count = getRingCount();
+
+  if (select) select.value = String(count);
+  if (!inline) return;
+
+  inline.className = 'rings-inline count-' + Math.min(count, 4);
+
+  if (count <= 4) {
+    inline.innerHTML = Array.from({length: count}, (_, i) => renderRingMini(i + 1)).join('');
+    if (hint) hint.textContent = '';
+
+    Array.from({length: count}, (_, i) => ringKey(i+1)).forEach(k => {
+      const el = document.getElementById('sl-' + k);
+      if (el) {
+        if (typeof makeDraggable === 'function') makeDraggable(el, k);
+        if (typeof makeDropTarget === 'function') makeDropTarget(el, k);
+        if (typeof attachSlotPreview === 'function') attachSlotPreview(el, k);
+      }
+    });
+  } else {
+    const filled = Array.from({length: count}, (_, i) => data[ringKey(i+1)]?.nom).filter(Boolean).length;
+    inline.innerHTML = `
+      <div class="rings-summary" onclick="event.stopPropagation(); openRingsPanel(event)">
+        <span class="rings-summary-symbol">◯</span>
+        <span class="rings-summary-text">
+          <span class="rings-summary-count">${filled}/${count}</span>
+          <span class="rings-summary-hint">${uiT('inventory.rings','Anneaux')}</span>
+        </span>
+      </div>
+    `;
+    if (hint) hint.textContent = '';
+  }
+}
+
+function openRingsPanel(ev) {
+  const count = getRingCount();
+  if (count <= 4 && ev?.target?.closest?.('.ring-mini')) return;
+
+  const panel = document.getElementById('rings-float');
+  const grid = document.getElementById('rings-float-grid');
+  if (!panel || !grid) return;
+
+  const wasOpen = panel.classList.contains('open');
+  grid.innerHTML = Array.from({length: count}, (_, i) => renderRingMini(i + 1, true)).join('');
+  panel.classList.add('open');
+
+  // Si la fenêtre est déjà ouverte ou déplacée, on conserve sa position.
+  if (!wasOpen && !panel.dataset.moved && !ev?.keepPosition) {
+    const r = (ev?.currentTarget || document.getElementById('sl-rings')).getBoundingClientRect();
+    const left = Math.min(window.innerWidth - panel.offsetWidth - 12, Math.max(12, r.left));
+    const top = Math.min(window.innerHeight - panel.offsetHeight - 12, Math.max(12, r.bottom + 8));
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+  }
+
+  // Important : dans la fenêtre, les IDs peuvent exister ailleurs dans la page.
+  // On attache donc les comportements directement aux éléments du panneau.
+  grid.querySelectorAll('.ring-mini').forEach(el => {
+    const k = el.dataset.slotKey;
+    if (!k) return;
+
+    if (typeof makeDraggable === 'function') makeDraggable(el, k);
+    if (typeof makeDropTarget === 'function') makeDropTarget(el, k);
+
+    // Infobulle clic droit spéciale, directe, sans dépendre d'un ID global.
+    el.oncontextmenu = e => e.preventDefault();
+    el.onmousedown = e => {
+      if (e.button !== 2) return;
+      e.preventDefault();
+      const d = data[k] || {};
+      showSlotPreview(e, d, d.armorStats || null); document.querySelector('.slot-preview')?.style?.setProperty('z-index','9999');
+    };
+    el.onmouseup = e => { if (e.button === 2) hideSlotPreview(); };
+    el.onmouseleave = hideSlotPreview;
+  });
+
+  initRingsFloatDrag();
+}
+
+function closeRingsPanel() {
+  document.getElementById('rings-float')?.classList.remove('open');
+}
+
+
+function getInventoryMode() {
+  return data._inventoryMode || 'default';
+}
+
+function setInventoryMode(mode) {
+  data._inventoryMode = mode === 'custom' ? 'custom' : 'default';
+  persist();
+  applyInventoryMode();
+  renderCustomInventoryParams();
+}
+
+function applyInventoryMode() {
+  const isCustom = getInventoryMode() === 'custom';
+  const main = document.querySelector('#page-inventaire .main-body');
+  const custom = document.getElementById('custom-inventory-page');
+  if (main) main.style.display = isCustom ? 'none' : '';
+  if (custom) custom.style.display = isCustom ? 'flex' : 'none';
+  if (isCustom) renderCustomInventory();
+}
+
+function getCustomInvSlots() {
+  if (!Array.isArray(data._customInvSlots)) data._customInvSlots = [];
+  return data._customInvSlots;
+}
+
+function addCustomInventorySlot() {
+  const inp = document.getElementById('custom-slot-label-input');
+  const label = (inp?.value || '').trim() || uiT('params.customSlotName','Nom de la case');
+  const slots = getCustomInvSlots();
+  const id = 'customInv_' + Date.now().toString(36);
+  slots.push({ id, label });
+  data._customInvSlots = slots;
+  if (inp) inp.value = '';
+  persist();
+  renderCustomInventoryParams();
+  renderCustomInventory();
+  toast(uiT('toast.customSlotAdded','Case ajoutée.'));
+}
+
+function removeCustomInventorySlot(id) {
+  data._customInvSlots = getCustomInvSlots().filter(s => s.id !== id);
+  delete data[id];
+  persist();
+  renderCustomInventoryParams();
+  renderCustomInventory();
+  toast(uiT('toast.customSlotRemoved','Case supprimée.'));
+}
+
+function renameCustomInventorySlot(id, val) {
+  const slots = getCustomInvSlots();
+  const s = slots.find(x => x.id === id);
+  if (s) {
+    s.label = val || uiT('params.customSlotName','Nom de la case');
+    persist();
+    renderCustomInventory();
+  }
+}
+
+function renderCustomInventoryParams() {
+  const mode = document.getElementById('cfg-inventory-mode');
+  if (mode) mode.value = getInventoryMode();
+
+  const list = document.getElementById('custom-slot-param-list');
+  if (!list) return;
+
+  const slots = getCustomInvSlots();
+  list.innerHTML = slots.map(s => `
+    <div class="custom-slot-param-row">
+      <input class="param-input" value="${escapeHtml(s.label)}" oninput="renameCustomInventorySlot('${s.id}', this.value)">
+      <button class="param-reset-btn" onclick="removeCustomInventorySlot('${s.id}')">×</button>
+    </div>
+  `).join('');
+}
+
+function renderCustomInventory() {
+  const grid = document.getElementById('custom-inventory-grid');
+  if (!grid) return;
+
+  const slots = getCustomInvSlots();
+  grid.innerHTML = slots.map(s => {
+    const d = data[s.id] || {};
+    return `<div class="grid-cell custom-slot-cell ${d.nom ? 'filled' : ''}" id="sl-${s.id}" data-slot-key="${s.id}" onclick="open_('${s.id}')">
+      <span class="lbl">${escapeHtml(s.label)}</span>
+      <span class="val">${escapeHtml(d.nom || '—')}</span>
+      ${d.type ? `<span class="val-type">${escapeHtml(d.type)}</span>` : ''}
+      ${d.effet ? `<span class="val-effet">${escapeHtml(d.effet)}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  slots.forEach(s => {
+    const el = document.getElementById('sl-' + s.id);
+    if (el) {
+      makeDraggable(el, s.id);
+      makeDropTarget(el, s.id);
+      attachSlotPreview(el, s.id);
+      if (data[s.id]?.quality !== undefined && data[s.id]?.quality !== null) applyQualityColor(el, data[s.id].quality);
+    }
+  });
+}
+
+function initInventoryRefactor() {
+  renderRingsSlot();
+  applyInventoryMode();
+  renderCustomInventoryParams();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initInventoryRefactor, 100);
+});
+
+
+function initRingsFloatDrag() {
+  const panel = document.getElementById('rings-float');
+  const head = panel?.querySelector('.rings-float-head');
+  if (!panel || !head || panel.dataset.dragReady === 'document') return;
+
+  let dragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+  let pointerId = null;
+
+  function canStartDrag(ev) {
+    // On peut déplacer depuis le titre ou le fond du panneau,
+    // mais pas depuis les anneaux ni les boutons/champs.
+    if (ev.target.closest('button, input, select, textarea, .ring-mini')) return false;
+    return ev.target === panel || ev.target.closest('.rings-float-head');
+  }
+
+  function start(ev) {
+    if (!canStartDrag(ev)) return;
+    dragging = true;
+    pointerId = ev.pointerId;
+    panel.classList.add('dragging-window');
+    const r = panel.getBoundingClientRect();
+    offsetX = ev.clientX - r.left;
+    offsetY = ev.clientY - r.top;
+    ev.preventDefault();
+  }
+
+  function move(ev) {
+    if (!dragging) return;
+    if (pointerId !== null && ev.pointerId !== pointerId) return;
+
+    const maxLeft = window.innerWidth - panel.offsetWidth - 8;
+    const maxTop = window.innerHeight - panel.offsetHeight - 8;
+    const left = Math.min(maxLeft, Math.max(8, ev.clientX - offsetX));
+    const top = Math.min(maxTop, Math.max(8, ev.clientY - offsetY));
+
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+    panel.dataset.moved = '1';
+    ev.preventDefault();
+  }
+
+  function end(ev) {
+    if (pointerId !== null && ev.pointerId !== pointerId) return;
+    dragging = false;
+    pointerId = null;
+    panel.classList.remove('dragging-window');
+  }
+
+  panel.addEventListener('pointerdown', start);
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', end);
+  document.addEventListener('pointercancel', end);
+
+  panel.dataset.dragReady = 'document';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initRingsFloatDrag, 120);
+});
+
+
+/* === PROSTHESES PANEL + SPECIAL INVENTORY LABELS === */
+
+const PROSTHESIS_SLOTS = [
+  'prothese_tete','prothese_oeil_g','prothese_oeil_d',
+  'prothese_bras_g','prothese_main_g','prothese_corps','prothese_bras_d','prothese_main_d',
+  'prothese_jambe_g','prothese_jambe_d',
+  'prothese_extra_1','prothese_extra_2','prothese_extra_3','prothese_extra_4','prothese_extra_5'
+];
+
+function getInventorySpecialLabel(key) {
+  const fallback = key === 'rings'
+    ? uiT('inventory.rings','Anneaux')
+    : uiT('inventory.prostheses','Prothèses');
+  return data._inventorySpecialLabels?.[key] || fallback;
+}
+
+function saveInventorySpecialLabel(key, val) {
+  if (!data._inventorySpecialLabels) data._inventorySpecialLabels = {};
+  data._inventorySpecialLabels[key] = val.trim();
+  persist();
+  applyInventorySpecialLabels();
+}
+
+function applyInventorySpecialLabels() {
+  const rings = getInventorySpecialLabel('rings');
+  const prostheses = getInventorySpecialLabel('prostheses');
+
+  document.querySelectorAll('[data-i18n="inventory.rings"]').forEach(el => {
+    el.textContent = rings;
+  });
+
+  const prostEls = [
+    document.getElementById('prostheses-trigger-label'),
+    document.getElementById('prostheses-panel-title')
+  ];
+  prostEls.forEach(el => { if (el) el.textContent = prostheses; });
+
+  const ringInput = document.getElementById('cfg-label-rings');
+  const prostInput = document.getElementById('cfg-label-prostheses');
+  if (ringInput && document.activeElement !== ringInput) ringInput.value = data._inventorySpecialLabels?.rings || '';
+  if (prostInput && document.activeElement !== prostInput) prostInput.value = data._inventorySpecialLabels?.prostheses || '';
+}
+
+function toggleProsthesesPanel(force) {
+  const panel = document.getElementById('prostheses-panel');
+  const trigger = document.querySelector('.prostheses-trigger');
+  if (!panel) return;
+
+  const open = force === undefined ? !panel.classList.contains('open') : !!force;
+  panel.classList.toggle('open', open);
+  trigger?.classList.toggle('open', open);
+
+  if (open) {
+    renderProsthesesPanel();
+  }
+}
+
+function setProsthesisSplit(side, checked) {
+  if (!data._prosthesisSplit) data._prosthesisSplit = {};
+  data._prosthesisSplit[side] = !!checked;
+  persist();
+  renderProsthesesPanel();
+}
+
+function getDefaultProsthesisLabel(key) {
+  const map = {
+    tete: uiT('prostheses.head','Tête'),
+    oeilG: uiT('prostheses.leftEye','Œil gauche'),
+    oeilD: uiT('prostheses.rightEye','Œil droit'),
+    brasG: uiT('prostheses.leftArm','Bras gauche'),
+    brasD: uiT('prostheses.rightArm','Bras droit'),
+    mainG: uiT('prostheses.leftHand','Main gauche'),
+    mainD: uiT('prostheses.rightHand','Main droite'),
+    corps: uiT('prostheses.body','Corps'),
+    jambeG: uiT('prostheses.leftLeg','Jambe gauche'),
+    jambeD: uiT('prostheses.rightLeg','Jambe droite'),
+    extra1: uiT('prostheses.extra1','Module 1'),
+    extra2: uiT('prostheses.extra2','Module 2'),
+    extra3: uiT('prostheses.extra3','Module 3'),
+    extra4: uiT('prostheses.extra4','Module 4'),
+    extra5: uiT('prostheses.extra5','Module 5'),
+  };
+  return map[key] || key;
+}
+
+function getProsthesisLabel(key) {
+  return data._prosthesisLabels?.[key] || getDefaultProsthesisLabel(key);
+}
+
+function saveProsthesisLabel(key, val) {
+  if (!data._prosthesisLabels) data._prosthesisLabels = {};
+  const clean = String(val || '').trim();
+  if (clean) data._prosthesisLabels[key] = clean;
+  else delete data._prosthesisLabels[key];
+  persist();
+  applyProsthesisLabels();
+}
+
+function resetProsthesisLabels() {
+  delete data._prosthesisLabels;
+  persist();
+  applyProsthesisLabels();
+  setTimeout(() => { renderProsthesisLabelParams(); }, 120);
+  toast(uiT('toast.prosthesisLabelsReset','Noms de prothèses réinitialisés.'));
+}
+
+function renderProsthesisLabelParams() {
+  const keys = ['tete','oeilG','oeilD','brasG','corps','brasD','mainG','mainD','jambeG','jambeD','extra1','extra2','extra3','extra4','extra5'];
+  keys.forEach(key => {
+    const el = document.getElementById('cfg-prost-' + key);
+    if (el && document.activeElement !== el) {
+      el.value = data._prosthesisLabels?.[key] || '';
+      el.placeholder = getDefaultProsthesisLabel(key);
+    }
+  });
+}
+
+function applyProsthesisLabels() {
+  document.querySelectorAll('[data-prost-label]').forEach(el => {
+    const key = el.getAttribute('data-prost-label');
+    el.textContent = getProsthesisLabel(key);
+  });
+  setTimeout(() => { renderProsthesisLabelParams(); }, 120);
+}
+
+function renderProsthesesPanel() {
+  const splitLeft = !!data._prosthesisSplit?.left;
+  const splitRight = !!data._prosthesisSplit?.right;
+
+  const cbL = document.getElementById('prost-split-left');
+  const cbR = document.getElementById('prost-split-right');
+  if (cbL) cbL.checked = splitLeft;
+  if (cbR) cbR.checked = splitRight;
+
+  document.querySelector('.prost-hand-left')?.classList.toggle('visible', splitLeft);
+  document.querySelector('.prost-hand-right')?.classList.toggle('visible', splitRight);
+  document.querySelector('.prost-hand-left')?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitLeft);
+  document.querySelector('.prost-hand-right')?.closest('.prost-arm-col')?.classList.toggle('has-hand', splitRight);
+
+  applyProsthesisLabels();
+
+  PROSTHESIS_SLOTS.forEach(key => {
+    const d = data[key] || {};
+    const sl = document.getElementById('sl-' + key);
+    const n  = document.getElementById('dsp-' + key + '-nom');
+    const tp = document.getElementById('dsp-' + key + '-type');
+    const ef = document.getElementById('dsp-' + key + '-effet');
+
+    if (n) n.textContent = d.nom || '—';
+    if (tp) tp.textContent = d.type || '';
+    if (ef) ef.textContent = d.effet || '';
+
+    if (sl) {
+      sl.classList.toggle('filled', !!d.nom);
+      if (typeof makeDraggable === 'function') makeDraggable(sl, key);
+      if (typeof makeDropTarget === 'function') makeDropTarget(sl, key);
+      if (typeof attachSlotPreview === 'function') attachSlotPreview(sl, key);
+      if (d.quality !== undefined && d.quality !== null && typeof applyQualityColor === 'function') {
+        applyQualityColor(sl, d.quality);
+      }
+    }
+  });
+}
+
+function initProsthesesSystem() {
+  applyInventorySpecialLabels();
+  renderProsthesesPanel();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initProsthesesSystem, 150);
+});
+
+function toggleParamAccordion(el) { toggleAccordion(el); }

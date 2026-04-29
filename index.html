@@ -50,13 +50,13 @@
 
       <!-- R1: Amulette | Couvre-Chef -->
       <div class="eq-r1">
-        <div class="slot" style="width:140px;" id="sl-amulette" onclick="open_('amulette')">
+        <div class="slot slot-amulette" id="sl-amulette" onclick="open_('amulette')">
           <span class="lbl" data-i18n="inventory.amulette">Amulette</span>
           <span class="val" id="dsp-amulette-nom">—</span>
           <span class="val-type" id="dsp-amulette-type"></span>
           <span class="val-effet" id="dsp-amulette-effet"></span>
         </div>
-        <div class="slot" style="flex:1;" id="sl-couvre-chef" onclick="open_('couvre-chef')">
+        <div class="slot slot-couvre-chef" id="sl-couvre-chef" onclick="open_('couvre-chef')">
           <span class="lbl" data-i18n="inventory.couvre-chef">Couvre-Chef</span>
           <span class="val" id="dsp-couvre-chef-nom">—</span>
           <span class="val-type" id="dsp-couvre-chef-type"></span>
@@ -86,7 +86,7 @@
           <span class="val-type" id="dsp-armure-type"></span>
           <span class="val-effet" id="dsp-armure-effet"></span>
         </div>
-        <div class="slot" style="width:140px;" id="sl-cape" onclick="open_('cape')">
+        <div class="slot slot-cape" id="sl-cape" onclick="open_('cape')">
           <span class="lbl" data-i18n="inventory.cape">Cape / Manteau</span>
           <span class="val" id="dsp-cape-nom">—</span>
           <span class="val-type" id="dsp-cape-type"></span>
@@ -94,19 +94,13 @@
         </div>
       </div>
 
-      <!-- R3: Anneau Gauche | Anneau Droit | Ceinture -->
+      <!-- R3: Divers | Ceinture -->
       <div class="eq-r3">
-        <div class="slot slot-anneau" id="sl-anneau1" onclick="open_('anneau1')">
-          <span class="lbl" data-i18n="inventory.anneau1">Anneau</span>
-          <span class="val" id="dsp-anneau1-nom">—</span>
-          <span class="val-type" id="dsp-anneau1-type"></span>
-          <span class="val-effet" id="dsp-anneau1-effet"></span>
-        </div>
-        <div class="slot slot-anneau" id="sl-anneau2" onclick="open_('anneau2')">
-          <span class="lbl" data-i18n="inventory.anneau2">Anneau</span>
-          <span class="val" id="dsp-anneau2-nom">—</span>
-          <span class="val-type" id="dsp-anneau2-type"></span>
-          <span class="val-effet" id="dsp-anneau2-effet"></span>
+        <div class="slot slot-divers" id="sl-divers" onclick="open_('divers')">
+          <span class="lbl" data-i18n="inventory.divers">Divers</span>
+          <span class="val" id="dsp-divers-nom">—</span>
+          <span class="val-type" id="dsp-divers-type"></span>
+          <span class="val-effet" id="dsp-divers-effet"></span>
         </div>
         <div class="slot slot-ceinture" id="sl-ceinture" onclick="open_('ceinture')">
           <span class="lbl" data-i18n="inventory.ceinture">Ceinture</span>
@@ -116,19 +110,165 @@
         </div>
       </div>
 
-      <!-- R4: Bottes -->
+      <!-- R4: Anneaux | Bottes -->
       <div class="eq-r4">
-        <div class="slot slot-divers" id="sl-divers" onclick="open_('divers')">
-          <span class="lbl" data-i18n="inventory.divers">Divers</span>
-          <span class="val" id="dsp-divers-nom">—</span>
-          <span class="val-type" id="dsp-divers-type"></span>
-          <span class="val-effet" id="dsp-divers-effet"></span>
+        <div class="slot slot-rings" id="sl-rings" onclick="openRingsPanel(event)">
+          <div class="rings-head">
+            <span class="lbl" data-i18n="inventory.rings">Anneaux</span>
+            <select id="ring-count-select" class="rings-count-select" onclick="event.stopPropagation()" onchange="setRingCount(this.value)">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          <div id="rings-inline" class="rings-inline"></div>
+          <div id="rings-more-hint" class="rings-more-hint"></div>
         </div>
         <div class="slot slot-bottes" id="sl-bottes" onclick="open_('bottes')">
           <span class="lbl" data-i18n="inventory.bottes">Bottes</span>
           <span class="val" id="dsp-bottes-nom">—</span>
           <span class="val-type" id="dsp-bottes-type"></span>
           <span class="val-effet" id="dsp-bottes-effet"></span>
+        </div>
+      </div>
+
+      
+      <!-- PROTHÈSES -->
+      <div class="prostheses-trigger" onclick="toggleProsthesesPanel()">
+        <span id="prostheses-trigger-label" data-i18n="inventory.prostheses">Prothèses</span>
+        <span class="prostheses-trigger-arrow">▾</span>
+      </div>
+
+      <div id="prostheses-panel" class="prostheses-panel">
+        <div class="prostheses-panel-head">
+          <span id="prostheses-panel-title" data-i18n="inventory.prostheses">Prothèses</span>
+          <button class="btn-sm" onclick="toggleProsthesesPanel(false)">×</button>
+        </div>
+
+        <div class="prostheses-grid">
+          <div class="prost-main-col">
+            <div class="prost-top-stack">
+              <div class="prost-slot prost-head" id="sl-prothese_tete" data-slot-key="prothese_tete" onclick="open_('prothese_tete')">
+                <span class="lbl" data-prost-label="tete">Tête</span>
+                <span class="val" id="dsp-prothese_tete-nom">—</span>
+                <span class="val-type" id="dsp-prothese_tete-type"></span>
+                <span class="val-effet" id="dsp-prothese_tete-effet"></span>
+              </div>
+
+              <div class="prost-eyes-row">
+                <div class="prost-slot prost-eye" id="sl-prothese_oeil_g" data-slot-key="prothese_oeil_g" onclick="open_('prothese_oeil_g')">
+                  <span class="lbl" data-prost-label="oeilG">Œil gauche</span>
+                  <span class="val" id="dsp-prothese_oeil_g-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_oeil_g-type"></span>
+                  <span class="val-effet" id="dsp-prothese_oeil_g-effet"></span>
+                </div>
+                <div class="prost-slot prost-eye" id="sl-prothese_oeil_d" data-slot-key="prothese_oeil_d" onclick="open_('prothese_oeil_d')">
+                  <span class="lbl" data-prost-label="oeilD">Œil droit</span>
+                  <span class="val" id="dsp-prothese_oeil_d-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_oeil_d-type"></span>
+                  <span class="val-effet" id="dsp-prothese_oeil_d-effet"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="prost-mid-row">
+              <div class="prost-arm-col">
+                <label class="prost-split-toggle">
+                  <input type="checkbox" id="prost-split-left" onchange="setProsthesisSplit('left', this.checked)">
+                  <span data-i18n="inventory.separateHand">Séparer main</span>
+                </label>
+                <div class="prost-slot prost-limb" id="sl-prothese_bras_g" data-slot-key="prothese_bras_g" onclick="open_('prothese_bras_g')">
+                  <span class="lbl" data-prost-label="brasG">Bras gauche</span>
+                  <span class="val" id="dsp-prothese_bras_g-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_bras_g-type"></span>
+                  <span class="val-effet" id="dsp-prothese_bras_g-effet"></span>
+                </div>
+                <div class="prost-slot prost-hand prost-hand-left" id="sl-prothese_main_g" data-slot-key="prothese_main_g" onclick="open_('prothese_main_g')">
+                  <span class="lbl" data-prost-label="mainG">Main gauche</span>
+                  <span class="val" id="dsp-prothese_main_g-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_main_g-type"></span>
+                  <span class="val-effet" id="dsp-prothese_main_g-effet"></span>
+                </div>
+              </div>
+
+              <div class="prost-slot prost-body" id="sl-prothese_corps" data-slot-key="prothese_corps" onclick="open_('prothese_corps')">
+                <span class="lbl" data-prost-label="corps">Corps</span>
+                <span class="val" id="dsp-prothese_corps-nom">—</span>
+                <span class="val-type" id="dsp-prothese_corps-type"></span>
+                <span class="val-effet" id="dsp-prothese_corps-effet"></span>
+              </div>
+
+              <div class="prost-arm-col">
+                <label class="prost-split-toggle">
+                  <input type="checkbox" id="prost-split-right" onchange="setProsthesisSplit('right', this.checked)">
+                  <span data-i18n="inventory.separateHand">Séparer main</span>
+                </label>
+                <div class="prost-slot prost-limb" id="sl-prothese_bras_d" data-slot-key="prothese_bras_d" onclick="open_('prothese_bras_d')">
+                  <span class="lbl" data-prost-label="brasD">Bras droit</span>
+                  <span class="val" id="dsp-prothese_bras_d-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_bras_d-type"></span>
+                  <span class="val-effet" id="dsp-prothese_bras_d-effet"></span>
+                </div>
+                <div class="prost-slot prost-hand prost-hand-right" id="sl-prothese_main_d" data-slot-key="prothese_main_d" onclick="open_('prothese_main_d')">
+                  <span class="lbl" data-prost-label="mainD">Main droite</span>
+                  <span class="val" id="dsp-prothese_main_d-nom">—</span>
+                  <span class="val-type" id="dsp-prothese_main_d-type"></span>
+                  <span class="val-effet" id="dsp-prothese_main_d-effet"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="prost-legs-row">
+              <div class="prost-slot prost-leg" id="sl-prothese_jambe_g" data-slot-key="prothese_jambe_g" onclick="open_('prothese_jambe_g')">
+                <span class="lbl" data-prost-label="jambeG">Jambe gauche</span>
+                <span class="val" id="dsp-prothese_jambe_g-nom">—</span>
+                <span class="val-type" id="dsp-prothese_jambe_g-type"></span>
+                <span class="val-effet" id="dsp-prothese_jambe_g-effet"></span>
+              </div>
+              <div class="prost-slot prost-leg" id="sl-prothese_jambe_d" data-slot-key="prothese_jambe_d" onclick="open_('prothese_jambe_d')">
+                <span class="lbl" data-prost-label="jambeD">Jambe droite</span>
+                <span class="val" id="dsp-prothese_jambe_d-nom">—</span>
+                <span class="val-type" id="dsp-prothese_jambe_d-type"></span>
+                <span class="val-effet" id="dsp-prothese_jambe_d-effet"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="prost-side-col">
+            <div class="prost-slot prost-extra-square" id="sl-prothese_extra_1" data-slot-key="prothese_extra_1" onclick="open_('prothese_extra_1')">
+              <span class="lbl" data-prost-label="extra1">Module 1</span>
+              <span class="val" id="dsp-prothese_extra_1-nom">—</span>
+              <span class="val-type" id="dsp-prothese_extra_1-type"></span>
+              <span class="val-effet" id="dsp-prothese_extra_1-effet"></span>
+            </div>
+            <div class="prost-slot prost-extra-square" id="sl-prothese_extra_2" data-slot-key="prothese_extra_2" onclick="open_('prothese_extra_2')">
+              <span class="lbl" data-prost-label="extra2">Module 2</span>
+              <span class="val" id="dsp-prothese_extra_2-nom">—</span>
+              <span class="val-type" id="dsp-prothese_extra_2-type"></span>
+              <span class="val-effet" id="dsp-prothese_extra_2-effet"></span>
+            </div>
+            <div class="prost-slot prost-extra-square" id="sl-prothese_extra_3" data-slot-key="prothese_extra_3" onclick="open_('prothese_extra_3')">
+              <span class="lbl" data-prost-label="extra3">Module 3</span>
+              <span class="val" id="dsp-prothese_extra_3-nom">—</span>
+              <span class="val-type" id="dsp-prothese_extra_3-type"></span>
+              <span class="val-effet" id="dsp-prothese_extra_3-effet"></span>
+            </div>
+            <div class="prost-slot prost-extra-square" id="sl-prothese_extra_4" data-slot-key="prothese_extra_4" onclick="open_('prothese_extra_4')">
+              <span class="lbl" data-prost-label="extra4">Module 4</span>
+              <span class="val" id="dsp-prothese_extra_4-nom">—</span>
+              <span class="val-type" id="dsp-prothese_extra_4-type"></span>
+              <span class="val-effet" id="dsp-prothese_extra_4-effet"></span>
+            </div>
+            <div class="prost-slot prost-extra-square" id="sl-prothese_extra_5" data-slot-key="prothese_extra_5" onclick="open_('prothese_extra_5')">
+              <span class="lbl" data-prost-label="extra5">Module 5</span>
+              <span class="val" id="dsp-prothese_extra_5-nom">—</span>
+              <span class="val-type" id="dsp-prothese_extra_5-type"></span>
+              <span class="val-effet" id="dsp-prothese_extra_5-effet"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -408,7 +548,23 @@
     </div>
   </div>
 
-  <!-- PAGE COMPÉTENCES -->
+  
+  <div id="custom-inventory-page" class="custom-inventory-page" style="display:none;">
+    <div class="custom-inventory-head">
+      <span data-i18n="inventory.customTitle">Inventaire personnalisé</span>
+    </div>
+    <div id="custom-inventory-grid" class="custom-inventory-grid"></div>
+  </div>
+
+  <div id="rings-float" class="rings-float">
+    <div class="rings-float-head">
+      <span data-i18n="inventory.rings">Anneaux</span>
+      <button class="btn-sm" onclick="closeRingsPanel()">×</button>
+    </div>
+    <div id="rings-float-grid" class="rings-float-grid"></div>
+  </div>
+
+<!-- PAGE COMPÉTENCES -->
   <div id="page-competences" class="page">
     <div class="comp-layout">
 
@@ -1029,7 +1185,7 @@
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
-          <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+<div class="param-cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
 
             <!-- Stats d'Armure -->
             <div class="param-col">
@@ -1074,6 +1230,85 @@
             </div>
 
           </div>
+
+
+          <div class="inventory-param-v2">
+            <div class="param-section-title" data-i18n="params.inventoryLayout">Inventaire</div>
+
+            <div class="inventory-param-row">
+              <label class="param-toggle-lbl" data-i18n="params.inventoryMode">Mode d’inventaire</label>
+              <select class="param-select" id="cfg-inventory-mode" onchange="setInventoryMode(this.value)">
+                <option value="default" data-i18n="params.inventoryDefault">Inventaire par défaut</option>
+                <option value="custom" data-i18n="params.inventoryCustom">Inventaire personnalisé</option>
+              </select>
+            </div>
+
+            <div class="param-info" data-i18n="params.inventoryCustomInfo">
+              En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.
+            </div>
+
+            <div class="inventory-param-row">
+              <input class="param-input" id="custom-slot-label-input" type="text" placeholder="Nom de la case">
+              <button class="param-add-btn" onclick="addCustomInventorySlot()" data-i18n="params.addCustomSlot">Ajouter une case</button>
+            </div>
+
+            <div id="custom-slot-param-list" class="custom-slot-param-list"></div>
+
+            <div class="param-section-title" data-i18n="params.renameInventorySpecials">Renommer les sections spéciales</div>
+
+            <div class="inventory-special-label-row">
+              <input class="param-input" id="cfg-label-rings" type="text" placeholder="Anneaux" oninput="saveInventorySpecialLabel('rings', this.value)">
+              <input class="param-input" id="cfg-label-prostheses" type="text" placeholder="Prothèses" oninput="saveInventorySpecialLabel('prostheses', this.value)">
+            </div>
+
+            <div class="param-section-title" data-i18n="params.renameProsthesisCapsules">Renommer les capsules de prothèses</div>
+
+            <div class="prost-label-layout-v2">
+              <div class="prost-label-group">
+                <div class="prost-label-group-title" data-i18n="prostheses.groupHead">Tête</div>
+                <input class="param-input" id="cfg-prost-tete" placeholder="Tête" oninput="saveProsthesisLabel('tete', this.value)">
+                <div class="prost-label-two">
+                  <input class="param-input" id="cfg-prost-oeilG" placeholder="Œil gauche" oninput="saveProsthesisLabel('oeilG', this.value)">
+                  <input class="param-input" id="cfg-prost-oeilD" placeholder="Œil droit" oninput="saveProsthesisLabel('oeilD', this.value)">
+                </div>
+              </div>
+
+              <div class="prost-label-group">
+                <div class="prost-label-group-title" data-i18n="prostheses.groupArmsBody">Bras / Corps</div>
+                <div class="prost-label-three">
+                  <input class="param-input" id="cfg-prost-brasG" placeholder="Bras gauche" oninput="saveProsthesisLabel('brasG', this.value)">
+                  <input class="param-input" id="cfg-prost-corps" placeholder="Corps" oninput="saveProsthesisLabel('corps', this.value)">
+                  <input class="param-input" id="cfg-prost-brasD" placeholder="Bras droit" oninput="saveProsthesisLabel('brasD', this.value)">
+                </div>
+                <div class="prost-label-two">
+                  <input class="param-input" id="cfg-prost-mainG" placeholder="Main gauche" oninput="saveProsthesisLabel('mainG', this.value)">
+                  <input class="param-input" id="cfg-prost-mainD" placeholder="Main droite" oninput="saveProsthesisLabel('mainD', this.value)">
+                </div>
+              </div>
+
+              <div class="prost-label-group">
+                <div class="prost-label-group-title" data-i18n="prostheses.groupLegs">Jambes</div>
+                <div class="prost-label-two">
+                  <input class="param-input" id="cfg-prost-jambeG" placeholder="Jambe gauche" oninput="saveProsthesisLabel('jambeG', this.value)">
+                  <input class="param-input" id="cfg-prost-jambeD" placeholder="Jambe droite" oninput="saveProsthesisLabel('jambeD', this.value)">
+                </div>
+              </div>
+
+              <div class="prost-label-group">
+                <div class="prost-label-group-title" data-i18n="prostheses.groupModules">Modules</div>
+                <div class="prost-label-five">
+                  <input class="param-input" id="cfg-prost-extra1" placeholder="Module 1" oninput="saveProsthesisLabel('extra1', this.value)">
+                  <input class="param-input" id="cfg-prost-extra2" placeholder="Module 2" oninput="saveProsthesisLabel('extra2', this.value)">
+                  <input class="param-input" id="cfg-prost-extra3" placeholder="Module 3" oninput="saveProsthesisLabel('extra3', this.value)">
+                  <input class="param-input" id="cfg-prost-extra4" placeholder="Module 4" oninput="saveProsthesisLabel('extra4', this.value)">
+                  <input class="param-input" id="cfg-prost-extra5" placeholder="Module 5" oninput="saveProsthesisLabel('extra5', this.value)">
+                </div>
+              </div>
+
+              <button class="param-reset-btn prost-label-reset" onclick="resetProsthesisLabels()" data-i18n="params.resetProsthesisLabels">Réinitialiser les noms de prothèses</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1116,6 +1351,10 @@
 
     </div><!-- end param-layout -->
 
+    
+      
+
+
     <!-- Reset global -->
     <div class="param-reset-global-row">
       <button class="param-reset-btn" onclick="resetAllParams()" data-i18n="params.resetAllParams">
@@ -1129,8 +1368,8 @@
   </div><!-- end page-parametres -->
 
 </div><!-- end app -->
+<div class="site-legal" data-i18n="legal.text"></div>
 </div><!-- end aspect-wrap -->
-
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">
   <div class="modal">
@@ -1211,7 +1450,6 @@
 </div>
 
 
-<div class="site-legal" data-i18n="legal.text"></div>
 
 </body>
 </html>
