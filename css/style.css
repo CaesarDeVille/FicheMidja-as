@@ -3069,3 +3069,12 @@ select::-ms-expand {
 .site-legal.visible {
   opacity: .62;
 }
+
+
+
+/* === Campaign spectator mode === */
+.spectator-bar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(980px,calc(100vw - 24px));z-index:10000;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid var(--border2);border-radius:10px;background:rgba(20,17,14,.96);box-shadow:0 10px 30px rgba(0,0,0,.45);color:var(--txt);backdrop-filter:blur(4px)}
+.spectator-bar-main{display:flex;flex-direction:column;gap:2px;min-width:0}.spectator-bar-main strong{color:var(--gold);font-size:14px;letter-spacing:.5px}.spectator-bar-main span{color:var(--muted);font-size:12px}.spectator-close{border-color:var(--gold);color:var(--gold);white-space:nowrap}
+body.spectator-mode{padding-top:58px}body.spectator-mode .tb-right,body.spectator-mode #page-campagne .campaign-panel:nth-child(2) .campaign-rename-row,body.spectator-mode #page-campagne .campaign-panel:nth-child(2) .btn-sm.danger,body.spectator-mode #page-campagne .campaign-panel:nth-child(2) .campaign-row,body.spectator-mode #page-parametres{display:none!important}
+body.spectator-mode input,body.spectator-mode textarea,body.spectator-mode select{pointer-events:none}body.spectator-mode .slot,body.spectator-mode .ring-mini,body.spectator-mode .prost-slot,body.spectator-mode .free-cell,body.spectator-mode .sort-cell,body.spectator-mode .cap-item{cursor:help!important}body.spectator-mode .nav-bar,body.spectator-mode .nav-btn,body.spectator-mode .slot,body.spectator-mode .ring-mini,body.spectator-mode .prost-slot,body.spectator-mode .free-cell,body.spectator-mode .sort-cell{pointer-events:auto}
+@media(max-width:700px){.spectator-bar{top:6px;align-items:stretch;flex-direction:column;gap:8px}body.spectator-mode{padding-top:96px}}

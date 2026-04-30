@@ -120,8 +120,14 @@ function loadData() {
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
 }
 
-function persist() { localStorage.setItem('dnd_inv', JSON.stringify(data)); }
-function saveData() { persist(); toast(uiT('toast.saved','Sauvegardé !')); }
+function persist() {
+  if (window.__midjaasSpectatorActive) return;
+  localStorage.setItem('dnd_inv', JSON.stringify(data));
+}
+function saveData() {
+  if (window.__midjaasSpectatorActive) { toast(uiT('spectator.readOnly','Mode spectateur : lecture seule.')); return; }
+  persist(); toast(uiT('toast.saved','Sauvegardé !'));
+}
 
 function exportData() {
   // Collect current theme values.
@@ -617,6 +623,7 @@ function refresh() {
 }
 
 function open_(key, speLabel) {
+  if (window.__midjaasSpectatorActive) { toast(uiT('spectator.rightClickOnly','Mode spectateur : clic droit pour voir l’infobulle.')); return; }
   curSlot = key;
   const label = key.startsWith('bag_') ? 'Sac — Emplacement ' + (+key.split('_')[1] + 1)
     : key.startsWith('poche_') ? 'Poche ' + (+key.split('_')[1] + 1)
@@ -2296,6 +2303,7 @@ function renderSavoirs() {
 
 /* ── Free modal (coup / savoir) ── */
 function openFreeModal(type, idx, current) {
+  if (window.__midjaasSpectatorActive) { toast(uiT('spectator.rightClickOnly','Mode spectateur : clic droit pour voir l’infobulle.')); return; }
   curFreeType = type; curFreeIdx = idx; curSlot = null; curSortKey = null;
   document.getElementById('modalTitle').textContent = type === 'coup' ? getCatLabel('coups') : getCatLabel('savoirs');
   document.getElementById('fNom').value   = current.nom   || '';
@@ -2422,6 +2430,7 @@ function swapSlots(keyA, keyB) {
 }
 
 function makeDraggable(el, key) {
+  if (window.__midjaasSpectatorActive) { el.draggable = false; return; }
   el.draggable = true;
   el.addEventListener('dragstart', e => {
     dragSrcKey = key;
@@ -4265,7 +4274,7 @@ function renderGmPlayerCard(p) {
         <div class="campaign-player-name-v2">${escapeHtml(p.name || code)}</div>
         <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
       </div>
-      <button class="btn-sm" onclick="gmLoadPlayerSheet('${code}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
+      <button class="btn-sm" onclick="gmOpenSpectatorSheet('${code}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
       <button class="btn-sm danger" onclick="gmKickPlayer('${code}')">${uiT('campaign.kick','Expulser')}</button>
     </div>
   `;
@@ -4331,6 +4340,105 @@ async function gmLoadPlayerSheet(playerCode) {
     toast(uiT('toast.firebaseLoadError','Erreur chargement Firebase'));
   }
 }
+
+
+/* === CAMPAIGN SPECTATOR MODE === */
+let __midjaasSpectatorBackup = null;
+let __midjaasSpectatorPage = 'campagne';
+
+function clonePlain(obj) { try { return JSON.parse(JSON.stringify(obj || {})); } catch (e) { return {}; } }
+function getActivePageName() { const active = document.querySelector('.page.active'); return active?.id?.replace(/^page-/, '') || 'fiche'; }
+
+function ensureSpectatorBar() {
+  let bar = document.getElementById('spectator-bar');
+  if (bar) return bar;
+  bar = document.createElement('div');
+  bar.id = 'spectator-bar';
+  bar.className = 'spectator-bar';
+  bar.innerHTML = `<div class="spectator-bar-main"><strong id="spectator-title">${uiT('spectator.title','Mode spectateur')}</strong><span id="spectator-subtitle">${uiT('spectator.info','Lecture seule · clic droit pour les infobulles')}</span></div><button class="btn-sm spectator-close" onclick="closeSpectatorSheet()">${uiT('spectator.close','Fermer')}</button>`;
+  document.body.appendChild(bar);
+  return bar;
+}
+
+function refreshAllAfterDataSwap() {
+  const bag = document.getElementById('bagSize'); if (bag) bag.value = data._bagSize || 'sacoche';
+  if (typeof preloadFicheImages === 'function') preloadFicheImages();
+  if (typeof buildBag === 'function') buildBag();
+  if (typeof buildPoche === 'function') buildPoche();
+  if (typeof buildSpe === 'function') buildSpe();
+  if (typeof refresh === 'function') refresh();
+  if (typeof loadChar === 'function') loadChar();
+  if (typeof renderFiche === 'function') renderFiche();
+  if (typeof renderCompetences === 'function') renderCompetences();
+  if (typeof renderCapital === 'function') renderCapital();
+  if (typeof applyStatLabels === 'function') applyStatLabels();
+  if (typeof applyCharLabels === 'function') applyCharLabels();
+  if (typeof applyCatLabels === 'function') applyCatLabels();
+  if (typeof applyMagieSetting === 'function') applyMagieSetting();
+  if (typeof applyParamShow === 'function') applyParamShow();
+  if (typeof applyStatSplits === 'function') applyStatSplits();
+  if (typeof applyEffetsPlus === 'function') applyEffetsPlus();
+  if (typeof applySlotLabels === 'function') applySlotLabels();
+  if (typeof applyFicheSectionLabels === 'function') applyFicheSectionLabels();
+  if (typeof applyAllQualityColors === 'function') applyAllQualityColors();
+  if (typeof buildBourseRows === 'function') buildBourseRows();
+  if (typeof refreshArmorStats === 'function') refreshArmorStats();
+  if (typeof initInventoryRefactor === 'function') initInventoryRefactor();
+  if (typeof initProsthesesSystem === 'function') initProsthesesSystem();
+  if (typeof updateTbNom === 'function') updateTbNom();
+}
+
+function setSpectatorReadonlyDom() {
+  document.body.classList.toggle('spectator-mode', !!window.__midjaasSpectatorActive);
+  if (!window.__midjaasSpectatorActive) return;
+  document.querySelectorAll('input, textarea, select').forEach(el => {
+    if (el.closest('#spectator-bar')) return;
+    el.setAttribute('readonly', 'readonly');
+    if (el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio' || el.type === 'file') el.setAttribute('disabled', 'disabled');
+  });
+}
+
+async function gmOpenSpectatorSheet(playerCode) {
+  const code = normalizeSaveCode(playerCode);
+  if (!code) return;
+  try {
+    const snap = await campaignRef('saves/' + code).get();
+    if (!snap.exists()) { toast(uiT('toast.noSaveFound','Aucune sauvegarde trouvée')); return; }
+    let loaded = snap.val();
+    if (loaded && typeof loaded === 'object' && typeof loaded.payloadJson === 'string') loaded = JSON.parse(loaded.payloadJson);
+    if (!loaded || typeof loaded !== 'object') { toast(uiT('toast.invalidSave','Sauvegarde invalide')); return; }
+    if (!window.__midjaasSpectatorActive) { __midjaasSpectatorBackup = clonePlain(data); __midjaasSpectatorPage = getActivePageName(); }
+    window.__midjaasSpectatorActive = true;
+    data = clonePlain(loaded);
+    data._firebaseSaveCode = code;
+    ensureSpectatorBar();
+    document.body.classList.add('spectator-mode');
+    const title = document.getElementById('spectator-title');
+    const subtitle = document.getElementById('spectator-subtitle');
+    if (title) title.textContent = uiT('spectator.title','Mode spectateur') + ' — ' + (data._char?.nom || formatSaveCode(code));
+    if (subtitle) subtitle.textContent = uiT('spectator.info','Lecture seule · clic droit pour les infobulles') + ' · ' + formatSaveCode(code);
+    refreshAllAfterDataSwap();
+    showPage('fiche');
+    setSpectatorReadonlyDom();
+    toast(uiT('spectator.opened','Fiche ouverte en spectateur'));
+  } catch (err) { console.error(err); toast(uiT('toast.firebaseLoadError','Erreur chargement Firebase')); }
+}
+
+function closeSpectatorSheet() {
+  if (!window.__midjaasSpectatorActive) return;
+  window.__midjaasSpectatorActive = false;
+  data = clonePlain(__midjaasSpectatorBackup || {});
+  __midjaasSpectatorBackup = null;
+  const bar = document.getElementById('spectator-bar'); if (bar) bar.remove();
+  document.body.classList.remove('spectator-mode');
+  document.querySelectorAll('input[readonly], textarea[readonly]').forEach(el => el.removeAttribute('readonly'));
+  document.querySelectorAll('select[disabled], input[disabled]').forEach(el => el.removeAttribute('disabled'));
+  refreshAllAfterDataSwap();
+  showPage(__midjaasSpectatorPage || 'campagne');
+  toast(uiT('spectator.closed','Mode spectateur fermé'));
+}
+
+window.addEventListener('keydown', ev => { if (ev.key === 'Escape' && window.__midjaasSpectatorActive) closeSpectatorSheet(); });
 
 async function gmKickPlayer(playerCode) {
   const campaignCode = normalizeCampaignCode(data._gmCampaignCode || '');
