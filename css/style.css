@@ -3,6 +3,7 @@
   --bg2:     #1e1008;
   --bg3:     #140c00;
   --slot-empty: #0a0600;
+  --spe-slot-empty: #070f16;
   --char-panel: #0a0600;
   --border:  #8b6914;
   --border2: #6a4a10;
@@ -3187,5 +3188,12 @@ body.spectator-mode input,body.spectator-mode textarea,body.spectator-mode selec
   }
   .campaign-player-cartouche-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  #page-inventaire .main-body::before,
+  #page-inventaire .main-body::after {
+    display: none;
   }
 }

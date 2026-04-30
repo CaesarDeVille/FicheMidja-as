@@ -1,5 +1,5 @@
 /* ── THEME ── */
-const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif",slotEmpty:'#0a0600',charPanel:'#0a0600'};
+const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif",slotEmpty:'#0a0600',speSlot:'#070f16',charPanel:'#0a0600'};
 
 function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
 function dk(h,f=.5){const[r,g,b]=hexToRgb(h);return`rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;}
@@ -15,6 +15,7 @@ function applyTheme(){
   const font=document.getElementById('tc-font').value;
   const slotEmpty=(document.getElementById('tc-slot-empty')?.value) || DEFAULTS.slotEmpty;
   const charPanel=(document.getElementById('tc-char-panel')?.value) || DEFAULTS.charPanel;
+  const speSlot=(document.getElementById('tc-spe-slot')?.value) || DEFAULTS.speSlot;
   const s=document.documentElement.style;
   s.setProperty('--bg',bg);
   s.setProperty('--bg2',bg2);
@@ -31,8 +32,9 @@ function applyTheme(){
   s.setProperty('--font',font);
   s.setProperty('--slot-empty',slotEmpty);
   s.setProperty('--char-panel',charPanel);
+  s.setProperty('--spe-slot-empty',speSlot);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,charPanel}));
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,speSlot,charPanel}));
 }
 
 function resetTheme(){
@@ -43,6 +45,7 @@ function resetTheme(){
   document.getElementById('tc-border').value=DEFAULTS.border;
   document.getElementById('tc-font').value=DEFAULTS.font;
   const se=document.getElementById('tc-slot-empty'); if(se) se.value=DEFAULTS.slotEmpty;
+  const ss=document.getElementById('tc-spe-slot'); if(ss) ss.value=DEFAULTS.speSlot;
   const cp=document.getElementById('tc-char-panel'); if(cp) cp.value=DEFAULTS.charPanel;
   applyTheme();
 }
@@ -58,6 +61,7 @@ function loadTheme(){
       if(t.border)document.getElementById('tc-border').value=t.border;
       if(t.font)document.getElementById('tc-font').value=t.font;
       const se=document.getElementById('tc-slot-empty'); if(se&&t.slotEmpty) se.value=t.slotEmpty;
+      const ss=document.getElementById('tc-spe-slot'); if(ss&&t.speSlot) ss.value=t.speSlot;
       const cp=document.getElementById('tc-char-panel'); if(cp&&t.charPanel) cp.value=t.charPanel;
     }
   }catch(e){}
@@ -135,7 +139,7 @@ function exportData() {
   // not only values manually changed inline.
   const root = document.documentElement;
   const cs = getComputedStyle(root);
-  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--char-panel'];
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel'];
   const theme = {};
   themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
 
@@ -191,6 +195,7 @@ function importData(e) {
         '--text':'tc-text',
         '--border':'tc-border',
         '--slot-empty':'tc-slot-empty',
+        '--spe-slot-empty':'tc-spe-slot',
         '--char-panel':'tc-char-panel'
       };
 
@@ -237,6 +242,7 @@ function importData(e) {
           border: t['--border'] || '',
           font: parsed._exportFont || '',
           slotEmpty: t['--slot-empty'] || '',
+          speSlot: t['--spe-slot-empty'] || '',
           charPanel: t['--char-panel'] || ''
         }));
       }
@@ -433,6 +439,7 @@ function buildBag() {
       el.id = 'sl-' + k;
       el.dataset.slotKey = k;
       el.style.borderLeft = '3px solid #4a6a8a';
+      el.style.background = d?.nom ? 'var(--bg3)' : 'var(--spe-slot-empty)';
       el.innerHTML = d?.nom
         ? `<span style="color:var(--text)">${d.nom}</span>${d.type ? `<span style="color:#9a9a9a;margin-left:6px;font-size:10px;">${d.type}</span>` : ''}`
         : `<span style="color:#4a7a9a;font-style:italic;">${label}</span>`;
@@ -3657,7 +3664,7 @@ function firebaseRef(path) {
 function makeFirebaseSavePayload() {
   const root = document.documentElement;
   const cs = getComputedStyle(root);
-  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--char-panel'];
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel'];
   const theme = {};
   themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
 
@@ -3826,7 +3833,7 @@ async function firebaseLoadByCode() {
       const t = data._exportTheme;
       Object.entries(t).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
       if (data._exportFont) root.style.setProperty('--font', data._exportFont);
-      const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--char-panel':'tc-char-panel'};
+      const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--spe-slot-empty':'tc-spe-slot','--char-panel':'tc-char-panel'};
       Object.entries(pickers).forEach(([cssVar, id]) => { const el = document.getElementById(id); if (el && t[cssVar]) el.value = t[cssVar]; });
       const fontEl = document.getElementById('tc-font'); if (fontEl && data._exportFont) fontEl.value = data._exportFont;
     }
