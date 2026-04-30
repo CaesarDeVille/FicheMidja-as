@@ -4215,14 +4215,114 @@ async function renderPlayerCampaignList(campaignCode = data._campaignCode) {
     return;
   }
 
-  list.innerHTML = entries.map(p => renderCampaignPlayerAccordion(p, { gm: false })).join('');
+  const hydrated = await Promise.all(entries.map(p => hydrateCampaignPlayerPreview(p)));
+  list.innerHTML = hydrated.map(p => renderCampaignPlayerAccordion(p, { gm: false })).join('');
+}
+
+async function hydrateCampaignPlayerPreview(p) {
+  const code = normalizeSaveCode(p?.playerCode || p?.code || p?.saveCode);
+  const base = { ...(p || {}), playerCode: code };
+  if (!code) return base;
+
+  try {
+    const ref = campaignRef('saves/' + code);
+    if (!ref) return base;
+    const snap = await ref.get();
+    if (!snap.exists()) return base;
+
+    let loaded = snap.val();
+    if (loaded && typeof loaded === 'object' && typeof loaded.payloadJson === 'string') loaded = JSON.parse(loaded.payloadJson);
+    if (!loaded || typeof loaded !== 'object') return base;
+
+    const c = loaded._char || {};
+    const armorStats = loaded.armure?.armorStats || {};
+    return {
+      ...base,
+      name: c.nom || base.name || code,
+      preview: {
+        labels: {
+          char: loaded._charLabels || {},
+          stat: loaded._statLabels || {},
+          armor: loaded._armorLabels || {},
+          armorEnabled: loaded._armorEnabled || {}
+        },
+        nom: c.nom || base.name || code,
+        race: c.race || '',
+        age: c.age || '',
+        naissance: c.naiss || '',
+        pv: c.pv || '',
+        pvMax: c['pv-max'] || '',
+        pa: c.pa || '',
+        paMax: c['pa-max'] || '',
+        ps: c.ps || '',
+        psMax: c['ps-max'] || '',
+        pe: c.pe || '',
+        peMax: c['pe-max'] || '',
+        dsnc: c.dsnc || '',
+        dsncMax: c['dsnc-max'] || '',
+        armorStats
+      }
+    };
+  } catch (err) {
+    console.warn('Aperçu joueur indisponible', code, err);
+    return base;
+  }
+}
+
+function formatPreviewPair(cur, max) {
+  const a = String(cur ?? '').trim();
+  const b = String(max ?? '').trim();
+  if (a && b) return `${a} / ${b}`;
+  return a || b || '—';
+}
+
+function renderCampaignPreviewField(label, value) {
+  return `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value || '—')}</strong></div>`;
+}
+
+function getCampaignPreviewCharLabel(preview, key) {
+  return preview?.labels?.char?.[key] || CHAR_LABEL_DEFAULTS[key] || key;
+}
+
+function getCampaignPreviewStatLabel(preview, key) {
+  return preview?.labels?.stat?.[key] || key.toUpperCase();
+}
+
+function getCampaignPreviewArmorLabel(preview, key) {
+  return preview?.labels?.armor?.[key] || ARMOR_STATS.find(s => s.key === key)?.defaultLabel || key.toUpperCase();
+}
+
+function isCampaignPreviewArmorEnabled(preview, key) {
+  const enabled = preview?.labels?.armorEnabled;
+  if (!enabled || enabled[key] === undefined) return key !== 'edpl';
+  return !!enabled[key];
 }
 
 function renderCampaignPlayerAccordion(p, options = {}) {
   const code = normalizeSaveCode(p.playerCode || p.code || p.saveCode);
-  const name = escapeHtml(p.name || code || uiT('campaign.defaultName','Campagne sans nom'));
+  const preview = p.preview || {};
+  const displayName = preview.nom || p.name || code || uiT('campaign.defaultName','Campagne sans nom');
+  const name = escapeHtml(displayName);
   const safeCode = escapeHtml(code);
   const gmActions = options.gm ? `<button class="btn-sm danger" onclick="gmKickPlayer('${safeCode}')">${uiT('campaign.kick','Expulser')}</button>` : '';
+
+  const armorStats = preview.armorStats || {};
+  const armorFields = ARMOR_STATS
+    .filter(s => isCampaignPreviewArmorEnabled(preview, s.key))
+    .map(({ key }) => renderCampaignPreviewField(getCampaignPreviewArmorLabel(preview, key), armorStats[key]));
+
+  const cartouche = [
+    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'nom'), preview.nom || p.name || code),
+    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'race'), preview.race),
+    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'age'), preview.age),
+    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'naiss'), preview.naissance),
+    renderCampaignPreviewField(getCampaignPreviewStatLabel(preview, 'pv'), formatPreviewPair(preview.pv, preview.pvMax)),
+    renderCampaignPreviewField(getCampaignPreviewStatLabel(preview, 'pa'), formatPreviewPair(preview.pa, preview.paMax)),
+    renderCampaignPreviewField(getCampaignPreviewStatLabel(preview, 'ps'), formatPreviewPair(preview.ps, preview.psMax)),
+    renderCampaignPreviewField(getCampaignPreviewStatLabel(preview, 'pe'), formatPreviewPair(preview.pe, preview.peMax)),
+    renderCampaignPreviewField(getCampaignPreviewStatLabel(preview, 'dsnc'), formatPreviewPair(preview.dsnc, preview.dsncMax)),
+    ...armorFields
+  ].join('');
 
   return `
     <div class="campaign-player-accordion" data-player="${safeCode}">
@@ -4233,12 +4333,12 @@ function renderCampaignPlayerAccordion(p, options = {}) {
       </button>
       <div class="campaign-player-accordion-body">
         <div class="campaign-player-card-v3 campaign-player-cartouche">
-          <div class="campaign-player-main">
-            <div class="campaign-player-name-v2">${name}</div>
-            <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
+          <div class="campaign-player-cartouche-title">${name}</div>
+          <div class="campaign-player-cartouche-grid">${cartouche}</div>
+          <div class="campaign-player-actions">
+            <button class="btn-sm" onclick="gmOpenSpectatorSheet('${safeCode}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
+            ${gmActions}
           </div>
-          <button class="btn-sm" onclick="gmOpenSpectatorSheet('${safeCode}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
-          ${gmActions}
         </div>
       </div>
     </div>
@@ -4267,7 +4367,7 @@ async function renderManagedCampaigns() {
     const campaignCode = normalizeCampaignCode(entry.campaignCode);
     const camp = await getCampaignData(campaignCode);
     const name = getCampaignName(camp || entry);
-    const players = Object.values(camp?.players || {});
+    const players = await Promise.all(Object.values(camp?.players || {}).map(p => hydrateCampaignPlayerPreview(p)));
     const isOpen = data._gmCampaignCode === campaignCode;
 
     chunks.push(`
