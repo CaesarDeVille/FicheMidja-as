@@ -2399,80 +2399,27 @@ select::-ms-expand {
 }
 
 
-/* === RINGS V2 : draggable panel + summary mode === */
-.rings-summary {
-  flex: 1;
-  min-height: 44px;
-  border: 1px dashed var(--border2);
-  border-radius: 4px;
-  background: rgba(0,0,0,.14);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--gold);
-  cursor: pointer;
-  user-select: none;
+/* === RINGS + PROSTHESES : cleaned stable layer === */
+
+/* Anneaux : résumé cliquable dans la case d'équipement */
+.slot-rings {
+  min-height: 116px;
 }
 
-.rings-summary-symbol {
-  font-size: 24px;
-  line-height: 1;
-  opacity: .9;
-}
-
-.rings-summary-text {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.rings-summary-count {
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-
-.rings-summary-hint {
-  font-size: 10px;
-  color: var(--muted);
-  font-style: italic;
-}
-
-.rings-float-head {
-  cursor: move;
-  user-select: none;
-}
-
-.rings-float.dragging-window {
-  opacity: .92;
-  box-shadow: 0 22px 55px rgba(0,0,0,.78);
-}
-
-.rings-float-grid .ring-mini {
-  cursor: grab;
-}
-
-.rings-float-grid .ring-mini:active {
-  cursor: grabbing;
-}
-
-
-/* === RINGS V3 + PROSTHESES PANEL === */
-
-/* anneaux : symbole centré en fond de case */
 .slot-rings .rings-inline {
   place-items: center;
 }
 
 .rings-summary {
   position: absolute;
-  inset: 30px 8px 8px 8px;
-  border: none !important;
-  background: transparent !important;
+  inset: 34px 8px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
 }
 
 .rings-summary-symbol {
@@ -2483,29 +2430,141 @@ select::-ms-expand {
   justify-content: center;
   font-size: clamp(42px, 5vw, 72px);
   line-height: 1;
-  opacity: .18;
   color: var(--gold);
+  opacity: .18;
+  pointer-events: none;
 }
 
 .rings-summary-text {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 9px;
   background: rgba(0,0,0,.22);
   border: 1px solid var(--border2);
   border-radius: 4px;
-  padding: 5px 9px;
 }
 
 .rings-summary-count {
   color: var(--gold);
   font-size: 13px;
+  letter-spacing: 1px;
 }
 
 .rings-summary-hint {
   color: var(--muted);
   font-size: 10px;
+  font-style: italic;
 }
 
+.rings-inline.count-1,
+.rings-inline.count-2,
+.rings-inline.count-4 {
+  align-items: center;
+  justify-items: center;
+}
+
+.rings-inline.count-1 .ring-mini,
+.rings-inline.count-2 .ring-mini,
+.rings-inline.count-4 .ring-mini {
+  width: min(58px, 100%);
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.ring-mini {
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+
+.ring-mini:hover {
+  transform: translateY(-1px) scale(1.02);
+  border-color: var(--gold);
+  background:
+    radial-gradient(circle at center, rgba(240,192,64,.12), transparent 70%),
+    rgba(0,0,0,.18);
+  box-shadow:
+    0 0 12px rgba(240,192,64,.18),
+    inset 0 0 10px rgba(240,192,64,.05);
+}
+
+/* Fenêtre anneaux : déplacement stable sans bloquer les contrôles internes */
+.rings-float {
+  z-index: 10000;
+  user-select: none;
+  cursor: move;
+}
+
+.rings-float.dragging-window {
+  opacity: .92;
+  box-shadow: 0 22px 55px rgba(0,0,0,.78);
+}
+
+.rings-float-head {
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.rings-float .ring-mini,
+.rings-inline .ring-mini {
+  pointer-events: auto;
+}
+
+.rings-float .ring-mini,
+.rings-float button,
+.rings-float input,
+.rings-float select,
+.rings-float textarea {
+  cursor: auto;
+}
+
+.rings-float .ring-mini,
+.rings-float-grid .ring-mini {
+  cursor: grab;
+}
+
+.rings-float .ring-mini:active,
+.rings-float-grid .ring-mini:active {
+  cursor: grabbing;
+}
+
+/* Équipement : dimensions finales nettoyées */
+:root {
+  --equip-large-slot-h: 210px;
+  --equip-main-weapon-h: 225px;
+}
+
+.slot-dos,
+.slot-epaule,
+.slot-ceintG,
+.slot-ceintD {
+  min-height: var(--equip-large-slot-h);
+}
+
+.slot-arme {
+  flex-basis: var(--equip-main-weapon-h);
+  min-height: var(--equip-main-weapon-h);
+  height: var(--equip-main-weapon-h);
+  transform: none;
+}
+
+.slot-arme:hover {
+  transform: translateY(-1px);
+}
+
+.slot-arme:active {
+  transform: scale(.99);
+}
+
+/* Prothèses : panneau superposé à la colonne équipement */
 .col-equip {
   position: relative;
 }
@@ -2547,16 +2606,16 @@ select::-ms-expand {
   top: 0;
   left: 0;
   right: 0;
-  /* laisse le cartouche joueur accessible en bas */
   bottom: 152px;
+  box-sizing: border-box;
+  padding: 8px;
+  overflow: hidden;
   background:
     linear-gradient(180deg, rgba(240,192,64,.035), transparent),
     var(--bg2);
   border: 1.5px solid var(--gold);
   border-radius: 6px;
   box-shadow: 0 18px 45px rgba(0,0,0,.68);
-  padding: 10px;
-  overflow: auto;
 }
 
 .prostheses-panel.open {
@@ -2566,6 +2625,7 @@ select::-ms-expand {
 }
 
 .prostheses-panel-head {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2573,14 +2633,95 @@ select::-ms-expand {
   letter-spacing: 1px;
   border-bottom: 1px solid var(--border2);
   padding-bottom: 6px;
-  flex-shrink: 0;
 }
 
 .prostheses-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(82px, 1fr);
+  gap: 8px;
+}
+
+.prost-main-col {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(0, 12fr) minmax(0, 12fr) minmax(0, 38fr) minmax(0, 38fr);
+  gap: 8px;
+}
+
+.prost-top-stack {
+  display: contents;
+}
+
+.prost-eyes-row,
+.prost-mid-row,
+.prost-legs-row {
+  min-height: 0;
+  height: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.prost-eyes-row,
+.prost-legs-row {
+  grid-template-columns: 1fr 1fr;
+}
+
+.prost-mid-row {
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr) minmax(0, .9fr);
+  align-items: stretch;
+}
+
+.prost-arm-col {
+  position: relative;
+  min-height: 0;
+  height: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+}
+
+.prost-side-col {
+  position: relative;
   min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding-left: 10px;
+}
+
+.prost-side-col::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(240,192,64,.48), transparent);
+}
+
+.prost-slot,
+.prost-head,
+.prost-eye,
+.prost-limb,
+.prost-body,
+.prost-leg,
+.prost-extra-square {
+  position: relative;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+}
+
+/* Bras : s'étire pour remplir toute la hauteur de la colonne (= torse) */
+.prost-limb {
   flex: 1;
 }
 
@@ -2589,13 +2730,13 @@ select::-ms-expand {
   background: var(--slot-empty);
   border-radius: 4px;
   padding: 7px 8px;
-  min-height: 48px;
   overflow: hidden;
   cursor: pointer;
-  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
+  text-align: center;
   transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
 }
 
@@ -2621,172 +2762,9 @@ select::-ms-expand {
   font-size: 13px;
 }
 
-.prost-head {
-  min-height: 52px;
-}
-
-.prost-eyes-row,
-.prost-legs-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.prost-eye {
-  min-height: 48px;
-}
-
-.prost-mid-row {
-  display: grid;
-  grid-template-columns: 1fr 1.12fr 1fr;
-  gap: 8px;
-  flex: 1;
-  min-height: 0;
-}
-
-.prost-arm-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
-
-
-.prost-limb,
-.prost-body,
-.prost-leg {
-  min-height: 86px;
-  flex: 1;
-}
-
-.prost-body {
-  min-height: 150px;
-}
-
-
-
-@media (max-width: 900px) {
-  .prostheses-panel {
-    bottom: 168px;
-  }
-}
-
-
-/* === PROTHESES V2 LAYOUT + RING SQUARE FIX === */
-
-/* Anneaux : garde des carrés quand 1/2/4 visibles */
-.slot-rings {
-  min-height: 116px;
-}
-
-.rings-inline.count-1,
-.rings-inline.count-2,
-.rings-inline.count-4 {
-  align-items: center;
-  justify-items: center;
-}
-
-.rings-inline.count-1 .ring-mini,
-.rings-inline.count-2 .ring-mini,
-.rings-inline.count-4 .ring-mini {
-  width: min(58px, 100%);
-  aspect-ratio: 1 / 1;
-  min-height: 0;
-  box-sizing: border-box;
-}
-
-/* Panneau prothèses : 80% colonne principale + colonne carrée */
-.prostheses-grid {
-  display: grid !important;
-  grid-template-columns: minmax(0, 4fr) minmax(82px, 1fr);
-  gap: 10px;
-  min-height: 0;
-  flex: 1;
-}
-
-.prost-main-col {
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  gap: 8px;
-  min-width: 0;
-  min-height: 0;
-}
-
-.prost-top-stack {
-  width: min(70%, 360px);
-  justify-self: center;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.prost-head {
-  min-height: 70px !important;
-}
-
-.prost-eyes-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.prost-eye {
-  min-height: 64px !important;
-}
-
-.prost-mid-row {
-  display: grid !important;
-  grid-template-columns: minmax(0, .82fr) minmax(0, 1.25fr) minmax(0, .82fr);
-  gap: 8px;
-  min-height: 0;
-}
-
-.prost-arm-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
-
-.prost-limb,
-.prost-body,
-.prost-leg {
-  flex: initial !important;
-}
-
-.prost-limb {
-  min-height: 112px !important;
-}
-
-.prost-body {
-  min-height: 138px !important;
-}
-
-
-.prost-legs-row {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.prost-leg {
-  min-height: 112px !important;
-}
-
-.prost-side-col {
-  display: grid;
-  grid-template-rows: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  align-content: start;
-  min-width: 0;
-}
-
 .prost-extra-square {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  min-height: 0 !important;
-  padding: 5px !important;
-  box-sizing: border-box;
+  aspect-ratio: auto;
+  padding: 5px;
 }
 
 .prost-extra-square .lbl {
@@ -2797,103 +2775,21 @@ select::-ms-expand {
   font-size: 11px;
 }
 
-@media (max-width: 900px) {
-  .prostheses-grid {
-    grid-template-columns: minmax(0, 4fr) minmax(76px, 1fr);
-  }
-
-  .prost-top-stack {
-    width: min(82%, 340px);
-  }
-
-  .prost-limb,
-  .prost-leg {
-    min-height: 96px !important;
-  }
-
-  .prost-body {
-    min-height: 120px !important;
-  }
+.prost-slot .val,
+.prost-slot .val-type,
+.prost-slot .val-effet {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
-
-/* === PROTHESES POLISH + RING HOVER + EQUIP HEIGHTS === */
-
-/* Anneaux visibles : carrés propres, hover plus clair */
-.ring-mini {
-  transition:
-    transform .16s ease,
-    border-color .16s ease,
-    box-shadow .16s ease,
-    background .16s ease;
+.slot-preview,
+.slot-preview * {
+  z-index: 9999;
 }
 
-.ring-mini:hover {
-  transform: translateY(-1px) scale(1.02);
-  border-color: var(--gold) !important;
-  background:
-    radial-gradient(circle at center, rgba(240,192,64,.12), transparent 70%),
-    rgba(0,0,0,.18);
-  box-shadow:
-    0 0 12px rgba(240,192,64,.18),
-    inset 0 0 10px rgba(240,192,64,.05);
-}
-
-/* Le symbole des anneaux reste centré dans la case */
-.slot-rings .rings-summary {
-  inset: 34px 8px 8px 8px;
-}
-
-.slot-rings .rings-summary-symbol {
-  pointer-events: none;
-}
-
-/* Prothèses : bras, corps et jambes de même hauteur */
-.prost-limb,
-.prost-body,
-.prost-leg {
-  min-height: 132px !important;
-}
-
-/* Colonne modules séparée par une ligne fine */
-.prost-side-col {
-  position: relative;
-  padding-left: 10px;
-}
-
-.prost-side-col::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 1px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(240,192,64,.48),
-    transparent
-  );
-}
-
-/* Arme en main : environ 2/3 de la hauteur des groupes Dos/Épaule/Ceintures */
-:root {
-  --equip-large-slot-h: 135px;
-}
-
-.slot-dos,
-.slot-epaule,
-.slot-ceintG,
-.slot-ceintD {
-  min-height: var(--equip-large-slot-h) !important;
-}
-
-.slot-arme {
-  flex-basis: calc(var(--equip-large-slot-h) * .66) !important;
-  min-height: calc(var(--equip-large-slot-h) * .66) !important;
-}
-
-/* Paramètres : grille de renommage prothèses */
 .prost-label-param-title {
   margin-top: 8px;
 }
@@ -2906,316 +2802,13 @@ select::-ms-expand {
 }
 
 @media (max-width: 900px) {
-  .prost-label-param-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .prostheses-panel { bottom: 168px; }
+  .prostheses-grid { grid-template-columns: minmax(0, 4fr) minmax(76px, 1fr); }
+  .prost-label-param-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 520px) {
-  .prost-label-param-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-/* === BUGFIX RINGS + PROSTHESES HEIGHTS === */
-
-/* Arme en main : plus grande, environ 2/3 du bloc total Dos/Épaule + Ceintures */
-.slot-arme {
-  flex-basis: 150px !important;
-  min-height: 150px !important;
-}
-
-/* Les quatre slots armement gardent une vraie présence */
-.slot-dos,
-.slot-epaule,
-.slot-ceintG,
-.slot-ceintD {
-  min-height: 210px !important;
-}
-
-/* Prothèses : bras/corps/jambes égalisés */
-.prost-limb,
-.prost-body,
-.prost-leg {
-  min-height: 170px !important;
-  height: 170px !important;
-  flex: 0 0 170px !important;
-}
-
-/* La ligne du milieu et la ligne jambes ont la même hauteur utile */
-.prost-mid-row,
-.prost-legs-row {
-  align-items: stretch !important;
-}
-
-/* Séparer main/bras divise la colonne sans agrandir le bloc global */
-
-
-
-.prost-arm-col .prost-limb {
-  min-height: 0 !important;
-  height: auto !important;
-  flex: initial !important;
-}
-
-
-/* Fenêtre anneaux : barre vraiment déplaçable */
-.rings-float-head {
-  cursor: move !important;
-  touch-action: none;
-}
-
-.rings-float {
-  user-select: none;
-}
-
-.rings-float .ring-mini {
-  user-select: none;
-}
-
-/* Infobulle / clic droit anneaux : les cartes restent interactives */
-.rings-float .ring-mini,
-.rings-inline .ring-mini {
-  pointer-events: auto !important;
-}
-
-
-/* === HEIGHT + RING PANEL DRAG FIX === */
-
-/* Demande : doubler la hauteur des prothèses principales */
-.prost-limb,
-.prost-body,
-.prost-leg {
-  min-height: 340px !important;
-  height: 340px !important;
-  flex: 0 0 340px !important;
-}
-
-
-
-/* Demande : doubler Arme en main */
-.slot-arme {
-  flex-basis: 300px !important;
-  min-height: 300px !important;
-}
-
-/* Fenêtre anneaux plus facile à déplacer */
-.rings-float {
-  cursor: move;
-}
-
-.rings-float .ring-mini,
-.rings-float button,
-.rings-float input,
-.rings-float select,
-.rings-float textarea {
-  cursor: auto;
-}
-
-.rings-float .ring-mini {
-  cursor: grab;
-}
-
-.rings-float .ring-mini:active {
-  cursor: grabbing;
-}
-
-.rings-float-head {
-  cursor: move !important;
-  touch-action: none !important;
-}
-
-
-/* === FINAL LAYOUT FIX === */
-
-/* proportions globales prothèses */
-.prost-main-col {
-  display: grid;
-  grid-template-rows: 12% 12% 38% 38%;
-  height: 100%;
-}
-
-.prost-top-stack {
-  display: contents;
-}
-
-/* ligne yeux */
-.prost-eyes-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-/* ligne bras/corps */
-.prost-mid-row {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  height: 100%;
-}
-
-/* ligne jambes */
-.prost-legs-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 100%;
-}
-
-/* mode main séparée */
-
-/* éviter overlap */
-.prost-slot {
-  height: 100% !important;
-  min-height: 0 !important;
-}
-
-/* Arme en main : 3/4 de sa taille actuelle */
-.slot-arme {
-  transform: scaleY(0.75);
-  transform-origin: top;
-}
-
-/* tooltip au dessus */
-.slot-preview,
-.slot-preview * {
-  z-index: 9999 !important;
-}
-
-.rings-float {
-  z-index: 1000 !important;
-}
-
-
-/* === PROTHESES LAYOUT REPAIR + ARME EN MAIN CLEAN === */
-
-/* Annule l'ancien scaleY qui aplatissait Arme en main */
-.slot-arme {
-  transform: none !important;
-  flex-basis: 225px !important;
-  min-height: 225px !important;
-  height: 225px !important;
-}
-
-.slot-arme:hover {
-  transform: translateY(-1px) !important;
-}
-
-.slot-arme:active {
-  transform: scale(.99) !important;
-}
-
-/* Le panneau Prothèses ne doit pas créer de scrollbar interne */
-.prostheses-panel {
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  padding: 8px !important;
-}
-
-.prostheses-panel.open {
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-.prostheses-panel-head {
-  flex: 0 0 auto !important;
-}
-
-/* Grille globale : prend exactement l'espace restant */
-.prostheses-grid {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
-  display: grid !important;
-  grid-template-columns: minmax(0, 4fr) minmax(82px, 1fr) !important;
-  gap: 8px !important;
-}
-
-/* Colonne principale : proportions propres via fr, pas en % + gaps */
-.prost-main-col {
-  height: 100% !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  display: grid !important;
-  grid-template-rows: minmax(0, 12fr) minmax(0, 12fr) minmax(0, 38fr) minmax(0, 38fr) !important;
-  gap: 8px !important;
-}
-
-/* display: contents conserve la structure sans ajouter de hauteur parasite */
-.prost-top-stack {
-  display: contents !important;
-}
-
-/* Chaque ligne reste dans sa fraction */
-.prost-eyes-row,
-.prost-mid-row,
-.prost-legs-row {
-  min-height: 0 !important;
-  height: auto !important;
-}
-
-.prost-eyes-row {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 8px !important;
-}
-
-.prost-mid-row {
-  display: grid !important;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr) minmax(0, .9fr) !important;
-  gap: 8px !important;
-  align-items: stretch !important;
-}
-
-.prost-legs-row {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 8px !important;
-}
-
-/* Les cases remplissent leur cellule, sans min-height héritée qui force l'overlap */
-.prost-slot,
-.prost-head,
-.prost-eye,
-.prost-limb,
-.prost-body,
-.prost-leg,
-
-.prost-arm-col {
-  position: relative !important;
-  min-height: 0 !important;
-  height: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 6px !important;
-}
-
-
-/* Colonne modules : pas de débordement, modules carrés autant que possible */
-.prost-side-col {
-  min-height: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
-  display: grid !important;
-  grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
-  gap: 8px !important;
-  padding-left: 10px !important;
-}
-
-.prost-extra-square {
-  aspect-ratio: auto !important;
-  min-height: 0 !important;
-  height: auto !important;
-}
-
-/* Sécurité : les valeurs longues ne poussent plus les cases */
-.prost-slot .val,
-.prost-slot .val-type,
-.prost-slot .val-effet {
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  .prost-label-param-grid { grid-template-columns: 1fr; }
 }
 
 
@@ -3455,7 +3048,7 @@ select::-ms-expand {
   text-align: left;
   font-size: 10px;
   color: var(--muted);
-  opacity: 0;
+  opacity: .62;
   line-height: 1.2;
   letter-spacing: .2px;
   white-space: nowrap;
