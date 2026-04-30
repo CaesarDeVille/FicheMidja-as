@@ -4298,13 +4298,41 @@ function isCampaignPreviewArmorEnabled(preview, key) {
   return !!enabled[key];
 }
 
+
+const __campaignPlayerCodeByToken = new Map();
+
+function makeCampaignPlayerToken() {
+  try {
+    if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+      const arr = new Uint32Array(2);
+      window.crypto.getRandomValues(arr);
+      return 'cp_' + arr[0].toString(36) + arr[1].toString(36);
+    }
+  } catch (e) {}
+  return 'cp_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+function registerCampaignPlayerCode(code) {
+  const clean = normalizeSaveCode(code);
+  if (!clean) return '';
+  const token = makeCampaignPlayerToken();
+  __campaignPlayerCodeByToken.set(token, clean);
+  return token;
+}
+
+function resolveCampaignPlayerCode(tokenOrCode) {
+  const raw = String(tokenOrCode || '');
+  if (__campaignPlayerCodeByToken.has(raw)) return __campaignPlayerCodeByToken.get(raw);
+  return normalizeSaveCode(raw);
+}
+
 function renderCampaignPlayerAccordion(p, options = {}) {
   const code = normalizeSaveCode(p.playerCode || p.code || p.saveCode);
   const preview = p.preview || {};
-  const displayName = preview.nom || p.name || code || uiT('campaign.defaultName','Campagne sans nom');
+  const displayName = preview.nom || p.name || uiT('campaign.defaultName','Campagne sans nom');
   const name = escapeHtml(displayName);
-  const safeCode = escapeHtml(code);
-  const gmActions = options.gm ? `<button class="btn-sm danger" onclick="gmKickPlayer('${safeCode}')">${uiT('campaign.kick','Expulser')}</button>` : '';
+  const playerToken = escapeHtml(registerCampaignPlayerCode(code));
+  const gmActions = options.gm ? `<button class="btn-sm danger" onclick="gmKickPlayer('${playerToken}')">${uiT('campaign.kick','Expulser')}</button>` : '';
 
   const armorStats = preview.armorStats || {};
   const armorFields = ARMOR_STATS
@@ -4312,7 +4340,7 @@ function renderCampaignPlayerAccordion(p, options = {}) {
     .map(({ key }) => renderCampaignPreviewField(getCampaignPreviewArmorLabel(preview, key), armorStats[key]));
 
   const cartouche = [
-    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'nom'), preview.nom || p.name || code),
+    renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'nom'), preview.nom || p.name),
     renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'race'), preview.race),
     renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'age'), preview.age),
     renderCampaignPreviewField(getCampaignPreviewCharLabel(preview, 'naiss'), preview.naissance),
@@ -4325,10 +4353,9 @@ function renderCampaignPlayerAccordion(p, options = {}) {
   ].join('');
 
   return `
-    <div class="campaign-player-accordion" data-player="${safeCode}">
+    <div class="campaign-player-accordion" data-player="${playerToken}">
       <button class="campaign-player-accordion-head" type="button" onclick="toggleCampaignPlayerCard(this)">
         <span class="campaign-player-name-v2">${name}</span>
-        <span class="campaign-player-code-v2">${formatSaveCode(code)}</span>
         <span class="campaign-accordion-arrow-v3">▾</span>
       </button>
       <div class="campaign-player-accordion-body">
@@ -4336,7 +4363,7 @@ function renderCampaignPlayerAccordion(p, options = {}) {
           <div class="campaign-player-cartouche-title">${name}</div>
           <div class="campaign-player-cartouche-grid">${cartouche}</div>
           <div class="campaign-player-actions">
-            <button class="btn-sm" onclick="gmOpenSpectatorSheet('${safeCode}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
+            <button class="btn-sm" onclick="gmOpenSpectatorSheet('${playerToken}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
             ${gmActions}
           </div>
         </div>
@@ -4397,13 +4424,13 @@ function renderGmPlayerCard(p) {
 
 function toggleManagedCampaign(campaignCode) {
   const clean = normalizeCampaignCode(campaignCode);
-  data._gmCampaignCode = clean;
+  data._gmCampaignCode = normalizeCampaignCode(data._gmCampaignCode || '') === clean ? '' : clean;
   persist();
   renderManagedCampaigns();
 }
 
 async function gmLoadPlayerSheet(playerCode) {
-  const code = normalizeSaveCode(playerCode);
+  const code = resolveCampaignPlayerCode(playerCode);
   if (!code) return;
   if (!confirm(uiT('campaign.confirmLoadPlayer','Charger la fiche de ce joueur ? Votre fiche actuelle sera remplacée.'))) return;
 
@@ -4449,7 +4476,7 @@ async function gmLoadPlayerSheet(playerCode) {
       if (typeof resizeAllCartouche === 'function') resizeAllCartouche();
     }, 80);
 
-    toast(uiT('campaign.loadSheet','Voir fiche') + ' : ' + formatSaveCode(code));
+    toast(uiT('campaign.loadSheet','Voir fiche'));
   } catch (err) {
     console.error(err);
     toast(uiT('toast.firebaseLoadError','Erreur chargement Firebase'));
@@ -4514,7 +4541,7 @@ function setSpectatorReadonlyDom() {
 }
 
 async function gmOpenSpectatorSheet(playerCode) {
-  const code = normalizeSaveCode(playerCode);
+  const code = resolveCampaignPlayerCode(playerCode);
   if (!code) return;
   try {
     const snap = await campaignRef('saves/' + code).get();
@@ -4530,8 +4557,8 @@ async function gmOpenSpectatorSheet(playerCode) {
     document.body.classList.add('spectator-mode');
     const title = document.getElementById('spectator-title');
     const subtitle = document.getElementById('spectator-subtitle');
-    if (title) title.textContent = uiT('spectator.title','Mode spectateur') + ' — ' + (data._char?.nom || formatSaveCode(code));
-    if (subtitle) subtitle.textContent = uiT('spectator.info','Lecture seule · clic droit pour les infobulles') + ' · ' + formatSaveCode(code);
+    if (title) title.textContent = uiT('spectator.title','Mode spectateur') + ' — ' + (data._char?.nom || uiT('campaign.loadSheet','Voir fiche'));
+    if (subtitle) subtitle.textContent = uiT('spectator.info','Lecture seule · clic droit pour les infobulles');
     refreshAllAfterDataSwap();
     showPage('fiche');
     setSpectatorReadonlyDom();
@@ -4557,7 +4584,7 @@ window.addEventListener('keydown', ev => { if (ev.key === 'Escape' && window.__m
 
 async function gmKickPlayer(playerCode) {
   const campaignCode = normalizeCampaignCode(data._gmCampaignCode || '');
-  const code = normalizeSaveCode(playerCode);
+  const code = resolveCampaignPlayerCode(playerCode);
   if (!campaignCode || !code) return;
   if (!confirm(uiT('campaign.confirmKick','Expulser ce joueur de la campagne ?'))) return;
 
