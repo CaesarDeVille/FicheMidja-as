@@ -1404,7 +1404,6 @@ function showPage(name) {
   if (name === 'parametres') renderParametres();
   if (name === 'fiche') renderFiche();
 
-  if (name === 'campagne') { initCampaignInputs(); if (data._gmCampaignCode) renderGmCampaign(data._gmCampaignCode); }
 
   if (name === 'campagne') { initCampaignInputs(); renderManagedCampaigns(); updateCampaignUi(); }
 
@@ -4216,13 +4215,39 @@ async function renderPlayerCampaignList(campaignCode = data._campaignCode) {
     return;
   }
 
-  list.innerHTML = entries.map(p => `
-    <div class="campaign-player-card-v3 campaign-player-card-public">
-      <div class="campaign-player-main">
-        <div class="campaign-player-name-v2">${escapeHtml(p.name || uiT('campaign.defaultName','Campagne sans nom'))}</div>
+  list.innerHTML = entries.map(p => renderCampaignPlayerAccordion(p, { gm: false })).join('');
+}
+
+function renderCampaignPlayerAccordion(p, options = {}) {
+  const code = normalizeSaveCode(p.playerCode || p.code || p.saveCode);
+  const name = escapeHtml(p.name || code || uiT('campaign.defaultName','Campagne sans nom'));
+  const safeCode = escapeHtml(code);
+  const gmActions = options.gm ? `<button class="btn-sm danger" onclick="gmKickPlayer('${safeCode}')">${uiT('campaign.kick','Expulser')}</button>` : '';
+
+  return `
+    <div class="campaign-player-accordion" data-player="${safeCode}">
+      <button class="campaign-player-accordion-head" type="button" onclick="toggleCampaignPlayerCard(this)">
+        <span class="campaign-player-name-v2">${name}</span>
+        <span class="campaign-player-code-v2">${formatSaveCode(code)}</span>
+        <span class="campaign-accordion-arrow-v3">▾</span>
+      </button>
+      <div class="campaign-player-accordion-body">
+        <div class="campaign-player-card-v3 campaign-player-cartouche">
+          <div class="campaign-player-main">
+            <div class="campaign-player-name-v2">${name}</div>
+            <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
+          </div>
+          <button class="btn-sm" onclick="gmOpenSpectatorSheet('${safeCode}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
+          ${gmActions}
+        </div>
       </div>
     </div>
-  `).join('');
+  `;
+}
+
+function toggleCampaignPlayerCard(btn) {
+  const card = btn?.closest?.('.campaign-player-accordion');
+  if (card) card.classList.toggle('open');
 }
 
 async function renderManagedCampaigns() {
@@ -4267,17 +4292,7 @@ async function renderManagedCampaigns() {
 }
 
 function renderGmPlayerCard(p) {
-  const code = normalizeSaveCode(p.playerCode);
-  return `
-    <div class="campaign-player-card-v3">
-      <div class="campaign-player-main">
-        <div class="campaign-player-name-v2">${escapeHtml(p.name || code)}</div>
-        <div class="campaign-player-code-v2">${formatSaveCode(code)}</div>
-      </div>
-      <button class="btn-sm" onclick="gmOpenSpectatorSheet('${code}')">${uiT('campaign.loadSheet','Voir fiche')}</button>
-      <button class="btn-sm danger" onclick="gmKickPlayer('${code}')">${uiT('campaign.kick','Expulser')}</button>
-    </div>
-  `;
+  return renderCampaignPlayerAccordion(p, { gm: true });
 }
 
 function toggleManagedCampaign(campaignCode) {
