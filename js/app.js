@@ -3895,6 +3895,10 @@ async function loadTranslations(lang) {
     currentLang = lang;
     localStorage.setItem('midjaas_lang', lang); localStorage.setItem('dnd_lang', lang);
     applyTranslations(); if (typeof applyI18n === 'function') applyI18n();
+    // Rétablir les labels personnalisés après la traduction async
+    if (typeof applyCharLabels === 'function') applyCharLabels();
+    if (typeof applyFicheSectionLabels === 'function') applyFicheSectionLabels();
+    if (typeof applyStatLabels === 'function') applyStatLabels();
   } catch (err) {
     console.warn('Impossible de charger la traduction', lang, err);
     UI18N = (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS[lang])
@@ -3905,6 +3909,10 @@ async function loadTranslations(lang) {
     try { localStorage.setItem('midjaas_lang', currentLang); localStorage.setItem('dnd_lang', currentLang); } catch(e) {}
     applyTranslations();
     if (typeof applyI18n === 'function') applyI18n();
+    // Rétablir les labels personnalisés après la traduction async
+    if (typeof applyCharLabels === 'function') applyCharLabels();
+    if (typeof applyFicheSectionLabels === 'function') applyFicheSectionLabels();
+    if (typeof applyStatLabels === 'function') applyStatLabels();
   }
 }
 
@@ -5237,8 +5245,31 @@ function renderProsthesesPanel() {
       sl.dataset.prostReady = '1';
     }
 
-    if (d.quality !== undefined && d.quality !== null && typeof applyQualityColor === 'function') {
-      applyQualityColor(sl, d.quality);
+    // Bug fix : couleur qualité — toujours appeler avec null si vide pour réinitialiser
+    if (typeof applyQualityColor === 'function') {
+      applyQualityColor(sl, (d.quality !== undefined && d.quality !== null) ? d.quality : null);
+    }
+
+    // Bug fix : image de l'objet dans le slot prothèse
+    let bg = sl.querySelector('.slot-img-bg');
+    if (d.img) {
+      if (!bg) {
+        bg = document.createElement('div');
+        bg.className = 'slot-img-bg loading';
+        sl.insertBefore(bg, sl.firstChild);
+      }
+      if (bg.dataset.src !== d.img) {
+        bg.dataset.src = d.img;
+        bg.classList.remove('loaded'); bg.classList.add('loading');
+        const img = new Image();
+        img.onload = () => { bg.style.backgroundImage = `url('${d.img}')`; bg.classList.remove('loading'); bg.classList.add('loaded'); };
+        img.onerror = () => { bg.classList.remove('loading'); };
+        img.src = d.img;
+      } else {
+        bg.classList.remove('loading'); bg.classList.add('loaded');
+      }
+    } else if (bg) {
+      bg.remove();
     }
   });
 }
