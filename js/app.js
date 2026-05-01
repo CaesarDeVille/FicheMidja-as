@@ -767,6 +767,7 @@ function refresh() {
     }
   });
   refreshArmorStats(); // updates slot display + cartouches + fiche
+  refreshWeaponStats(); // updates weapon stats on all slots
 
   // mun
   const munEl = document.getElementById('sl-mun');
@@ -814,15 +815,13 @@ function open_(key, speLabel) {
   const toggleCb = document.getElementById('fArmorStatsToggle');
   if (toggleCb) toggleCb.checked = hasArmorStats;
   toggleArmorStatsSection(hasArmorStats, d.armorStats || {});
-  // Weapon stats — only on slot 'arme'
+  // Weapon stats — disponible sur tous les slots, lié à l'objet comme armorStats
   const weaponSection = document.getElementById('fWeaponStats');
-  if (weaponSection) weaponSection.style.display = (key === 'arme') ? '' : 'none';
-  if (key === 'arme') {
-    const hasWeaponStats = !!(d.weaponStats);
-    const wToggleCb = document.getElementById('fWeaponStatsToggle');
-    if (wToggleCb) wToggleCb.checked = hasWeaponStats;
-    toggleWeaponStatsSection(hasWeaponStats, d.weaponStats || {});
-  }
+  if (weaponSection) weaponSection.style.display = '';
+  const hasWeaponStats = !!(d.weaponStats);
+  const wToggleCb = document.getElementById('fWeaponStatsToggle');
+  if (wToggleCb) wToggleCb.checked = hasWeaponStats;
+  toggleWeaponStatsSection(hasWeaponStats, d.weaponStats || {});
   _modalQuality = (d.quality !== undefined && d.quality !== null) ? d.quality : null;
   renderQualityBtns(_modalQuality);
   document.getElementById('modalOverlay').classList.add('open');
@@ -863,7 +862,7 @@ function saveSlot() {
   closeModal();
   if (k.startsWith('bag_') || k.startsWith('spe_')) { buildBag(); setTimeout(() => refreshArmorStats(), 0); }
   else if (k.startsWith('poche_')) buildPoche();
-  else { refresh(); if (k === 'arme') refreshWeaponStats(); } // refresh already calls refreshArmorStats
+  else refresh(); // refresh already calls refreshArmorStats
   if (typeof renderRingsSlot === 'function') renderRingsSlot();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
@@ -1860,27 +1859,32 @@ function saveWeaponStat(key, val) {
 }
 
 function refreshWeaponSlotOnly() {
-  const el = document.getElementById('sl-arme');
-  if (!el) return;
-  const d = data.arme || {};
-  const ws = d.weaponStats || {};
-  let inner = '';
-  if (d.img) inner += `<div class="slot-img-bg" style="background-image:url('${d.img}');"></div>`;
-  inner += `<span class="lbl" data-i18n-slot="arme">${getSlotLabel('arme')}</span>`;
-  inner += `<span class="val" id="dsp-arme-nom">${d.nom||'—'}</span>`;
-  if (d.type)  inner += `<span class="val-type" id="dsp-arme-type">${d.type}</span>`;
-  if (d.effet) inner += `<span class="val-effet" id="dsp-arme-effet">${parseMarkdown(d.effet)}</span>`;
-  const activeWs = WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key));
-  const hasWsVals = activeWs.some(s => ws[s.key]);
-  if (hasWsVals) {
-    inner += `<div class="armure-stats">`;
+  // Met à jour tous les slots NAMED qui ont un objet avec weaponStats
+  NAMED_SLOTS.forEach(slotKey => {
+    const el = document.getElementById('sl-' + slotKey);
+    if (!el) return;
+    const d = data[slotKey] || {};
+    if (!d.weaponStats) return; // cet objet n'a pas de stats d'arme
+    const ws = d.weaponStats;
+    const activeWs = WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key));
+    const hasWsVals = activeWs.some(s => ws[s.key]);
+    if (!hasWsVals) return;
+    // Ajouter les stats dans le slot sans tout reconstruire
+    // Chercher un bloc armure-stats existant ou l'ajouter
+    let statsDiv = el.querySelector('.weapon-stats-display');
+    if (!statsDiv) {
+      statsDiv = document.createElement('div');
+      statsDiv.className = 'armure-stats weapon-stats-display';
+      el.appendChild(statsDiv);
+    }
+    statsDiv.innerHTML = '';
     activeWs.forEach(({ key }) => {
       const cur = ws[key] || '';
-      if (cur) inner += `<span class="armure-stat"><span class="armure-stat-lbl">${getWeaponStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
+      if (cur) {
+        statsDiv.innerHTML += `<span class="armure-stat"><span class="armure-stat-lbl">${getWeaponStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
+      }
     });
-    inner += `</div>`;
-  }
-  el.innerHTML = inner;
+  });
 }
 
 function applyWeaponStatLabels() {
