@@ -3049,6 +3049,116 @@ select::-ms-expand {
 
 
 
+
+/* === COMPÉTENCES : description + effet === */
+
+/* === COMPÉTENCES — DESC + EFFET (page Compétences) === */
+
+/* La row devient une colonne : sélecteur+niveaux en haut, puis desc, puis effet */
+.skill-dd-row {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Ligne du haut : sélecteur + niveaux côte à côte */
+.skill-dd-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+/* Nom de la compétence sélectionnée — couleur val inventaire */
+.skill-dd {
+  color: var(--gold) !important;
+}
+
+/* Description — une ligne, ... si trop long, couleur #9a9a9a */
+.skill-meta-desc {
+  font-size: 11px;
+  color: #9a9a9a;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding: 0 2px;
+  margin-top: 2px;
+}
+
+/* Effet — une ligne, ... si trop long, couleur #7ab8d4 italique */
+.skill-meta-effet {
+  font-size: 11px;
+  color: #7ab8d4;
+  font-style: italic;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding: 0 2px;
+  margin-top: 1px;
+  margin-bottom: 2px;
+}
+
+/* === PARAMÈTRES — desc + effet compétences === */
+.param-comp-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.param-comp-meta-ta {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg3);
+  border: 1.5px solid var(--border2);
+  border-radius: 3px;
+  color: var(--gold);
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 4px 8px;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  min-height: 28px;
+  line-height: 1.4;
+  transition: border-color .15s;
+}
+
+.param-comp-meta-ta:focus { border-color: var(--gold); }
+.param-comp-meta-ta::placeholder { color: var(--muted); opacity: .7; }
+
+.param-comp-effet-ta {
+  color: #7ab8d4;
+  font-style: italic;
+}
+.param-comp-effet-ta::placeholder { font-style: italic; }
+
+
+/* === MARKDOWN INLINE (parseMarkdown) === */
+.md-h1 {
+  display: block;
+  font-size: 1.25em;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .4px;
+  margin-bottom: 2px;
+}
+.md-h2 {
+  display: block;
+  font-size: 1.08em;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: .3px;
+  margin-bottom: 1px;
+}
+
 /* === ARKELITH 1.07 : ACCESSIBILITÉ & POLISH ===  */
 
 /* Focus visible accessible sur tous les éléments interactifs */

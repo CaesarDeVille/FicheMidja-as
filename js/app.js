@@ -157,6 +157,37 @@ function sanitizeImport(value) {
   return out;
 }
 
+// Mini parser Markdown pour desc/effet/textes libres
+function parseMarkdown(str) {
+  if (!str) return '';
+  // 1. Échapper le HTML pour éviter toute injection
+  let s = str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  // 2. Appliquer les patterns ligne par ligne
+  const lines = s.split('\n');
+  const out = lines.map(line => {
+    const trimmed = line.trim();
+    // # Titre (grande)
+    if (/^# /.test(trimmed))
+      return '<span class="md-h1">' + trimmed.slice(2) + '</span>';
+    // ## Titre (moyenne)
+    if (/^## /.test(trimmed))
+      return '<span class="md-h2">' + trimmed.slice(3) + '</span>';
+    // Inline patterns (ordre important : du plus long au plus court)
+    let l = trimmed;
+    l = l.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    l = l.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
+    l = l.replace(/\*(.+?)\*/g,         '<em>$1</em>');
+    l = l.replace(/__(.+?)__/g,          '<u>$1</u>');
+    l = l.replace(/~~(.+?)~~/g,          '<s>$1</s>');
+    return l;
+  });
+  return out.join('<br>');
+}
+
 // Diagnostic interne (console uniquement — pas de bouton visible)
 function runArkelithDiagnostics() {
   const checks = [];
@@ -372,7 +403,7 @@ function importData(e) {
 
 // Liste des clés de paramètres à préserver lors d'un effacement de fiche
 const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armorLabels','_armorNames',
-  '_armorEnabled','_slotLabels','_ficheSectionLabels','_capLabels','_capWalletLabels',
+  '_armorEnabled','_slotLabels','_ficheSectionLabels','_capLabels','_capWalletLabels','_compMeta',
   '_resSplit','_resNames','_magieEnabled','_infusionEnabled','_showCats','_maxCats',
   '_compFormats','_compArrays','_effetsPlus','_bagConfig','_speConfig','_levelNames',
   '_levelColors','_magicColors','_themeColors','_fontChoice','_fsSizes','_exportTheme','_exportFont',
@@ -635,7 +666,7 @@ function setSlotDisplay(key) {
 
   if (n)  n.textContent  = d.nom   || '—';
   if (tp) tp.textContent = d.type  || '';
-  if (ef) ef.textContent = d.effet || '';
+  if (ef) ef.innerHTML = parseMarkdown(d.effet || '');
 
   const sl = document.getElementById('sl-' + key);
   if (sl) {
@@ -710,7 +741,7 @@ function refresh() {
     munEl.classList.toggle('filled', hasMun);
     if (hasMun) {
       munEl.style.cssText = 'border-right:none;border-radius:3px 0 0 3px;cursor:pointer;';
-      munEl.innerHTML = '<span style="font-size:var(--fs-item-nom);color:var(--gold);">' + mun.nom + '</span>' + (mun.effet ? '<span style="font-size:var(--fs-item-effet);color:#7ab8d4;font-style:italic;display:block;margin-top:4px;">' + mun.effet + '</span>' : '');
+      munEl.innerHTML = '<span style="font-size:var(--fs-item-nom);color:var(--gold);">' + mun.nom + '</span>' + (mun.effet ? '<span style="font-size:var(--fs-item-effet);color:#7ab8d4;font-style:italic;display:block;margin-top:4px;">' + parseMarkdown(mun.effet) + '</span>' : '');
     } else {
       munEl.textContent = 'Munitions';
     }
@@ -1630,7 +1661,7 @@ function refreshArmureSlotOnly() {
   inner += `<span class="lbl" data-i18n="armure">Armure</span>`;
   inner += `<span class="val" id="dsp-armure-nom">${d.nom||'—'}</span>`;
   if (d.type)  inner += `<span class="val-type" id="dsp-armure-type">${d.type}</span>`;
-  if (d.effet) inner += `<span class="val-effet" id="dsp-armure-effet">${d.effet}</span>`;
+  if (d.effet) inner += `<span class="val-effet" id="dsp-armure-effet">${parseMarkdown(d.effet)}</span>`;
   if (d.armorStats) {
     const activeStats = ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key));
     const hasValues = activeStats.some(s => armorStats[s.key]);
@@ -1742,8 +1773,8 @@ function showSlotPreview(e, slotData, armorStats) {
   if (!slotData?.nom) return;
   const pv = document.getElementById('slot-preview');
   document.getElementById('sp-nom').textContent = slotData.nom || '';
-  document.getElementById('sp-type').textContent = slotData.type || '';
-  document.getElementById('sp-effet').textContent = slotData.effet || '';
+  document.getElementById('sp-type').innerHTML = parseMarkdown(slotData.type || '');
+  document.getElementById('sp-effet').innerHTML = parseMarkdown(slotData.effet || '');
   // Background image
   const bg = document.getElementById('sp-bg');
   bg.style.backgroundImage = slotData.img ? `url('${slotData.img}')` : '';
@@ -2158,7 +2189,10 @@ function addSkillRow(prefix, selectedName, levels, isMagic, allOptions, localArr
     if (newVal) setCompData(prefix+newVal, 1);
     renderCompetences();
   };
-  row.appendChild(sel);
+  const topRow = document.createElement('div');
+  topRow.className = 'skill-dd-top';
+  topRow.appendChild(sel);
+  row.appendChild(topRow);
 
   if (selectedName) {
     const cat = prefix==='pri_'?'pri':prefix==='sec_'?'sec':prefix==='mar_'?'mar':'mag';
@@ -2170,7 +2204,7 @@ function addSkillRow(prefix, selectedName, levels, isMagic, allOptions, localArr
       const freeKey = 'compfree_'+prefix+selectedName;
       freeInp.value = data._compFree?.[freeKey] || '';
       freeInp.oninput = (e) => { e.stopPropagation(); if(!data._compFree)data._compFree={}; data._compFree[freeKey]=freeInp.value; persist(); };
-      row.appendChild(freeInp);
+      topRow.appendChild(freeInp);
     } else {
       const lvlWrap = document.createElement('div');
       lvlWrap.className = 'level-sel';
@@ -2185,9 +2219,40 @@ function addSkillRow(prefix, selectedName, levels, isMagic, allOptions, localArr
         box.onclick = (e) => { e.stopPropagation(); const newLvl=(cur===boxIdx)?0:boxIdx; setCompData(prefix+selectedName,newLvl===0?1:newLvl); renderCompetences(); };
         lvlWrap.appendChild(box);
       });
-      row.appendChild(lvlWrap);
+      topRow.appendChild(lvlWrap);
     }
   }
+  // Description et effet sous la compétence sélectionnée
+  if (selectedName) {
+    const meta = getCompMeta(prefix, selectedName);
+    if (meta.desc || meta.effet) {
+      if (meta.desc) {
+        const descEl = document.createElement('div');
+        descEl.className = 'skill-meta-desc';
+        descEl.innerHTML = parseMarkdown(meta.desc);
+        row.appendChild(descEl);
+      }
+      if (meta.effet) {
+        const effetEl = document.createElement('div');
+        effetEl.className = 'skill-meta-effet';
+        effetEl.innerHTML = parseMarkdown(meta.effet);
+        row.appendChild(effetEl);
+      }
+    }
+
+    // Clic droit → preview bulle (réutilise le système slot-preview)
+    row.addEventListener('contextmenu', e => e.preventDefault());
+    row.addEventListener('mousedown', e => {
+      if (e.button !== 2) return;
+      e.preventDefault();
+      const m = getCompMeta(prefix, selectedName);
+      if (!m.desc && !m.effet) return; // pas de bulle si rien à afficher
+      showSlotPreview(e, { nom: selectedName, type: m.desc, effet: m.effet }, null);
+    });
+    row.addEventListener('mouseup', e => { if (e.button === 2) hideSlotPreview(); });
+    row.addEventListener('mouseleave', hideSlotPreview);
+  }
+
   container.appendChild(row);
 }
 
@@ -2231,7 +2296,7 @@ function renderLivreSorts() {
         cell.innerHTML = `
           <span class="fc-nom">${s.nom}</span>
           ${s.type  ? `<span class="fc-type">${s.type}</span>`  : ''}
-          ${s.effet ? `<span class="fc-effet">${s.effet}</span>` : ''}
+          ${s.effet ? `<span class="fc-effet">${parseMarkdown(s.effet)}</span>` : ''}
           ${s.cout  ? `<span class="fc-cout">Coût : ${s.cout}</span>` : ''}
         `;
       } else {
@@ -2357,7 +2422,7 @@ function renderCoups() {
       cell.innerHTML = `
         <span class="fc-nom">${coup.nom}</span>
         ${coup.type  ? `<span class="fc-type">${coup.type}</span>`  : ''}
-        ${coup.effet ? `<span class="fc-effet">${coup.effet}</span>` : ''}
+        ${coup.effet ? `<span class="fc-effet">${parseMarkdown(coup.effet)}</span>` : ''}
         ${coup.cout  ? `<span class="fc-cout">Coût : ${coup.cout}</span>` : ''}
       `;
     } else {
@@ -2393,7 +2458,7 @@ function renderSavoirs() {
       cell.innerHTML = `
         <span class="fc-nom">${sav.nom}</span>
         ${sav.type  ? `<span class="fc-type">${sav.type}</span>`  : ''}
-        ${sav.effet ? `<span class="fc-effet">${sav.effet}</span>` : ''}
+        ${sav.effet ? `<span class="fc-effet">${parseMarkdown(sav.effet)}</span>` : ''}
       `;
     } else {
       cell.innerHTML = '<span class="fc-lbl" style="color:var(--dim);font-style:italic;">' + (getCatLabel('savoirs') || 'Connaissance…') + '</span>';
@@ -2450,6 +2515,21 @@ function saveFreeSlot() {
 }
 
 /* Main render */
+/* ══ COMPÉTENCE META (description + effet) ══ */
+function getCompMeta(prefix, name) {
+  const key = prefix + name;
+  return data._compMeta?.[key] || { desc: '', effet: '' };
+}
+
+function setCompMeta(prefix, name, field, val) {
+  if (!data._compMeta) data._compMeta = {};
+  const key = prefix + name;
+  if (!data._compMeta[key]) data._compMeta[key] = { desc: '', effet: '' };
+  data._compMeta[key][field] = val.trim();
+  if (!data._compMeta[key].desc && !data._compMeta[key].effet) delete data._compMeta[key];
+  persist();
+}
+
 function renderCompetences() {
   loadCompChar();
 
@@ -3242,6 +3322,35 @@ function renderParamList(type, containerId) {
       if(document.getElementById('page-competences').classList.contains('active')) renderCompetences();
     };
     row.appendChild(inp); row.appendChild(del); container.appendChild(row);
+
+    // Ligne desc + effet sous le nom (textarea auto-resize)
+    const metaRow = document.createElement('div');
+    metaRow.className = 'param-comp-meta-row';
+    const prefix = type + '_';
+    const meta = getCompMeta(prefix, name);
+
+    function makeMetaTa(field, placeholder, extraClass) {
+      const ta = document.createElement('textarea');
+      ta.className = 'param-comp-meta-ta' + (extraClass ? ' ' + extraClass : '');
+      ta.placeholder = placeholder;
+      ta.rows = 1;
+      ta.value = meta[field] || '';
+      const autoResize = () => {
+        ta.style.height = 'auto';
+        ta.style.height = ta.scrollHeight + 'px';
+      };
+      ta.addEventListener('input', () => {
+        autoResize();
+        setCompMeta(prefix, name, field, ta.value);
+        renderCompetences();
+      });
+      setTimeout(autoResize, 0);
+      return ta;
+    }
+
+    metaRow.appendChild(makeMetaTa('desc',  'Description…', ''));
+    metaRow.appendChild(makeMetaTa('effet', 'Effet…',       'param-comp-effet-ta'));
+    container.appendChild(metaRow);
   });
 }
 
@@ -5005,7 +5114,7 @@ function renderRingMini(i, large = false) {
   return `<div class="ring-mini ${d.nom ? 'filled' : ''}" id="sl-${key}" data-slot-key="${key}" onclick="event.stopPropagation(); open_('${key}')">
     <span class="${cls}">${label}</span>
     ${large && d.type ? `<span class="val-type">${escapeHtml(d.type)}</span>` : ''}
-    ${large && d.effet ? `<span class="val-effet">${escapeHtml(d.effet)}</span>` : ''}
+    ${large && d.effet ? `<span class="val-effet">${parseMarkdown(d.effet)}</span>` : ''}
   </div>`;
 }
 
@@ -5353,7 +5462,7 @@ function renderProsthesesPanel() {
 
     if (n) n.textContent = d.nom || '—';
     if (tp) tp.textContent = d.type || '';
-    if (ef) ef.textContent = d.effet || '';
+    if (ef) ef.innerHTML = parseMarkdown(d.effet || '');
 
     if (!sl) return;
 
