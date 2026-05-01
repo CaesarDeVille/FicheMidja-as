@@ -377,7 +377,7 @@
 
       <div class="inv-header">
         <div class="inv-title-cell">
-          <span class="inv-title-txt">Sac</span>
+          <span class="inv-title-txt" data-section="sac">Sac</span>
           <select class="sac-select" id="bagSize" onchange="updateBag()">
             <option value="sacoche" selected>Sacoche (6 empl.)</option>
             <option value="petit">Petit sac (9 empl. + 1 spé)</option>
@@ -386,7 +386,7 @@
           </select>
         </div>
         <div class="inv-title-cell">
-          <span class="inv-title-txt">Poches</span>
+          <span class="inv-title-txt" data-section="poches">Poches</span>
         </div>
       </div>
 
@@ -1224,6 +1224,16 @@
 
             <div class="inv-specials-grid">
               <div class="inv-special-item">
+                <span class="inv-special-lbl">◫ Sac</span>
+                <input class="param-input" id="cfg-label-sac" type="text" placeholder="Sac"
+                  oninput="saveBagSectionLabel(this.value)">
+              </div>
+              <div class="inv-special-item">
+                <span class="inv-special-lbl">◻ Poches</span>
+                <input class="param-input" id="cfg-label-poches" type="text" placeholder="Poches"
+                  oninput="savePocheSectionLabel(this.value)">
+              </div>
+              <div class="inv-special-item">
                 <span class="inv-special-lbl">◯ Anneaux</span>
                 <input class="param-input" id="cfg-label-rings" type="text" placeholder="Anneaux"
                   oninput="saveInventorySpecialLabel('rings', this.value)">
@@ -1357,7 +1367,7 @@
   </div><!-- end page-parametres -->
 
 </div><!-- end app -->
-<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.14</div></div>
+<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.15</div></div>
 </div><!-- end aspect-wrap -->
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">

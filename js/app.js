@@ -442,7 +442,7 @@ const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armo
   '_resSplit','_resNames','_magieEnabled','_infusionEnabled','_showCats','_maxCats',
   '_compFormats','_compArrays','_effetsPlus','_bagConfig','_speConfig','_levelNames',
   '_levelColors','_magicColors','_themeColors','_fontChoice','_fsSizes','_exportTheme','_exportFont',
-  '_bourseCount','_bourseLabel','_banqueLabel'];
+  '_bourseCount','_bourseLabel','_banqueLabel','_bagSectionLabel','_pocheSectionLabel'];
 
 function clearFiche() {
   if (!confirm(uiT('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
@@ -3404,9 +3404,17 @@ function renderParamList(type, containerId) {
     };
     const del = document.createElement('button'); del.className='param-del-btn'; del.textContent='×'; del.title='Supprimer';
     del.onclick = () => {
-      const cur = [...getCompArray(type)]; cur.splice(idx,1); setCustomComp(type,cur);
+      const cur = [...getCompArray(type)];
+      const removedName = cur[idx];
+      cur.splice(idx, 1);
+      setCustomComp(type, cur);
+      // Nettoyer les données associées à la compétence supprimée
+      const pref = type + '_';
+      if (data._comp)      { delete data._comp[pref + removedName]; }
+      if (data._compMeta)  { delete data._compMeta[pref + removedName]; }
+      persist();
       renderParametres();
-      if(document.getElementById('page-competences').classList.contains('active')) renderCompetences();
+      if (document.getElementById('page-competences')?.classList.contains('active')) renderCompetences();
     };
     row.appendChild(inp); row.appendChild(del); container.appendChild(row);
 
@@ -4239,6 +4247,26 @@ function uiT(key, fallback = '') {
 }
 
 // Restaure tous les labels personnalisés après une mise à jour de traduction
+/* ══ LABELS SECTIONS SAC ET POCHES ══ */
+function getBagSectionLabel()   { return data._bagSectionLabel   || uiT('inventory.sac',   'Sac'); }
+function getPocheSectionLabel() { return data._pocheSectionLabel || uiT('inventory.poches', 'Poches'); }
+function saveBagSectionLabel(val)   {
+  data._bagSectionLabel = val.trim() || ''; persist();
+  const el = document.querySelector('.inv-title-txt[data-section="sac"]');
+  if (el) el.textContent = getBagSectionLabel();
+}
+function savePocheSectionLabel(val) {
+  data._pocheSectionLabel = val.trim() || ''; persist();
+  const el = document.querySelector('.inv-title-txt[data-section="poches"]');
+  if (el) el.textContent = getPocheSectionLabel();
+}
+function applyBagSectionLabels() {
+  const s = document.querySelector('.inv-title-txt[data-section="sac"]');
+  const p = document.querySelector('.inv-title-txt[data-section="poches"]');
+  if (s) s.textContent = getBagSectionLabel();
+  if (p) p.textContent = getPocheSectionLabel();
+}
+
 function applyAllCustomLabels() {
   if (typeof applyCharLabels === 'function')              applyCharLabels();
   if (typeof applyStatLabels === 'function')              applyStatLabels();
@@ -4249,6 +4277,7 @@ function applyAllCustomLabels() {
   if (typeof applyInventorySpecialLabels === 'function')  applyInventorySpecialLabels();
   if (typeof applyProsthesisGroupLabels === 'function')   applyProsthesisGroupLabels();
   if (typeof applyProsthesisLabels === 'function')        applyProsthesisLabels();
+  if (typeof applyBagSectionLabels === 'function')         applyBagSectionLabels();
 }
 
 async function loadTranslations(lang) {
@@ -4399,9 +4428,15 @@ async function updateCampaignUi() {
   const created = document.getElementById('campaign-created-code');
   const createdGm = document.getElementById('campaign-created-gm-code');
 
-  if (pl) pl.textContent = player ? formatSaveCode(player) : '—';
-  if (created && data._lastCreatedCampaignCode) created.textContent = formatCampaignCode(data._lastCreatedCampaignCode);
-  if (createdGm && data._lastCreatedGmCode) createdGm.textContent = formatGmCode(data._lastCreatedGmCode);
+  if (window.__midjaasSpectatorActive) {
+    if (pl) pl.textContent = '••••••';
+    if (created) created.textContent = '••••••';
+    if (createdGm) createdGm.textContent = '••••••';
+  } else {
+    if (pl) pl.textContent = player ? formatSaveCode(player) : '—';
+    if (created && data._lastCreatedCampaignCode) created.textContent = formatCampaignCode(data._lastCreatedCampaignCode);
+    if (createdGm && data._lastCreatedGmCode) createdGm.textContent = formatGmCode(data._lastCreatedGmCode);
+  }
 
   if (campCode) {
     const camp = await getCampaignData(campCode);
@@ -4773,13 +4808,14 @@ async function renderManagedCampaigns() {
       <div class="campaign-accordion-v3 ${isOpen ? 'open' : ''}" data-campaign="${campaignCode}">
         <div class="campaign-accordion-head-v3" onclick="toggleManagedCampaign('${campaignCode}')">
           <div class="campaign-accordion-name-v3">${escapeHtml(name)}</div>
-          <div class="campaign-accordion-code-v3">${formatCampaignCode(campaignCode)} · ${formatGmCode(entry.gmCode || camp?.gmCode || '')}</div>
+          <div class="campaign-accordion-code-v3">${window.__midjaasSpectatorActive ? '•••••• · ••••••' : formatCampaignCode(campaignCode) + ' · ' + formatGmCode(entry.gmCode || camp?.gmCode || '')}</div>
           <div class="campaign-accordion-arrow-v3">▾</div>
         </div>
         <div class="campaign-accordion-body-v3">
           <div class="campaign-rename-row">
             <input class="campaign-rename-input" id="campaign-rename-${campaignCode}" value="${escapeHtml(name)}">
             <button class="btn-sm" onclick="gmRenameCampaign('${campaignCode}')">${uiT('campaign.rename','Renommer')}</button>
+            <button class="btn-sm danger" onclick="gmDeleteCampaign('${campaignCode}')">${uiT('campaign.delete','Supprimer')}</button>
           </div>
           ${players.length ? players.map(p => renderGmPlayerCard(p)).join('') : `<div class="param-info">${uiT('campaign.noPlayers','Aucun joueur dans cette campagne.')}</div>`}
         </div>
@@ -4800,6 +4836,54 @@ function toggleManagedCampaign(campaignCode) {
   persist();
   renderManagedCampaigns();
 }
+
+async function gmDeleteCampaign(campaignCode) {
+  const code = normalizeCampaignCode(campaignCode);
+  if (!code) return;
+  if (!confirm(uiT('campaign.confirmDelete', 'Supprimer cette campagne ? Les joueurs ne seront plus associés mais leurs fiches seront conservées.'))) return;
+
+  try {
+    const db = getFirebaseDbCompat();
+    if (!db) { toast(uiT('toast.firebaseUnavailable', 'Firebase indisponible')); return; }
+
+    // Retirer le code campagne des fiches des joueurs
+    const snap = await db.ref('campaigns/' + code + '/players').get();
+    if (snap.exists()) {
+      const players = snap.val();
+      await Promise.all(Object.values(players).map(async playerCode => {
+        const pSnap = await db.ref('saves/' + playerCode).get();
+        if (pSnap.exists()) {
+          let loaded = pSnap.val();
+          if (loaded && typeof loaded.payloadJson === 'string') loaded = JSON.parse(loaded.payloadJson);
+          if (loaded && normalizeCampaignCode(loaded._campaignCode) === code) {
+            delete loaded._campaignCode;
+            await db.ref('saves/' + playerCode).set({ payloadJson: JSON.stringify(loaded), savedAt: Date.now(), version: 2 });
+          }
+        }
+      }));
+    }
+
+    // Supprimer la campagne Firebase
+    await db.ref('campaigns/' + code).remove();
+
+    // Retirer de _managedCampaigns localement
+    if (data._managedCampaigns) {
+      Object.keys(data._managedCampaigns).forEach(k => {
+        if (normalizeCampaignCode(data._managedCampaigns[k].campaignCode) === code) delete data._managedCampaigns[k];
+      });
+    }
+    if (normalizeCampaignCode(data._gmCampaignCode || '') === code) delete data._gmCampaignCode;
+    persist();
+
+    await renderManagedCampaigns();
+    await updateCampaignUi();
+    toast(uiT('campaign.deleted', 'Campagne supprimée.'));
+  } catch (err) {
+    console.error(err);
+    toast(uiT('toast.firebaseSaveError', 'Erreur Firebase'));
+  }
+}
+
 
 async function gmLoadPlayerSheet(playerCode) {
   const code = resolveCampaignPlayerCode(playerCode);
@@ -5450,6 +5534,10 @@ function applyInventorySpecialLabels() {
   const prostInput = document.getElementById('cfg-label-prostheses');
   if (ringInput && document.activeElement !== ringInput) ringInput.value = data._inventorySpecialLabels?.rings || '';
   if (prostInput && document.activeElement !== prostInput) prostInput.value = data._inventorySpecialLabels?.prostheses || '';
+  const sacInput = document.getElementById('cfg-label-sac');
+  const pocheInput = document.getElementById('cfg-label-poches');
+  if (sacInput && document.activeElement !== sacInput) sacInput.value = data._bagSectionLabel || '';
+  if (pocheInput && document.activeElement !== pocheInput) pocheInput.value = data._pocheSectionLabel || '';
 }
 
 function toggleProsthesesPanel(force) {
