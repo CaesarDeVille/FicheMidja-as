@@ -1004,7 +1004,7 @@
             <!-- Compétences Magiques + Livre de Sorts -->
             <div class="param-col">
               <div class="param-cat-header">
-                <input class="param-cat-name-input" id="cfg-name-mag" type="text" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-mag" type="text" placeholder="Compétences Magiques" value="Compétences Magiques" oninput="saveParamCatLabel('mag',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-mag" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mag',this.value)">
@@ -1022,7 +1022,7 @@
               <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('mag')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('mag')">&#8635; Défaut</button></div>
 
               <div class="param-cat-header" style="margin-top:14px;">
-                <input class="param-cat-name-input" id="cfg-name-livre" type="text" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-livre" type="text" placeholder="Livre de Sorts" value="Livre de Sorts" oninput="saveParamCatLabel('livre',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max/magie</span>
                   <input class="param-max-input" id="cfg-max-livre" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('livre',this.value)">
@@ -1049,7 +1049,7 @@
             <!-- Statistiques -->
             <div class="param-col">
               <div class="param-cat-header">
-                <input class="param-cat-name-input" id="cfg-name-stats" type="text" value="Statistiques" oninput="saveParamCatLabel('stats',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-stats" type="text" placeholder="Statistiques" value="Statistiques" oninput="saveParamCatLabel('stats',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
                   <span class="param-info" style="font-style:normal;">Afficher</span>
                   <input type="checkbox" id="cfg-show-stats" class="blessure-cb" onchange="saveParamShow('stats',this.checked)">
@@ -1063,7 +1063,7 @@
             <!-- Principales + Secondaires + Connaissances -->
             <div class="param-col">
               <div class="param-cat-header">
-                <input class="param-cat-name-input" id="cfg-name-pri" type="text" value="Compétences Principales" oninput="saveParamCatLabel('pri',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-pri" type="text" placeholder="Compétences Principales" value="Compétences Principales" oninput="saveParamCatLabel('pri',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-pri" type="number" min="0" value="3" title="0 = illimité" oninput="saveParamMax('pri',this.value)">
@@ -1081,7 +1081,7 @@
               <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('pri')">&#8635; Défaut</button></div>
 
               <div class="param-cat-header" style="margin-top:14px;">
-                <input class="param-cat-name-input" id="cfg-name-sec" type="text" value="Compétences Secondaires" oninput="saveParamCatLabel('sec',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-sec" type="text" placeholder="Compétences Secondaires" value="Compétences Secondaires" oninput="saveParamCatLabel('sec',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-sec" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('sec',this.value)">
@@ -1100,7 +1100,7 @@
 
               <!-- Connaissances et Statut sous Secondaires -->
               <div class="param-cat-header" style="margin-top:14px;">
-                <input class="param-cat-name-input" id="cfg-name-savoirs" type="text" value="Connaissances et Statut" oninput="saveParamCatLabel('savoirs',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-savoirs" type="text" placeholder="Connaissances et Statut" value="Connaissances et Statut" oninput="saveParamCatLabel('savoirs',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-savoirs" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('savoirs',this.value)">
@@ -1114,7 +1114,7 @@
             <!-- Martiales + Coups -->
             <div class="param-col">
               <div class="param-cat-header">
-                <input class="param-cat-name-input" id="cfg-name-mar" type="text" value="Compétences Martiales" oninput="saveParamCatLabel('mar',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-mar" type="text" placeholder="Compétences Martiales" value="Compétences Martiales" oninput="saveParamCatLabel('mar',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-mar" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('mar',this.value)">
@@ -1133,7 +1133,7 @@
 
               <!-- Coups Spéciaux sous Martiales -->
               <div class="param-cat-header" style="margin-top:14px;">
-                <input class="param-cat-name-input" id="cfg-name-coups" type="text" value="Coups Spéciaux" oninput="saveParamCatLabel('coups',this.value)">
+                <input class="param-cat-name-input" id="cfg-name-coups" type="text" placeholder="Coups Spéciaux" value="Coups Spéciaux" oninput="saveParamCatLabel('coups',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
                   <input class="param-max-input" id="cfg-max-coups" type="number" min="0" value="0" title="0 = illimité" oninput="saveParamMax('coups',this.value)">
@@ -1349,6 +1349,7 @@
 
 </div><!-- end app -->
 <div class="site-legal" data-i18n="legal.text"></div>
+<div class="site-version">Beta 1.03</div>
 </div><!-- end aspect-wrap -->
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">

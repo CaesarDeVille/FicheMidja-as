@@ -840,7 +840,7 @@ function renderBagParams() {
     const row = document.createElement('div');
     row.className = 'param-comp-row'; row.style.gap = '6px'; row.style.flexWrap = 'wrap';
     const nameInp = document.createElement('input');
-    nameInp.className = 'param-comp-input'; nameInp.type='text'; nameInp.value=bag.label; nameInp.style.flex='1';
+    nameInp.className = 'param-comp-input'; nameInp.type='text'; nameInp.value=bag.label; nameInp.placeholder=bag.label||'Nom du sac'; nameInp.style.flex='1';
     nameInp.oninput = () => { bags[idx].label=nameInp.value; saveCustomBags(bags); };
     const normLbl = document.createElement('span'); normLbl.className='param-info'; normLbl.textContent='Empl.';
     const normInp = document.createElement('input');
@@ -904,7 +904,7 @@ function renderSpeParams() {
     const row = document.createElement('div');
     row.className='param-comp-row'; row.style.gap='6px'; row.style.flexWrap='wrap';
     const nameInp = document.createElement('input');
-    nameInp.className='param-comp-input'; nameInp.type='text'; nameInp.value=s.label; nameInp.style.flex='1';
+    nameInp.className='param-comp-input'; nameInp.type='text'; nameInp.value=s.label; nameInp.placeholder=s.label||"Nom de l'emplacement"; nameInp.style.flex='1';
     nameInp.oninput = () => { spe[idx].label=nameInp.value; saveCustomSpe(spe); };
     const slotsLbl = document.createElement('span'); slotsLbl.className='param-info'; slotsLbl.textContent='+empl.';
     const slotsInp = document.createElement('input');
@@ -3117,7 +3117,7 @@ function renderParamList(type, containerId) {
   container.innerHTML = '';
   getCompArray(type).forEach((name, idx) => {
     const row = document.createElement('div'); row.className = 'param-comp-row';
-    const inp = document.createElement('input'); inp.className='param-comp-input'; inp.type='text'; inp.value=name;
+    const inp = document.createElement('input'); inp.className='param-comp-input'; inp.type='text'; inp.value=name; inp.placeholder=name||'Compétence';
     inp.oninput = () => {
       const cur = [...getCompArray(type)]; const old = cur[idx];
       cur[idx] = inp.value; setCustomComp(type, cur);
@@ -3386,9 +3386,12 @@ applyStatSplits();
 applyEffetsPlus();
 updateBagSelect();
 refreshArmorStats();
+applyArmorStatLabels();
 applyAllQualityColors();
 applySlotLabels();
 applyFicheSectionLabels();
+applyInventorySpecialLabels();
+applyProsthesisGroupLabels();
 buildBourseRows();
 // Restore PS enabled/disabled state based on saved infuse value
 toggleInfuse(data._infuse || false);
@@ -3887,6 +3890,19 @@ function uiT(key, fallback = '') {
   return fallback || key;
 }
 
+// Restaure tous les labels personnalisés après une mise à jour de traduction
+function applyAllCustomLabels() {
+  if (typeof applyCharLabels === 'function')              applyCharLabels();
+  if (typeof applyStatLabels === 'function')              applyStatLabels();
+  if (typeof applyFicheSectionLabels === 'function')      applyFicheSectionLabels();
+  if (typeof applySlotLabels === 'function')              applySlotLabels();
+  if (typeof applyArmorStatLabels === 'function')         applyArmorStatLabels();
+  if (typeof applyCatLabels === 'function')               applyCatLabels();
+  if (typeof applyInventorySpecialLabels === 'function')  applyInventorySpecialLabels();
+  if (typeof applyProsthesisGroupLabels === 'function')   applyProsthesisGroupLabels();
+  if (typeof applyProsthesisLabels === 'function')        applyProsthesisLabels();
+}
+
 async function loadTranslations(lang) {
   try {
     const res = await fetch(`lang/${lang}.json`, { cache: 'no-store' });
@@ -3895,10 +3911,7 @@ async function loadTranslations(lang) {
     currentLang = lang;
     localStorage.setItem('midjaas_lang', lang); localStorage.setItem('dnd_lang', lang);
     applyTranslations(); if (typeof applyI18n === 'function') applyI18n();
-    // Rétablir les labels personnalisés après la traduction async
-    if (typeof applyCharLabels === 'function') applyCharLabels();
-    if (typeof applyFicheSectionLabels === 'function') applyFicheSectionLabels();
-    if (typeof applyStatLabels === 'function') applyStatLabels();
+    applyAllCustomLabels();
   } catch (err) {
     console.warn('Impossible de charger la traduction', lang, err);
     UI18N = (typeof BUILTIN_TRANSLATIONS !== 'undefined' && BUILTIN_TRANSLATIONS[lang])
@@ -3909,10 +3922,7 @@ async function loadTranslations(lang) {
     try { localStorage.setItem('midjaas_lang', currentLang); localStorage.setItem('dnd_lang', currentLang); } catch(e) {}
     applyTranslations();
     if (typeof applyI18n === 'function') applyI18n();
-    // Rétablir les labels personnalisés après la traduction async
-    if (typeof applyCharLabels === 'function') applyCharLabels();
-    if (typeof applyFicheSectionLabels === 'function') applyFicheSectionLabels();
-    if (typeof applyStatLabels === 'function') applyStatLabels();
+    applyAllCustomLabels();
   }
 }
 
@@ -5290,9 +5300,8 @@ function toggleParamAccordion(el) { toggleAccordion(el); }
 
 /* === CLEAN SAFE BOOT === */
 function safeRefreshLateUi() {
+  try { if (typeof applyAllCustomLabels === 'function') applyAllCustomLabels(); } catch(e) { console.warn(e); }
   try { if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel(); } catch(e) { console.warn(e); }
-  try { if (typeof applyInventorySpecialLabels === 'function') applyInventorySpecialLabels(); } catch(e) { console.warn(e); }
-  try { if (typeof applyProsthesisGroupLabels === 'function') applyProsthesisGroupLabels(); } catch(e) { console.warn(e); }
   try { if (typeof renderProsthesisLabelParams === 'function') renderProsthesisLabelParams(); } catch(e) { console.warn(e); }
   try { if (typeof initMidjaasEasterEgg === 'function') initMidjaasEasterEgg(); } catch(e) { console.warn(e); }
   try { if (typeof initRingsFloatDrag === 'function') initRingsFloatDrag(); } catch(e) { console.warn(e); }

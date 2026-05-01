@@ -824,7 +824,9 @@ body {
   padding: 4px 8px; border-radius: 3px; outline: none; text-align: center;
   transition: border-color .15s;
 }
+.param-input::placeholder { color: var(--muted); font-style: italic; opacity: .7; }
 .param-input:focus { border-color: var(--gold); }
+.param-input:focus::placeholder { opacity: .35; }
 .param-toggle-lbl {
   display: flex; align-items: center; gap: 8px;
   font-size: 13px; color: var(--text); cursor: pointer; user-select: none;
@@ -839,6 +841,7 @@ body {
   padding: 4px 8px; border-radius: 3px; outline: none;
   transition: border-color .15s;
 }
+.param-comp-input::placeholder { color: var(--muted); opacity: .7; }
 .param-comp-input:focus { border-color: var(--gold); }
 .param-del-btn {
   background: none; border: 1.5px solid #5a2010; color: #c04040;
@@ -876,6 +879,7 @@ body {
   outline: none; padding: 2px 4px; min-width: 0;
   transition: border-color .15s;
 }
+.param-cat-name-input::placeholder { color: var(--muted); opacity: .6; }
 .param-cat-name-input:focus { border-color: var(--gold); }
 .param-max-input {
   width: 42px; background: var(--bg3); border: 1.5px solid var(--border2);
@@ -3013,6 +3017,7 @@ select::-ms-expand {
   padding: 2px 6px !important;
   opacity: .8;
 }
+.prost-group-name-inp::placeholder { color: var(--muted); font-style: italic; opacity: .6; }
 
 /* Chaque ligne capsule : label à gauche, input à droite */
 .prost-params-slots {
@@ -3039,6 +3044,21 @@ select::-ms-expand {
   .prost-params-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+
+/* === VERSION BADGE === */
+.site-version {
+  position: fixed;
+  bottom: 6px;
+  right: 10px;
+  font-size: 9px;
+  color: var(--muted);
+  opacity: .38;
+  letter-spacing: .4px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
 }
 
 /* === LEGAL FOOTER === */
