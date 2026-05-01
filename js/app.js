@@ -1904,7 +1904,9 @@ function toggleWeaponStatsSection(show, existingStats) {
   if (!list) return;
   list.style.display = show ? 'flex' : 'none';
   list.style.flexDirection = 'column';
-  if (show && list.children.length === 0) {
+  // Toujours reconstruire pour charger les bonnes valeurs de l'objet ouvert
+  list.innerHTML = '';
+  if (show) {
     WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key)).forEach(({ key: sk }) => {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
@@ -1914,8 +1916,6 @@ function toggleWeaponStatsSection(show, existingStats) {
           style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
       list.appendChild(wrap);
     });
-  } else if (!show) {
-    list.innerHTML = '';
   }
 }
 
@@ -2143,8 +2143,9 @@ function toggleArmorStatsSection(show, existingStats) {
   if (!list) return;
   list.style.display = show ? 'flex' : 'none';
   list.style.flexDirection = 'column';
-  if (show && list.children.length === 0) {
-    // Build inputs
+  // Toujours reconstruire pour charger les bonnes valeurs de l'objet ouvert
+  list.innerHTML = '';
+  if (show) {
     ARMOR_STATS.filter(s=>isArmorStatEnabled(s.key)).forEach(({ key: sk }) => {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
@@ -2154,8 +2155,6 @@ function toggleArmorStatsSection(show, existingStats) {
           style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
       list.appendChild(wrap);
     });
-  } else if (!show) {
-    list.innerHTML = ''; // clear when hidden so they rebuild fresh next time
   }
 }
 
