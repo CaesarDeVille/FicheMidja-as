@@ -1034,7 +1034,9 @@ function renderSlotLabelParams() {
     lbl.textContent = LABELS[k] || k;
     const inp = document.createElement('input');
     inp.className = 'param-comp-input'; inp.type = 'text';
-    inp.value = getSlotLabel(k); inp.placeholder = LABELS[k] || k;
+    const def_k = LABELS[k] || k;
+    inp.value = data._slotLabels?.[k] && data._slotLabels[k] !== def_k ? data._slotLabels[k] : '';
+    inp.placeholder = def_k;
     inp.oninput = () => saveSlotLabel(k, inp.value);
     row.appendChild(lbl); row.appendChild(inp);
     container.appendChild(row);
@@ -1053,7 +1055,8 @@ function renderFicheLabelParams() {
     lbl.textContent = def;
     const inp = document.createElement('input');
     inp.className = 'param-comp-input'; inp.type = 'text';
-    inp.value = getFicheSectionLabel(key); inp.placeholder = def;
+    inp.value = data._ficheSectionLabels?.[key] && data._ficheSectionLabels[key] !== def ? data._ficheSectionLabels[key] : '';
+    inp.placeholder = def;
     inp.oninput = () => saveFicheSectionLabel(key, inp.value);
     row.appendChild(lbl); row.appendChild(inp);
     container.appendChild(row);
@@ -1621,11 +1624,13 @@ function renderArmorParams() {
     cb.title = 'Activer'; cb.onchange = () => saveArmorStatEnabled(key, cb.checked);
     const nameInp = document.createElement('input');
     nameInp.className = 'param-input param-input-wide'; nameInp.type = 'text';
-    nameInp.placeholder = defaultName; nameInp.value = getArmorStatName(key);
+    nameInp.placeholder = defaultName;
+    nameInp.value = data._armorNames?.[key] && data._armorNames[key] !== defaultName ? data._armorNames[key] : '';
     nameInp.oninput = () => saveArmorStatName(key, nameInp.value);
     const lblInp = document.createElement('input');
     lblInp.className = 'param-input'; lblInp.type = 'text'; lblInp.style.width = '60px';
-    lblInp.placeholder = defaultLabel; lblInp.value = getArmorStatLabel(key);
+    lblInp.placeholder = defaultLabel;
+    lblInp.value = data._armorLabels?.[key] && data._armorLabels[key] !== defaultLabel ? data._armorLabels[key] : '';
     lblInp.oninput = () => saveArmorStatLabel(key, lblInp.value);
     row.appendChild(cb); row.appendChild(nameInp); row.appendChild(lblInp);
     container.appendChild(row);
