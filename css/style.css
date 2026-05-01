@@ -3219,3 +3219,19 @@ select option, .skill-dd option { background: var(--select-bg) !important; color
 .param-cat-header { flex-wrap: wrap; gap: 6px; }
 .param-cat-name-input { min-width: 0; }
 .param-comp-meta-row { min-width: 0; }
+
+
+/* === ARKELITH : onglet Paramètres > Compétences sans plafond de hauteur === */
+.param-accordion.open .param-accordion-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.param-accordion.open .param-cols {
+  align-items: start;
+}
+
+/* La fenêtre et le panneau Paramètres peuvent s'allonger quand un joueur ajoute beaucoup de pages/compétences. */
+.main, .tab-content, #parametres, #tab-parametres, .parametres-panel {
+  max-height: none !important;
+}

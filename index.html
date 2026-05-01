@@ -1052,7 +1052,7 @@
         <div class="param-accordion-body">
           <div class="param-cols" style="grid-template-columns:1fr 1fr 1fr;">
 
-            <!-- Statistiques -->
+            <!-- Statistiques + Principales -->
             <div class="param-col">
               <div class="param-cat-header">
                 <input class="param-cat-name-input" id="cfg-name-stats" type="text" placeholder="Statistiques" value="Statistiques" oninput="saveParamCatLabel('stats',this.value)">
@@ -1064,11 +1064,10 @@
               <div id="cfg-list-sta" class="param-list"></div>
               <button class="param-add-btn" onclick="addParamComp('sta')">+ Ajouter</button>
               <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('sta')">&#8635; Défaut</button>
-            </div>
 
-            <!-- Principales + Secondaires + Connaissances -->
-            <div class="param-col">
-              <div class="param-cat-header">
+
+              <!-- Compétences Principales sous Statistiques -->
+              <div class="param-cat-header" style="margin-top:14px;">
                 <input class="param-cat-name-input" id="cfg-name-pri" type="text" placeholder="Compétences Principales" value="Compétences Principales" oninput="saveParamCatLabel('pri',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
@@ -1086,7 +1085,11 @@
               <div id="cfg-list-pri" class="param-list"></div>
               <div style="display:flex;gap:4px;flex-wrap:wrap;"><button class="param-add-btn" onclick="addParamComp('pri')">+ Ajouter</button><button class="param-add-btn" onclick="resetParamSection('pri')">&#8635; Défaut</button></div>
 
-              <div class="param-cat-header" style="margin-top:14px;">
+            </div>
+
+            <!-- Secondaires + Connaissances -->
+            <div class="param-col">
+              <div class="param-cat-header">
                 <input class="param-cat-name-input" id="cfg-name-sec" type="text" placeholder="Compétences Secondaires" value="Compétences Secondaires" oninput="saveParamCatLabel('sec',this.value)">
                 <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;">
                   <span class="param-info" style="font-style:normal;">Max</span>
