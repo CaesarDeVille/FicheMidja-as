@@ -1,5 +1,5 @@
 /* ── THEME ── */
-const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif",slotEmpty:'#0a0600',speSlot:'#070f16',charPanel:'#0a0600'};
+const DEFAULTS={bg:'#0d0700',bg2:'#1e1008',gold:'#f0c040',text:'#e8d5a0',border:'#8b6914',font:"'Palatino Linotype','Book Antiqua',Palatino,serif",slotEmpty:'#0a0600',speSlot:'#070f16',charPanel:'#0a0600',itemName:'#f0c040',itemDesc:'#9a9a9a',itemEffet:'#7ab8d4',placeholder:'#8b6914',selectBg:'#0d0700',cellBg:'#140c00'};
 
 function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
 function dk(h,f=.5){const[r,g,b]=hexToRgb(h);return`rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;}
@@ -16,6 +16,12 @@ function applyTheme(){
   const slotEmpty=(document.getElementById('tc-slot-empty')?.value) || DEFAULTS.slotEmpty;
   const charPanel=(document.getElementById('tc-char-panel')?.value) || DEFAULTS.charPanel;
   const speSlot=(document.getElementById('tc-spe-slot')?.value) || DEFAULTS.speSlot;
+  const itemName=(document.getElementById('tc-item-name')?.value) || DEFAULTS.itemName;
+  const itemDesc=(document.getElementById('tc-item-desc')?.value) || DEFAULTS.itemDesc;
+  const itemEffet=(document.getElementById('tc-item-effet')?.value) || DEFAULTS.itemEffet;
+  const placeholder=(document.getElementById('tc-placeholder')?.value) || DEFAULTS.placeholder;
+  const selectBg=(document.getElementById('tc-select-bg')?.value) || DEFAULTS.selectBg;
+  const cellBg=(document.getElementById('tc-cell-bg')?.value) || DEFAULTS.cellBg;
   const s=document.documentElement.style;
   s.setProperty('--bg',bg);
   s.setProperty('--bg2',bg2);
@@ -33,8 +39,14 @@ function applyTheme(){
   s.setProperty('--slot-empty',slotEmpty);
   s.setProperty('--char-panel',charPanel);
   s.setProperty('--spe-slot-empty',speSlot);
+  s.setProperty('--item-name',itemName);
+  s.setProperty('--item-desc',itemDesc);
+  s.setProperty('--item-effet',itemEffet);
+  s.setProperty('--placeholder',placeholder);
+  s.setProperty('--select-bg',selectBg);
+  s.setProperty('--cell-bg',cellBg);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,speSlot,charPanel}));
+  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,speSlot,charPanel,itemName,itemDesc,itemEffet,placeholder,selectBg,cellBg}));
 }
 
 function resetTheme(){
@@ -47,6 +59,12 @@ function resetTheme(){
   const se=document.getElementById('tc-slot-empty'); if(se) se.value=DEFAULTS.slotEmpty;
   const ss=document.getElementById('tc-spe-slot'); if(ss) ss.value=DEFAULTS.speSlot;
   const cp=document.getElementById('tc-char-panel'); if(cp) cp.value=DEFAULTS.charPanel;
+  const iname=document.getElementById('tc-item-name'); if(iname) iname.value=DEFAULTS.itemName;
+  const idesc=document.getElementById('tc-item-desc'); if(idesc) idesc.value=DEFAULTS.itemDesc;
+  const ieff=document.getElementById('tc-item-effet'); if(ieff) ieff.value=DEFAULTS.itemEffet;
+  const ph=document.getElementById('tc-placeholder'); if(ph) ph.value=DEFAULTS.placeholder;
+  const sb=document.getElementById('tc-select-bg'); if(sb) sb.value=DEFAULTS.selectBg;
+  const cb=document.getElementById('tc-cell-bg'); if(cb) cb.value=DEFAULTS.cellBg;
   applyTheme();
 }
 
@@ -63,6 +81,12 @@ function loadTheme(){
       const se=document.getElementById('tc-slot-empty'); if(se&&t.slotEmpty) se.value=t.slotEmpty;
       const ss=document.getElementById('tc-spe-slot'); if(ss&&t.speSlot) ss.value=t.speSlot;
       const cp=document.getElementById('tc-char-panel'); if(cp&&t.charPanel) cp.value=t.charPanel;
+      const iname=document.getElementById('tc-item-name'); if(iname&&t.itemName) iname.value=t.itemName;
+      const idesc=document.getElementById('tc-item-desc'); if(idesc&&t.itemDesc) idesc.value=t.itemDesc;
+      const ieff=document.getElementById('tc-item-effet'); if(ieff&&t.itemEffet) ieff.value=t.itemEffet;
+      const ph=document.getElementById('tc-placeholder'); if(ph&&t.placeholder) ph.value=t.placeholder;
+      const sb=document.getElementById('tc-select-bg'); if(sb&&t.selectBg) sb.value=t.selectBg;
+      const cb=document.getElementById('tc-cell-bg'); if(cb&&t.cellBg) cb.value=t.cellBg;
     }
   }catch(e){}
   applyTheme();
@@ -261,7 +285,7 @@ function exportData() {
   // not only values manually changed inline.
   const root = document.documentElement;
   const cs = getComputedStyle(root);
-  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel'];
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel','--item-name','--item-desc','--item-effet','--placeholder','--select-bg','--cell-bg'];
   const theme = {};
   themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
 
@@ -320,7 +344,7 @@ function importData(e) {
         '--border':'tc-border',
         '--slot-empty':'tc-slot-empty',
         '--spe-slot-empty':'tc-spe-slot',
-        '--char-panel':'tc-char-panel'
+        '--char-panel':'tc-char-panel','--item-name':'tc-item-name','--item-desc':'tc-item-desc','--item-effet':'tc-item-effet','--placeholder':'tc-placeholder','--select-bg':'tc-select-bg','--cell-bg':'tc-cell-bg'
       };
 
       const currentTheme = {};
@@ -370,7 +394,13 @@ function importData(e) {
           font: parsed._exportFont || '',
           slotEmpty: t['--slot-empty'] || '',
           speSlot: t['--spe-slot-empty'] || '',
-          charPanel: t['--char-panel'] || ''
+          charPanel: t['--char-panel'] || '',
+          itemName: t['--item-name'] || '',
+          itemDesc: t['--item-desc'] || '',
+          itemEffet: t['--item-effet'] || '',
+          placeholder: t['--placeholder'] || '',
+          selectBg: t['--select-bg'] || '',
+          cellBg: t['--cell-bg'] || ''
         }));
       }
 
@@ -459,7 +489,7 @@ function resetParamSection(section, skipConfirm = false) {
     qualities:'les Qualités/Raretés', ficheSections:'les titres de la Fiche Perso',
     slotLabels:'les noms des slots', charLabels:'le Cartouche Joueur',
     catLabels:'les noms des catégories', statLabels:'les labels des ressources',
-    armorStats:'les stats d\'Armure', capLabels:'les titres Capital',
+    armorStats:'les stats d\'Armure', capLabels:'les titres Possessions',
     theme:'l\'apparence',
     pri:'les Compétences Principales', sec:'les Compétences Secondaires',
     mar:'les Compétences Martiales', mag:'les Compétences Magiques',
@@ -467,7 +497,7 @@ function resetParamSection(section, skipConfirm = false) {
     livre:'le Livre de Sorts', allComps:'toutes les compétences',
     resources:'les Ressources', magie:'les réglages Magie',
     bags:'les types de Sacs', spe:'les Emplacements Spéciaux',
-    capital:'les données Capital',
+    capital:'les données Possessions',
   };
   if (!skipConfirm && !confirm('Réinitialiser '+(labels[section]||section)+' ?')) return;
   const map = {
@@ -2614,7 +2644,7 @@ function renderCompetences() {
     statsList.innerHTML = '';
     getCompArray('sta').forEach(name => {
       const box = document.createElement('div');
-      box.style.cssText = 'background:var(--bg3);border:1.5px solid var(--border2);border-radius:3px;padding:6px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px;';
+      box.style.cssText = 'background:var(--cell-bg);border:1.5px solid var(--border2);border-radius:3px;padding:6px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px;';
       const lbl = document.createElement('div');
       lbl.style.cssText = 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;';
       lbl.textContent = name;
@@ -2625,6 +2655,16 @@ function renderCompetences() {
       inp.value = data._stats?.[statKey] || '';
       inp.oninput = () => { if(!data._stats)data._stats={}; data._stats[statKey]=inp.value; persist(); };
       box.appendChild(lbl); box.appendChild(inp);
+      box.addEventListener('contextmenu', e => e.preventDefault());
+      box.addEventListener('mousedown', e => {
+        if (e.button !== 2) return;
+        e.preventDefault();
+        const m = getCompMeta('sta_', name);
+        if (!m.desc && !m.effet) return;
+        showSlotPreview(e, { nom: name, type: m.desc, effet: m.effet }, null);
+      });
+      box.addEventListener('mouseup', e => { if (e.button === 2) hideSlotPreview(); });
+      box.addEventListener('mouseleave', hideSlotPreview);
       statsList.appendChild(box);
     });
   }
@@ -2702,7 +2742,7 @@ function makeSlotDraggable(slotEl, key) {
 /* ══ I18N ══ */
 let currentLang = 'fr';
 
-const BUILTIN_TRANSLATIONS = {"fr": {"app.title": "⚔ ARKELITH ⚔", "top.sheetOf": "Fiche de", "top.sheetOfEmpty": "Fiche de —", "top.save": "💾 Sauvegarder / Charger", "top.load": "↻ Charger", "top.undo": "↶ Annuler", "top.redo": "↷ Rétablir", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Réinit. fiche", "nav.fiche": "⚬ Fiche Perso", "nav.competences": "⚔ Compétences", "nav.inventaire": "⊞ Inventaire", "nav.capital": "◈ Capital", "nav.campagne": "⚑ Campagne", "nav.parametres": "⚙ Paramètres", "modal.firebaseSave.title": "Sauvegarde Firebase", "modal.firebaseSave.currentCode": "Code actuel", "modal.firebaseSave.noCode": "Aucun code", "modal.firebaseSave.save": "Sauvegarder", "modal.firebaseSave.saveAs": "Sauvegarder sous", "modal.firebaseSave.close": "Fermer", "modal.firebaseSave.info": "“Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.", "modal.firebaseLoad.title": "Charger une sauvegarde", "modal.firebaseLoad.code": "Code de sauvegarde", "modal.firebaseLoad.load": "Charger", "modal.firebaseLoad.close": "Fermer", "common.name": "Nom", "common.race": "Race", "common.bioAge": "Âge Bio", "common.birth": "Naissance", "common.gender": "Genre", "common.right": "Droite", "common.left": "Gauche", "common.close": "Fermer", "common.cancel": "Annuler", "common.validate": "Valider", "common.delete": "Supprimer", "common.add": "Ajouter", "inventory.amulette": "Amulette", "inventory.couvre-chef": "Couvre-Chef", "inventory.gants": "Gants", "inventory.bracelet": "Bracelet", "inventory.armure": "Armure", "inventory.cape": "Cape / Manteau", "inventory.anneau1": "Anneau", "inventory.anneau2": "Anneau", "inventory.ceinture": "Ceinture", "inventory.divers": "Divers", "inventory.bottes": "Bottes", "inventory.arme": "Arme en Main", "inventory.dos": "Dos", "inventory.epaule": "Épaule", "inventory.ceintureGauche": "Ceinture Gauche", "inventory.ceintureDroite": "Ceinture Droite", "inventory.sac": "Sac", "inventory.poches": "Poches", "inventory.munitions": "Munitions", "inventory.bourse": "Bourse", "fiche.character": "Caractère", "fiche.physical": "Physique", "fiche.history": "Histoire", "fiche.mainHand": "Main dominante", "fiche.photoHint": "Cliquer pour ajouter une image", "params.appearance": "Apparence", "params.keepColors": "Conserver mes couleurs à l'import", "params.keepColorsInfo": "Si coché, l'apparence de la fiche importée est ignorée.", "params.visualEffectsPlus": "Effets Visuels +++", "params.resetAll": "Réinitialiser tous les paramètres", "toast.saved": "Sauvegardé !", "toast.imported": "Importé !", "toast.jsonError": "Erreur JSON", "toast.nothingUndo": "Rien à annuler", "toast.nothingRedo": "Rien à rétablir", "toast.undo": "Action annulée", "toast.redo": "Action rétablie", "toast.firebaseUnavailable": "Firebase indisponible", "toast.invalidCode": "Code invalide", "toast.firebaseSaveError": "Erreur sauvegarde Firebase", "toast.firebaseLoadError": "Erreur chargement Firebase", "toast.noSaveFound": "Aucune sauvegarde trouvée", "toast.invalidSave": "Sauvegarde invalide", "toast.sheetReset": "Fiche réinitialisée.", "confirm.resetSheet": "Réinitialiser la fiche du personnage ? Les paramètres seront conservés.", "confirm.loadSave": "Charger cette sauvegarde ? La fiche actuelle sera remplacée.", "modal.firebase.title": "Sauvegarder / Charger", "modal.firebase.save": "Sauvegarder", "modal.firebase.saveAs": "Sauvegarder sous", "modal.firebase.load": "Charger", "modal.firebase.close": "Fermer", "modal.firebase.noCode": "Aucun code", "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.", "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.", "arme": "Arme en Main", "dos": "Dos", "epaule": "Épaule", "ceintureGauche": "Ceinture — Gauche", "ceintureDroite": "Ceinture — Droite", "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé", "campaign.playerTitle": "Campagne Joueur", "campaign.currentCampaign": "Campagne actuelle", "campaign.playerSaveCode": "Code joueur", "campaign.join": "Rejoindre", "campaign.leave": "Quitter la campagne", "campaign.joinInfo": "Le code campagne permet d’associer votre fiche à une campagne.", "campaign.gmTitle": "Gestion MJ", "campaign.create": "Créer", "campaign.campaignCode": "Code Campagne", "campaign.gmCode": "Code MJ", "campaign.manage": "Gérer", "campaign.players": "Joueurs", "campaign.noCampaignLoaded": "Aucune campagne MJ chargée.", "campaign.loadSheet": "Voir fiche", "campaign.kick": "Expulser", "campaign.noPlayers": "Aucun joueur dans cette campagne.", "campaign.created": "Campagne créée", "campaign.joined": "Campagne rejointe", "campaign.left": "Campagne quittée", "campaign.loaded": "Campagne chargée", "campaign.playerKicked": "Joueur expulsé", "campaign.invalidCampaignCode": "Code campagne invalide", "campaign.invalidGmCode": "Code MJ invalide", "campaign.notFound": "Campagne introuvable", "campaign.needSaveCode": "Sauvegarde d’abord ta fiche pour obtenir un code joueur.", "campaign.confirmLeave": "Quitter cette campagne ? Votre fiche ne sera pas supprimée.", "campaign.confirmKick": "Expulser ce joueur de la campagne ?", "campaign.confirmLoadPlayer": "Charger la fiche de ce joueur ? Votre fiche actuelle sera remplacée.", "campaign.playersInCampaign": "Joueurs dans la campagne", "campaign.noCampaignJoined": "Aucune campagne rejointe.", "campaign.managedCampaigns": "Campagnes gérées", "campaign.defaultName": "Campagne sans nom", "campaign.rename": "Renommer", "campaign.renamed": "Campagne renommée", "params.resetAllParams": "↺ Réinitialiser tous les paramètres", "params.clearAll": "⚠ Tout réinitialiser (fiche + params)", "confirm.resetAllParams": "Réinitialiser tous les paramètres ?", "confirm.clearAll": "Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.", "toast.paramsReset": "Paramètres réinitialisés.", "toast.allReset": "Tout réinitialisé.", "toast.reset": "Réinitialisé.", "inventory.rings": "Anneaux", "inventory.customTitle": "Inventaire personnalisé", "params.inventoryLayout": "Inventaire", "params.inventoryMode": "Mode d’inventaire", "params.inventoryDefault": "Inventaire par défaut", "params.inventoryCustom": "Inventaire personnalisé", "params.inventoryCustomInfo": "En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.", "params.addCustomSlot": "Ajouter une case", "params.customSlotName": "Nom de la case", "toast.customSlotAdded": "Case ajoutée.", "toast.customSlotRemoved": "Case supprimée.", "inventory.prostheses": "Prothèses", "inventory.separateHand": "Séparer main", "params.renameInventorySpecials": "Renommer les sections spéciales", "prostheses.head": "Tête", "prostheses.leftEye": "Œil gauche", "prostheses.rightEye": "Œil droit", "prostheses.leftArm": "Bras gauche", "prostheses.rightArm": "Bras droit", "prostheses.leftHand": "Main gauche", "prostheses.rightHand": "Main droite", "prostheses.body": "Corps", "prostheses.leftLeg": "Jambe gauche", "prostheses.rightLeg": "Jambe droite", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Renommer les capsules de prothèses", "params.resetProsthesisLabels": "Réinitialiser les noms de prothèses", "toast.prosthesisLabelsReset": "Noms de prothèses réinitialisés.", "prostheses.groupHead": "Tête", "prostheses.groupArmsBody": "Bras / Corps", "prostheses.groupLegs": "Jambes", "prostheses.groupModules": "Modules"}, "en": {"app.title": "⚔ ARKELITH ⚔", "top.sheetOf": "Sheet of", "top.sheetOfEmpty": "Sheet of —", "top.save": "💾 Save / Load", "top.load": "↻ Load", "top.undo": "↶ Undo", "top.redo": "↷ Redo", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Reset sheet", "nav.fiche": "⚬ Character Sheet", "nav.competences": "⚔ Skills", "nav.inventaire": "⊞ Inventory", "nav.capital": "◈ Capital", "nav.campagne": "⚑ Campaign", "nav.parametres": "⚙ Settings", "modal.firebaseSave.title": "Firebase Save", "modal.firebaseSave.currentCode": "Current code", "modal.firebaseSave.noCode": "No code", "modal.firebaseSave.save": "Save", "modal.firebaseSave.saveAs": "Save as", "modal.firebaseSave.close": "Close", "modal.firebaseSave.info": "“Save” overwrites the save linked to the current code. “Save as” creates a new code.", "modal.firebaseLoad.title": "Load a save", "modal.firebaseLoad.code": "Save code", "modal.firebaseLoad.load": "Load", "modal.firebaseLoad.close": "Close", "common.name": "Name", "common.race": "Race", "common.bioAge": "Bio Age", "common.birth": "Birth", "common.gender": "Gender", "common.right": "Right", "common.left": "Left", "common.close": "Close", "common.cancel": "Cancel", "common.validate": "Confirm", "common.delete": "Delete", "common.add": "Add", "inventory.amulette": "Amulet", "inventory.couvre-chef": "Headgear", "inventory.gants": "Gloves", "inventory.bracelet": "Bracelet", "inventory.armure": "Armor", "inventory.cape": "Cape / Coat", "inventory.anneau1": "Ring", "inventory.anneau2": "Ring", "inventory.ceinture": "Belt", "inventory.divers": "Misc.", "inventory.bottes": "Boots", "inventory.arme": "Main Weapon", "inventory.dos": "Back", "inventory.epaule": "Shoulder", "inventory.ceintureGauche": "Left Belt", "inventory.ceintureDroite": "Right Belt", "inventory.sac": "Bag", "inventory.poches": "Pockets", "inventory.munitions": "Ammunition", "inventory.bourse": "Purse", "fiche.character": "Personality", "fiche.physical": "Appearance", "fiche.history": "History", "fiche.mainHand": "Dominant hand", "fiche.photoHint": "Click to add an image", "params.appearance": "Appearance", "params.keepColors": "Keep my colors on import", "params.keepColorsInfo": "If checked, the imported sheet appearance is ignored.", "params.visualEffectsPlus": "Visual Effects +++", "params.resetAll": "Reset all settings", "toast.saved": "Saved!", "toast.imported": "Imported!", "toast.jsonError": "JSON error", "toast.nothingUndo": "Nothing to undo", "toast.nothingRedo": "Nothing to redo", "toast.undo": "Action undone", "toast.redo": "Action redone", "toast.firebaseUnavailable": "Firebase unavailable", "toast.invalidCode": "Invalid code", "toast.firebaseSaveError": "Firebase save error", "toast.firebaseLoadError": "Firebase load error", "toast.noSaveFound": "No save found", "toast.invalidSave": "Invalid save", "toast.sheetReset": "Sheet reset.", "confirm.resetSheet": "Reset the character sheet? Settings will be kept.", "confirm.loadSave": "Load this save? The current sheet will be replaced.", "modal.firebase.title": "Save / Load", "modal.firebase.save": "Save", "modal.firebase.saveAs": "Save as", "modal.firebase.load": "Load", "modal.firebase.close": "Close", "modal.firebase.noCode": "No code", "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.", "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.", "arme": "Main Weapon", "dos": "Back", "epaule": "Shoulder", "ceintureGauche": "Belt — Left", "ceintureDroite": "Belt — Right", "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed", "campaign.playerTitle": "Player Campaign", "campaign.currentCampaign": "Current campaign", "campaign.playerSaveCode": "Player code", "campaign.join": "Join", "campaign.leave": "Leave campaign", "campaign.joinInfo": "The campaign code links your sheet to a campaign.", "campaign.gmTitle": "GM Management", "campaign.create": "Create", "campaign.campaignCode": "Campaign Code", "campaign.gmCode": "GM Code", "campaign.manage": "Manage", "campaign.players": "Players", "campaign.noCampaignLoaded": "No GM campaign loaded.", "campaign.loadSheet": "View sheet", "campaign.kick": "Kick", "campaign.noPlayers": "No player in this campaign.", "campaign.created": "Campaign created", "campaign.joined": "Campaign joined", "campaign.left": "Campaign left", "campaign.loaded": "Campaign loaded", "campaign.playerKicked": "Player kicked", "campaign.invalidCampaignCode": "Invalid campaign code", "campaign.invalidGmCode": "Invalid GM code", "campaign.notFound": "Campaign not found", "campaign.needSaveCode": "Save your sheet first to get a player code.", "campaign.confirmLeave": "Leave this campaign? Your sheet will not be deleted.", "campaign.confirmKick": "Kick this player from the campaign?", "campaign.confirmLoadPlayer": "Load this player sheet? Your current sheet will be replaced.", "campaign.playersInCampaign": "Players in campaign", "campaign.noCampaignJoined": "No campaign joined.", "campaign.managedCampaigns": "Managed campaigns", "campaign.defaultName": "Unnamed campaign", "campaign.rename": "Rename", "campaign.renamed": "Campaign renamed", "params.resetAllParams": "↺ Reset all settings", "params.clearAll": "⚠ Reset everything (sheet + settings)", "confirm.resetAllParams": "Reset all settings?", "confirm.clearAll": "Reset EVERYTHING (sheet AND settings)? This cannot be undone.", "toast.paramsReset": "Settings reset.", "toast.allReset": "Everything reset.", "toast.reset": "Reset.", "inventory.rings": "Rings", "inventory.customTitle": "Custom inventory", "params.inventoryLayout": "Inventory", "params.inventoryMode": "Inventory mode", "params.inventoryDefault": "Default inventory", "params.inventoryCustom": "Custom inventory", "params.inventoryCustomInfo": "In custom mode, you add your own inventory slots. They display in 3 columns.", "params.addCustomSlot": "Add slot", "params.customSlotName": "Slot name", "toast.customSlotAdded": "Slot added.", "toast.customSlotRemoved": "Slot removed.", "inventory.prostheses": "Prostheses", "inventory.separateHand": "Separate hand", "params.renameInventorySpecials": "Rename special sections", "prostheses.head": "Head", "prostheses.leftEye": "Left eye", "prostheses.rightEye": "Right eye", "prostheses.leftArm": "Left arm", "prostheses.rightArm": "Right arm", "prostheses.leftHand": "Left hand", "prostheses.rightHand": "Right hand", "prostheses.body": "Body", "prostheses.leftLeg": "Left leg", "prostheses.rightLeg": "Right leg", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Rename prosthesis capsules", "params.resetProsthesisLabels": "Reset prosthesis names", "toast.prosthesisLabelsReset": "Prosthesis names reset.", "prostheses.groupHead": "Head", "prostheses.groupArmsBody": "Arms / Body", "prostheses.groupLegs": "Legs", "prostheses.groupModules": "Modules"}};
+const BUILTIN_TRANSLATIONS = {"fr": {"app.title": "⚔ ARKELITH ⚔", "top.sheetOf": "Fiche de", "top.sheetOfEmpty": "Fiche de —", "top.save": "💾 Sauvegarder / Charger", "top.load": "↻ Charger", "top.undo": "↶ Annuler", "top.redo": "↷ Rétablir", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Réinit. fiche", "nav.fiche": "⚬ Fiche Perso", "nav.competences": "⚔ Compétences", "nav.inventaire": "⊞ Inventaire", "nav.capital": "◈ Possessions", "nav.campagne": "⚑ Campagne", "nav.parametres": "⚙ Paramètres", "modal.firebaseSave.title": "Sauvegarde Firebase", "modal.firebaseSave.currentCode": "Code actuel", "modal.firebaseSave.noCode": "Aucun code", "modal.firebaseSave.save": "Sauvegarder", "modal.firebaseSave.saveAs": "Sauvegarder sous", "modal.firebaseSave.close": "Fermer", "modal.firebaseSave.info": "“Sauvegarder” écrase la sauvegarde liée au code actuel. “Sauvegarder sous” crée un nouveau code.", "modal.firebaseLoad.title": "Charger une sauvegarde", "modal.firebaseLoad.code": "Code de sauvegarde", "modal.firebaseLoad.load": "Charger", "modal.firebaseLoad.close": "Fermer", "common.name": "Nom", "common.race": "Race", "common.bioAge": "Âge Bio", "common.birth": "Naissance", "common.gender": "Genre", "common.right": "Droite", "common.left": "Gauche", "common.close": "Fermer", "common.cancel": "Annuler", "common.validate": "Valider", "common.delete": "Supprimer", "common.add": "Ajouter", "inventory.amulette": "Amulette", "inventory.couvre-chef": "Couvre-Chef", "inventory.gants": "Gants", "inventory.bracelet": "Bracelet", "inventory.armure": "Armure", "inventory.cape": "Cape / Manteau", "inventory.anneau1": "Anneau", "inventory.anneau2": "Anneau", "inventory.ceinture": "Ceinture", "inventory.divers": "Divers", "inventory.bottes": "Bottes", "inventory.arme": "Arme en Main", "inventory.dos": "Dos", "inventory.epaule": "Épaule", "inventory.ceintureGauche": "Ceinture Gauche", "inventory.ceintureDroite": "Ceinture Droite", "inventory.sac": "Sac", "inventory.poches": "Poches", "inventory.munitions": "Munitions", "inventory.bourse": "Bourse", "fiche.character": "Caractère", "fiche.physical": "Physique", "fiche.history": "Histoire", "fiche.mainHand": "Main dominante", "fiche.photoHint": "Cliquer pour ajouter une image", "params.appearance": "Apparence", "params.keepColors": "Conserver mes couleurs à l'import", "params.keepColorsInfo": "Si coché, l'apparence de la fiche importée est ignorée.", "params.visualEffectsPlus": "Effets Visuels +++", "params.resetAll": "Réinitialiser tous les paramètres", "toast.saved": "Sauvegardé !", "toast.imported": "Importé !", "toast.jsonError": "Erreur JSON", "toast.nothingUndo": "Rien à annuler", "toast.nothingRedo": "Rien à rétablir", "toast.undo": "Action annulée", "toast.redo": "Action rétablie", "toast.firebaseUnavailable": "Firebase indisponible", "toast.invalidCode": "Code invalide", "toast.firebaseSaveError": "Erreur sauvegarde Firebase", "toast.firebaseLoadError": "Erreur chargement Firebase", "toast.noSaveFound": "Aucune sauvegarde trouvée", "toast.invalidSave": "Sauvegarde invalide", "toast.sheetReset": "Fiche réinitialisée.", "confirm.resetSheet": "Réinitialiser la fiche du personnage ? Les paramètres seront conservés.", "confirm.loadSave": "Charger cette sauvegarde ? La fiche actuelle sera remplacée.", "modal.firebase.title": "Sauvegarder / Charger", "modal.firebase.save": "Sauvegarder", "modal.firebase.saveAs": "Sauvegarder sous", "modal.firebase.load": "Charger", "modal.firebase.close": "Fermer", "modal.firebase.noCode": "Aucun code", "modal.firebase.saveInfo": "Sauvegarde sur le code actuel. Si aucun code n’existe, un code est généré.", "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.", "arme": "Arme en Main", "dos": "Dos", "epaule": "Épaule", "ceintureGauche": "Ceinture — Gauche", "ceintureDroite": "Ceinture — Droite", "legal.text": "© XVI — Univers Midja’as · Reproduction interdite · Usage personnel autorisé", "campaign.playerTitle": "Campagne Joueur", "campaign.currentCampaign": "Campagne actuelle", "campaign.playerSaveCode": "Code joueur", "campaign.join": "Rejoindre", "campaign.leave": "Quitter la campagne", "campaign.joinInfo": "Le code campagne permet d’associer votre fiche à une campagne.", "campaign.gmTitle": "Gestion MJ", "campaign.create": "Créer", "campaign.campaignCode": "Code Campagne", "campaign.gmCode": "Code MJ", "campaign.manage": "Gérer", "campaign.players": "Joueurs", "campaign.noCampaignLoaded": "Aucune campagne MJ chargée.", "campaign.loadSheet": "Voir fiche", "campaign.kick": "Expulser", "campaign.noPlayers": "Aucun joueur dans cette campagne.", "campaign.created": "Campagne créée", "campaign.joined": "Campagne rejointe", "campaign.left": "Campagne quittée", "campaign.loaded": "Campagne chargée", "campaign.playerKicked": "Joueur expulsé", "campaign.invalidCampaignCode": "Code campagne invalide", "campaign.invalidGmCode": "Code MJ invalide", "campaign.notFound": "Campagne introuvable", "campaign.needSaveCode": "Sauvegarde d’abord ta fiche pour obtenir un code joueur.", "campaign.confirmLeave": "Quitter cette campagne ? Votre fiche ne sera pas supprimée.", "campaign.confirmKick": "Expulser ce joueur de la campagne ?", "campaign.confirmLoadPlayer": "Charger la fiche de ce joueur ? Votre fiche actuelle sera remplacée.", "campaign.playersInCampaign": "Joueurs dans la campagne", "campaign.noCampaignJoined": "Aucune campagne rejointe.", "campaign.managedCampaigns": "Campagnes gérées", "campaign.defaultName": "Campagne sans nom", "campaign.rename": "Renommer", "campaign.renamed": "Campagne renommée", "params.resetAllParams": "↺ Réinitialiser tous les paramètres", "params.clearAll": "⚠ Tout réinitialiser (fiche + params)", "confirm.resetAllParams": "Réinitialiser tous les paramètres ?", "confirm.clearAll": "Réinitialiser TOUT (fiche ET paramètres) ? Irréversible.", "toast.paramsReset": "Paramètres réinitialisés.", "toast.allReset": "Tout réinitialisé.", "toast.reset": "Réinitialisé.", "inventory.rings": "Anneaux", "inventory.customTitle": "Inventaire personnalisé", "params.inventoryLayout": "Inventaire", "params.inventoryMode": "Mode d’inventaire", "params.inventoryDefault": "Inventaire par défaut", "params.inventoryCustom": "Inventaire personnalisé", "params.inventoryCustomInfo": "En mode personnalisé, vous ajoutez vos propres cases d’inventaire. Elles s’affichent sur 3 colonnes.", "params.addCustomSlot": "Ajouter une case", "params.customSlotName": "Nom de la case", "toast.customSlotAdded": "Case ajoutée.", "toast.customSlotRemoved": "Case supprimée.", "inventory.prostheses": "Prothèses", "inventory.separateHand": "Séparer main", "params.renameInventorySpecials": "Renommer les sections spéciales", "prostheses.head": "Tête", "prostheses.leftEye": "Œil gauche", "prostheses.rightEye": "Œil droit", "prostheses.leftArm": "Bras gauche", "prostheses.rightArm": "Bras droit", "prostheses.leftHand": "Main gauche", "prostheses.rightHand": "Main droite", "prostheses.body": "Corps", "prostheses.leftLeg": "Jambe gauche", "prostheses.rightLeg": "Jambe droite", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Renommer les capsules de prothèses", "params.resetProsthesisLabels": "Réinitialiser les noms de prothèses", "toast.prosthesisLabelsReset": "Noms de prothèses réinitialisés.", "prostheses.groupHead": "Tête", "prostheses.groupArmsBody": "Bras / Corps", "prostheses.groupLegs": "Jambes", "prostheses.groupModules": "Modules"}, "en": {"app.title": "⚔ ARKELITH ⚔", "top.sheetOf": "Sheet of", "top.sheetOfEmpty": "Sheet of —", "top.save": "💾 Save / Load", "top.load": "↻ Load", "top.undo": "↶ Undo", "top.redo": "↷ Redo", "top.export": "⇧ Export", "top.import": "⇩ Import", "top.resetSheet": "✕ Reset sheet", "nav.fiche": "⚬ Character Sheet", "nav.competences": "⚔ Skills", "nav.inventaire": "⊞ Inventory", "nav.capital": "◈ Possessions", "nav.campagne": "⚑ Campaign", "nav.parametres": "⚙ Settings", "modal.firebaseSave.title": "Firebase Save", "modal.firebaseSave.currentCode": "Current code", "modal.firebaseSave.noCode": "No code", "modal.firebaseSave.save": "Save", "modal.firebaseSave.saveAs": "Save as", "modal.firebaseSave.close": "Close", "modal.firebaseSave.info": "“Save” overwrites the save linked to the current code. “Save as” creates a new code.", "modal.firebaseLoad.title": "Load a save", "modal.firebaseLoad.code": "Save code", "modal.firebaseLoad.load": "Load", "modal.firebaseLoad.close": "Close", "common.name": "Name", "common.race": "Race", "common.bioAge": "Bio Age", "common.birth": "Birth", "common.gender": "Gender", "common.right": "Right", "common.left": "Left", "common.close": "Close", "common.cancel": "Cancel", "common.validate": "Confirm", "common.delete": "Delete", "common.add": "Add", "inventory.amulette": "Amulet", "inventory.couvre-chef": "Headgear", "inventory.gants": "Gloves", "inventory.bracelet": "Bracelet", "inventory.armure": "Armor", "inventory.cape": "Cape / Coat", "inventory.anneau1": "Ring", "inventory.anneau2": "Ring", "inventory.ceinture": "Belt", "inventory.divers": "Misc.", "inventory.bottes": "Boots", "inventory.arme": "Main Weapon", "inventory.dos": "Back", "inventory.epaule": "Shoulder", "inventory.ceintureGauche": "Left Belt", "inventory.ceintureDroite": "Right Belt", "inventory.sac": "Bag", "inventory.poches": "Pockets", "inventory.munitions": "Ammunition", "inventory.bourse": "Purse", "fiche.character": "Personality", "fiche.physical": "Appearance", "fiche.history": "History", "fiche.mainHand": "Dominant hand", "fiche.photoHint": "Click to add an image", "params.appearance": "Appearance", "params.keepColors": "Keep my colors on import", "params.keepColorsInfo": "If checked, the imported sheet appearance is ignored.", "params.visualEffectsPlus": "Visual Effects +++", "params.resetAll": "Reset all settings", "toast.saved": "Saved!", "toast.imported": "Imported!", "toast.jsonError": "JSON error", "toast.nothingUndo": "Nothing to undo", "toast.nothingRedo": "Nothing to redo", "toast.undo": "Action undone", "toast.redo": "Action redone", "toast.firebaseUnavailable": "Firebase unavailable", "toast.invalidCode": "Invalid code", "toast.firebaseSaveError": "Firebase save error", "toast.firebaseLoadError": "Firebase load error", "toast.noSaveFound": "No save found", "toast.invalidSave": "Invalid save", "toast.sheetReset": "Sheet reset.", "confirm.resetSheet": "Reset the character sheet? Settings will be kept.", "confirm.loadSave": "Load this save? The current sheet will be replaced.", "modal.firebase.title": "Save / Load", "modal.firebase.save": "Save", "modal.firebase.saveAs": "Save as", "modal.firebase.load": "Load", "modal.firebase.close": "Close", "modal.firebase.noCode": "No code", "modal.firebase.saveInfo": "Saves to the current code. If there is no code yet, one is generated.", "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.", "arme": "Main Weapon", "dos": "Back", "epaule": "Shoulder", "ceintureGauche": "Belt — Left", "ceintureDroite": "Belt — Right", "legal.text": "© XVI — Midja’as Universe · No reproduction · Personal use allowed", "campaign.playerTitle": "Player Campaign", "campaign.currentCampaign": "Current campaign", "campaign.playerSaveCode": "Player code", "campaign.join": "Join", "campaign.leave": "Leave campaign", "campaign.joinInfo": "The campaign code links your sheet to a campaign.", "campaign.gmTitle": "GM Management", "campaign.create": "Create", "campaign.campaignCode": "Campaign Code", "campaign.gmCode": "GM Code", "campaign.manage": "Manage", "campaign.players": "Players", "campaign.noCampaignLoaded": "No GM campaign loaded.", "campaign.loadSheet": "View sheet", "campaign.kick": "Kick", "campaign.noPlayers": "No player in this campaign.", "campaign.created": "Campaign created", "campaign.joined": "Campaign joined", "campaign.left": "Campaign left", "campaign.loaded": "Campaign loaded", "campaign.playerKicked": "Player kicked", "campaign.invalidCampaignCode": "Invalid campaign code", "campaign.invalidGmCode": "Invalid GM code", "campaign.notFound": "Campaign not found", "campaign.needSaveCode": "Save your sheet first to get a player code.", "campaign.confirmLeave": "Leave this campaign? Your sheet will not be deleted.", "campaign.confirmKick": "Kick this player from the campaign?", "campaign.confirmLoadPlayer": "Load this player sheet? Your current sheet will be replaced.", "campaign.playersInCampaign": "Players in campaign", "campaign.noCampaignJoined": "No campaign joined.", "campaign.managedCampaigns": "Managed campaigns", "campaign.defaultName": "Unnamed campaign", "campaign.rename": "Rename", "campaign.renamed": "Campaign renamed", "params.resetAllParams": "↺ Reset all settings", "params.clearAll": "⚠ Reset everything (sheet + settings)", "confirm.resetAllParams": "Reset all settings?", "confirm.clearAll": "Reset EVERYTHING (sheet AND settings)? This cannot be undone.", "toast.paramsReset": "Settings reset.", "toast.allReset": "Everything reset.", "toast.reset": "Reset.", "inventory.rings": "Rings", "inventory.customTitle": "Custom inventory", "params.inventoryLayout": "Inventory", "params.inventoryMode": "Inventory mode", "params.inventoryDefault": "Default inventory", "params.inventoryCustom": "Custom inventory", "params.inventoryCustomInfo": "In custom mode, you add your own inventory slots. They display in 3 columns.", "params.addCustomSlot": "Add slot", "params.customSlotName": "Slot name", "toast.customSlotAdded": "Slot added.", "toast.customSlotRemoved": "Slot removed.", "inventory.prostheses": "Prostheses", "inventory.separateHand": "Separate hand", "params.renameInventorySpecials": "Rename special sections", "prostheses.head": "Head", "prostheses.leftEye": "Left eye", "prostheses.rightEye": "Right eye", "prostheses.leftArm": "Left arm", "prostheses.rightArm": "Right arm", "prostheses.leftHand": "Left hand", "prostheses.rightHand": "Right hand", "prostheses.body": "Body", "prostheses.leftLeg": "Left leg", "prostheses.rightLeg": "Right leg", "prostheses.extra1": "Module 1", "prostheses.extra2": "Module 2", "prostheses.extra3": "Module 3", "prostheses.extra4": "Module 4", "prostheses.extra5": "Module 5", "params.renameProsthesisCapsules": "Rename prosthesis capsules", "params.resetProsthesisLabels": "Reset prosthesis names", "toast.prosthesisLabelsReset": "Prosthesis names reset.", "prostheses.groupHead": "Head", "prostheses.groupArmsBody": "Arms / Body", "prostheses.groupLegs": "Legs", "prostheses.groupModules": "Modules"}};
 const I18N = {
   fr: {
     "prostheses.groupHead": "Tête",
@@ -2804,7 +2844,7 @@ const I18N = {
     "nav.fiche": "⚬ Fiche Perso",
     "nav.competences": "⚔ Compétences",
     "nav.inventaire": "⊞ Inventaire",
-    "nav.capital": "◈ Capital",
+    "nav.capital": "◈ Possessions",
     "nav.campagne": "⚑ Campagne",
     "nav.parametres": "⚙ Paramètres",
     "inventory.amulette": "Amulette",
@@ -2833,7 +2873,7 @@ const I18N = {
     "modal.firebase.saveAsInfo": "Laisse vide pour générer un nouveau code, ou entre ton propre code.",
     "params.keepColors": "Conserver mes couleurs à l'import",
     "params.keepColorsInfo": "Si coché, l'apparence de la fiche importée est ignorée.",
-    nav_competences: '⚔ Compétences', nav_inventaire: '⊞ Inventaire', nav_capital: '◈ Capital',
+    nav_competences: '⚔ Compétences', nav_inventaire: '⊞ Inventaire', nav_capital: '◈ Possessions',
     amulette: 'Amulette', 'couvre-chef': 'Couvre-Chef', gants: 'Gants',
     bracelet: 'Bracelet', armure: 'Armure', cape: 'Cape / Manteau',
     anneau1: 'Anneau', anneau2: 'Anneau',
@@ -2851,7 +2891,7 @@ const I18N = {
     savoirs: 'Connaissances et Statut', livre_sorts: 'Livre de Sorts',
     sacoche: 'Sacoche (6 empl.)', petit_sac: 'Petit sac (9 empl. + 1 spé)',
     sac_moyen: 'Sac moyen (11 empl. + 2 spé)', grand_sac: 'Grand sac (13 empl. + 3 spé)',
-    capital_wip: '💰 Capital — à venir', choisir: '— Choisir —',
+    capital_wip: '💰 Possessions — à venir', choisir: '— Choisir —',
     levels_std: ['Novice','Adepte','Expert','Maître'],
     levels_magic: ['Adepte','Expert','Maître'],
     comp_pri: ['Identification','Marchandage','Désamorçage','Vol à la tire','Médecine','Artisanat / Réparation','Alchimie','Chasse / Pistage','Dressage','Acrobaties','Cuisine'],
@@ -2962,7 +3002,7 @@ const I18N = {
     "nav.fiche": "⚬ Character Sheet",
     "nav.competences": "⚔ Skills",
     "nav.inventaire": "⊞ Inventory",
-    "nav.capital": "◈ Capital",
+    "nav.capital": "◈ Possessions",
     "nav.campagne": "⚑ Campaign",
     "nav.parametres": "⚙ Settings",
     "inventory.amulette": "Amulet",
@@ -2991,7 +3031,7 @@ const I18N = {
     "modal.firebase.saveAsInfo": "Leave empty to generate a new code, or enter your own code.",
     "params.keepColors": "Keep my colors on import",
     "params.keepColorsInfo": "If checked, the imported sheet appearance is ignored.",
-    nav_competences: '⚔ Skills', nav_inventaire: '⊞ Inventory', nav_capital: '◈ Capital',
+    nav_competences: '⚔ Skills', nav_inventaire: '⊞ Inventory', nav_capital: '◈ Possessions',
     amulette: 'Amulet', 'couvre-chef': 'Headgear', gants: 'Gloves',
     bracelet: 'Bracelet', armure: 'Armor', cape: 'Cape / Cloak',
     anneau1: 'Ring', anneau2: 'Ring',
@@ -3009,7 +3049,7 @@ const I18N = {
     savoirs: 'Lore & Status', livre_sorts: 'Spellbook',
     sacoche: 'Pouch (6 slots)', petit_sac: 'Small bag (9 slots + 1 sp.)',
     sac_moyen: 'Medium bag (11 slots + 2 sp.)', grand_sac: 'Large bag (13 slots + 3 sp.)',
-    capital_wip: '💰 Capital — coming soon', choisir: '— Choose —',
+    capital_wip: '💰 Possessions — coming soon', choisir: '— Choose —',
     levels_std: ['Novice','Adept','Expert','Master'],
     levels_magic: ['Adept','Expert','Master'],
     comp_pri: ['Identification','Bargaining','Disarming','Pickpocket','Medicine','Crafting / Repair','Alchemy','Hunting / Tracking','Taming','Acrobatics','Cooking'],
@@ -3416,7 +3456,7 @@ function renderParametres() {
   // Bourse count
   const bourseCountSel = document.getElementById('cfg-bourse-count');
   if (bourseCountSel) bourseCountSel.value = getBourseCount();
-  // Capital labels
+  // Possessions labels
   renderCapitalParams();
   // Quality params
   renderQualityParams();
@@ -3928,7 +3968,7 @@ function firebaseRef(path) {
 function makeFirebaseSavePayload() {
   const root = document.documentElement;
   const cs = getComputedStyle(root);
-  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel'];
+  const themeKeys = ['--bg','--bg2','--bg3','--gold','--text','--border','--border2','--muted','--dim','--hover','--filled','--slot-empty','--spe-slot-empty','--char-panel','--item-name','--item-desc','--item-effet','--placeholder','--select-bg','--cell-bg'];
   const theme = {};
   themeKeys.forEach(k => { theme[k] = cs.getPropertyValue(k).trim(); });
 
@@ -4098,7 +4138,7 @@ async function firebaseLoadByCode() {
       const t = data._exportTheme;
       Object.entries(t).forEach(([k, v]) => { if (v) root.style.setProperty(k, v); });
       if (data._exportFont) root.style.setProperty('--font', data._exportFont);
-      const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--spe-slot-empty':'tc-spe-slot','--char-panel':'tc-char-panel'};
+      const pickers = {'--bg':'tc-bg','--bg2':'tc-bg2','--gold':'tc-gold','--text':'tc-text','--border':'tc-border','--slot-empty':'tc-slot-empty','--spe-slot-empty':'tc-spe-slot','--char-panel':'tc-char-panel','--item-name':'tc-item-name','--item-desc':'tc-item-desc','--item-effet':'tc-item-effet','--placeholder':'tc-placeholder','--select-bg':'tc-select-bg','--cell-bg':'tc-cell-bg'};
       Object.entries(pickers).forEach(([cssVar, id]) => { const el = document.getElementById(id); if (el && t[cssVar]) el.value = t[cssVar]; });
       const fontEl = document.getElementById('tc-font'); if (fontEl && data._exportFont) fontEl.value = data._exportFont;
     }

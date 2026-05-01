@@ -12,7 +12,7 @@
 <!-- ══ THEME BAR ══ -->
 <div class="theme-bar">
   <span class="tb-fiche-nom" id="tb-fiche-nom">Fiche de —</span>
-  <span class="tb-title" id="midjaas-title-egg" data-i18n="app.title" title="Midja’as">⚔ ARKELITH ⚔</span>
+  <span class="tb-title" id="midjaas-title-egg" data-i18n="app.title" title="Arkelith">⚔ ARKELITH ⚔</span>
   <div class="tb-right">
     <div class="gender-wrap">
       <label class="gender-lbl" title="Français">
@@ -38,7 +38,7 @@
     <button class="nav-btn active" id="nav-fiche" onclick="showPage('fiche')" data-i18n="nav.fiche">⚬ Fiche Perso</button>
     <button class="nav-btn" id="nav-competences" onclick="showPage('competences')" data-i18n="nav.competences">⚔ Compétences</button>
     <button class="nav-btn" id="nav-inventaire" onclick="showPage('inventaire')" data-i18n="nav.inventaire">⊞ Inventaire</button>
-    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')" data-i18n="nav.capital">◈ Capital</button>
+    <button class="nav-btn" id="nav-capital" onclick="showPage('capital')" data-i18n="nav.capital">◈ Possessions</button>
     <button class="nav-btn" id="nav-campagne" onclick="showPage('campagne')" data-i18n="nav.campagne">⚑ Campagne</button>
     <button class="nav-btn" id="nav-parametres" onclick="showPage('parametres')" data-i18n="nav.parametres">⚙ Paramètres</button>
   </div>
@@ -873,6 +873,12 @@
                 <div class="param-row"><span class="param-lbl">Cases vides</span><input type="color" id="tc-slot-empty" value="#0a0600" oninput="applyTheme()"></div>
                 <div class="param-row"><span class="param-lbl">Empl. spéciaux</span><input type="color" id="tc-spe-slot" value="#070f16" oninput="applyTheme()"></div>
                 <div class="param-row"><span class="param-lbl">Cartouche</span><input type="color" id="tc-char-panel" value="#0a0600" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Cellules</span><input type="color" id="tc-cell-bg" value="#140c00" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Menus déroulants</span><input type="color" id="tc-select-bg" value="#0d0700" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Noms</span><input type="color" id="tc-item-name" value="#f0c040" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Descriptions</span><input type="color" id="tc-item-desc" value="#9a9a9a" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Effets</span><input type="color" id="tc-item-effet" value="#7ab8d4" oninput="applyTheme()"></div>
+                <div class="param-row"><span class="param-lbl">Placeholders</span><input type="color" id="tc-placeholder" value="#8b6914" oninput="applyTheme()"></div>
                 <div class="param-row">
                   <span class="param-lbl">Police</span>
                   <select id="tc-font" onchange="applyTheme()" style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font);font-size:11px;padding:2px 4px;border-radius:2px;">
@@ -1292,10 +1298,10 @@
         </div>
       </div>
 
-      <!-- ACCORDÉON : Capital -->
+      <!-- ACCORDÉON : Possessions -->
       <div class="param-accordion">
         <div class="param-accordion-header" onclick="toggleAccordion(this)">
-          <span class="param-accordion-title">&#9670; Capital</span>
+          <span class="param-accordion-title">&#9670; Possessions</span>
           <span class="param-accordion-arrow">▼</span>
         </div>
         <div class="param-accordion-body">
@@ -1348,7 +1354,7 @@
   </div><!-- end page-parametres -->
 
 </div><!-- end app -->
-<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.11</div></div>
+<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.12</div></div>
 </div><!-- end aspect-wrap -->
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">

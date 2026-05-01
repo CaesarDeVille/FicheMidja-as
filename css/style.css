@@ -18,6 +18,12 @@
   --fs-item-nom: 14px;
   --fs-item-type: 12px;
   --fs-item-effet: 12px;
+  --item-name: #f0c040;
+  --item-desc: #9a9a9a;
+  --item-effet: #7ab8d4;
+  --placeholder: #8b6914;
+  --select-bg: #0d0700;
+  --cell-bg: #140c00;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -915,10 +921,7 @@ body {
 /* === Corrections ciblées === */
 
 /* Les effets restent en italique dans les emplacements */
-.val-effet,
-.fc-effet {
-  font-style: italic;
-}
+
 
 /* Dans l'infobulle clic droit, les effets sont droits pour plus de lisibilité */
 #slot-preview .sp-effet,
@@ -938,25 +941,6 @@ body {
 
 
 /* === UI POLISH : hover, sélection, drag & drop === */
-
-/* Transitions plus douces */
-.slot,
-.free-cell,
-.sort-cell,
-.grid-cell,
-.spe-cell,
-.nav-btn,
-.btn,
-.btn-sm,
-.camp-player-card {
-  transition:
-    transform .12s ease,
-    box-shadow .16s ease,
-    border-color .16s ease,
-    background .16s ease,
-    color .16s ease,
-    opacity .16s ease;
-}
 
 /* Hover légèrement animé */
 .slot:hover,
@@ -1059,8 +1043,6 @@ body {
   font-weight: bold;
 }
 
-
-/* === FIREBASE SAVE / LOAD FIXED MODAL === */
 .firebase-save-load-modal {
   width: 520px;
   max-width: 95vw;
@@ -1279,36 +1261,6 @@ body {
 }
 
 
-/* === CAMPAIGN V2 FORCE FIX === */
-#page-campagne.active {
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-#page-campagne .campaign-layout-v2 {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-  gap: 18px !important;
-  width: 100% !important;
-  align-items: stretch !important;
-}
-
-#page-campagne .campaign-panel {
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-}
-
-#page-campagne .campaign-title,
-#page-campagne [data-i18n^="campaign."] {
-  text-transform: none;
-}
-
-@media (max-width: 900px) {
-  #page-campagne .campaign-layout-v2 {
-    grid-template-columns: 1fr !important;
-  }
-}
-
 
 /* === CAMPAIGN V3 : named campaigns + accordions === */
 #page-campagne.active {
@@ -1472,11 +1424,7 @@ body {
 }
 
 
-/* === MIDJA'AS EASTER EGG === */
-#midjaas-title-egg {
-  cursor: pointer;
-}
-
+/* === ARKELITH EASTER EGG === */
 #midjaas-title-egg.egg-pulse {
   animation: eggPulse .55s ease;
 }
@@ -1511,11 +1459,11 @@ body {
 }
 
 
-/* === EASTER EGG CLICK FIX === */
+/* === EASTER EGG INTERACTIONS === */
 #midjaas-title-egg,
 .tb-title {
   pointer-events: auto !important;
-  cursor: pointer !important;
+  cursor: default !important;
   user-select: none !important;
   z-index: 120 !important;
 }
@@ -1528,13 +1476,6 @@ body {
 .tb-right {
   position: relative;
   z-index: 90;
-}
-
-
-/* === EASTER EGG CURSOR NORMAL === */
-#midjaas-title-egg,
-.tb-title {
-  cursor: default !important;
 }
 
 
@@ -2215,7 +2156,7 @@ select::-ms-expand {
 }
 
 
-/* === INVENTORY REFRACTOR TEST : rings + custom mode === */
+/* === INVENTAIRE : anneaux + emplacements === */
 
 /* colonnes inventaire un peu plus aérées */
 #page-inventaire .main-body {
@@ -2346,56 +2287,7 @@ select::-ms-expand {
 }
 
 /* Custom inventory mode */
-.custom-inventory-page {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
 
-.custom-inventory-head {
-  color: var(--gold);
-  letter-spacing: 1px;
-  font-size: 16px;
-  border-bottom: 1px solid var(--border2);
-  padding: 8px 0;
-  margin-bottom: 12px;
-}
-
-.custom-inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.custom-slot-cell {
-  min-height: 90px;
-}
-
-.custom-slot-param-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.custom-slot-param-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 6px;
-  align-items: center;
-}
-
-@media (max-width: 900px) {
-  #page-inventaire .main-body {
-    min-width: 940px;
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 16px !important;
-  }
-
-  .custom-inventory-grid {
-    min-width: 720px;
-  }
-}
 
 @media (max-width: 520px) {
   .rings-float-grid {
@@ -2911,31 +2803,7 @@ select::-ms-expand {
 }
 
 
-/* === CLEANUP HOTFIX FINAL OVERRIDES === */
-
-
-
-.slot-arme {
-  transform: none !important;
-  min-height: 225px !important;
-  flex-basis: 225px !important;
-}
-
-.slot-arme:hover {
-  transform: translateY(-1px) !important;
-}
-
-.prostheses-panel {
-  overflow: hidden !important;
-}
-
-#slot-preview,
-.slot-preview {
-  z-index: 20000 !important;
-}
-
-
-
+/* === CLEANUP HOTFIX === */
 .slot-arme {
   transform: none !important;
   min-height: 225px !important;
@@ -2944,7 +2812,8 @@ select::-ms-expand {
 }
 .slot-arme:hover { transform: translateY(-1px) !important; }
 
-#slot-preview, .slot-preview { z-index: 20000 !important; }
+#slot-preview,
+.slot-preview { z-index: 20000 !important; }
 
 .prostheses-panel { overflow: visible !important; }
 
@@ -3052,8 +2921,6 @@ select::-ms-expand {
 
 /* === COMPÉTENCES : description + effet === */
 
-/* === COMPÉTENCES — DESC + EFFET (page Compétences) === */
-
 /* La row devient une colonne : sélecteur+niveaux en haut, puis desc, puis effet */
 .skill-dd-row {
   flex-direction: column;
@@ -3103,7 +2970,7 @@ select::-ms-expand {
   margin-bottom: 2px;
 }
 
-/* === PARAMÈTRES — desc + effet compétences === */
+
 .param-comp-meta-row {
   display: flex;
   flex-direction: column;
@@ -3332,3 +3199,23 @@ body.spectator-mode input,body.spectator-mode textarea,body.spectator-mode selec
     display: none;
   }
 }
+
+
+/* === ARKELITH v112+ : personnalisation fine des couleurs === */
+.val, .fc-nom, .skill-dd, #slot-preview .sp-nom { color: var(--item-name) !important; }
+.val-type, .fc-type, .skill-meta-desc, .param-comp-meta-row .param-comp-meta-ta:not(.param-comp-effet-ta), #slot-preview .sp-type { color: var(--item-desc) !important; }
+.val-effet, .fc-effet, .skill-meta-effet, .param-comp-effet-ta, #slot-preview .sp-effet { color: var(--item-effet) !important; }
+input::placeholder, textarea::placeholder, .param-input::placeholder, .param-comp-input::placeholder, .param-comp-meta-ta::placeholder, .mun-input::placeholder { color: var(--placeholder) !important; opacity: .85; }
+select, .skill-dd, .sac-select, .param-format-sel, .rings-count-select { background-color: var(--select-bg) !important; }
+select option, .skill-dd option { background: var(--select-bg) !important; color: var(--text) !important; }
+.skill-dd-row.has-skill, .free-cell.filled, .param-comp-input, .param-comp-meta-ta { background-color: var(--cell-bg) !important; }
+
+/* Les paramètres de compétences restent accessibles même avec beaucoup de noms longs. */
+.param-accordion-body { overflow-x: auto; }
+.param-cols { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important; }
+.param-col { min-width: 0; }
+.param-comp-row { align-items: stretch; min-width: 0; }
+.param-comp-input { min-width: 0; width: 100%; }
+.param-cat-header { flex-wrap: wrap; gap: 6px; }
+.param-cat-name-input { min-width: 0; }
+.param-comp-meta-row { min-width: 0; }
