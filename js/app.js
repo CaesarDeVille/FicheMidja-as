@@ -108,6 +108,97 @@ const NAMED_SLOTS = ['couvre-chef','arme','armure','dos','epaule',
 
 let data = {}, curSlot = null;
 
+/* ══════════════════════════════════════════════════════
+   ARKELITH — STABILITÉ & SÉCURITÉ
+   ══════════════════════════════════════════════════════ */
+
+const ARKELITH_VERSION    = 'Beta 1.07';
+const ARKELITH_STORAGE_KEY  = 'dnd_inv';
+const ARKELITH_RECOVERY_KEY = 'arkelith_recovery';
+
+// Accès localStorage sécurisé
+function safeLocalGet(key, fallback = null) {
+  try { return localStorage.getItem(key) ?? fallback; }
+  catch (e) { console.warn('[Arkelith] localStorage inaccessible (get):', key, e); return fallback; }
+}
+
+function safeLocalSet(key, value) {
+  try { localStorage.setItem(key, value); return true; }
+  catch (e) {
+    console.warn('[Arkelith] localStorage inaccessible (set):', key, e);
+    try { toast(uiT('toast.storageError', 'Stockage local plein. Exporte ta fiche pour ne pas perdre de données.')); } catch(_) {}
+    return false;
+  }
+}
+
+// Snapshot de secours avant toute opération destructive
+function createRecoveryPoint(reason = 'manual') {
+  if (window.__midjaasSpectatorActive) return false;
+  try {
+    safeLocalSet(ARKELITH_RECOVERY_KEY, JSON.stringify({
+      version: ARKELITH_VERSION,
+      reason,
+      savedAt: new Date().toISOString(),
+      data: JSON.parse(JSON.stringify(data || {}))
+    }));
+    return true;
+  } catch (e) { console.warn('[Arkelith] Snapshot impossible:', e); return false; }
+}
+
+// Protection contre la prototype pollution sur les imports JSON
+function sanitizeImport(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new Error('La sauvegarde doit être un objet JSON valide.');
+  const out = {};
+  Object.keys(value).forEach(k => {
+    if (k === '__proto__' || k === 'constructor' || k === 'prototype') return;
+    out[k] = value[k];
+  });
+  return out;
+}
+
+// Diagnostic interne (console uniquement — pas de bouton visible)
+function runArkelithDiagnostics() {
+  const checks = [];
+  const add = (ok, label, detail = '') => checks.push({ ok, label, detail });
+
+  add(!!document.querySelector('.app'),              'Structure .app présente');
+  add(!!document.getElementById('page-fiche'),       'Page Fiche présente');
+  add(!!document.getElementById('page-inventaire'),  'Page Inventaire présente');
+  add(typeof t === 'function' && typeof uiT === 'function', 'Système i18n disponible');
+  add(typeof openFirebaseSaveModal === 'function',   'Firebase save branché');
+
+  // IDs dupliqués
+  const ids = [...document.querySelectorAll('[id]')].map(el => el.id);
+  const dupes = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
+  add(dupes.length === 0, 'IDs HTML uniques', dupes.join(', '));
+
+  // Clés i18n manquantes
+  const missing = [...document.querySelectorAll('[data-i18n]')]
+    .map(el => el.dataset.i18n)
+    .filter(k => k && typeof t === 'function' && t(k, '__MISSING__') === '__MISSING__');
+  add(missing.length === 0, 'Clés i18n présentes', [...new Set(missing)].slice(0, 10).join(', '));
+
+  // localStorage
+  const lsOk = safeLocalSet('arkelith_diag_ping', '1');
+  if (lsOk) try { localStorage.removeItem('arkelith_diag_ping'); } catch(_) {}
+  add(lsOk, 'localStorage accessible');
+
+  console.groupCollapsed('[Arkelith] Diagnostic');
+  checks.forEach(c => (c.ok ? console.info : console.warn)(`${c.ok ? '✓' : '⚠'} ${c.label}`, c.detail || ''));
+  console.groupEnd();
+  return checks;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const r = runArkelithDiagnostics();
+    const failed = r.filter(c => !c.ok);
+    if (failed.length) console.warn('[Arkelith] ' + failed.length + ' point(s) à vérifier — voir le diagnostic ci-dessus.');
+  }, 800);
+});
+
+
 var PROSTHESIS_SLOTS = [
   'prothese_tete','prothese_oeil_g','prothese_oeil_d',
   'prothese_bras_g','prothese_corps','prothese_bras_d',
@@ -119,14 +210,14 @@ let curSortKey = null, curSortIdx = null;
 let curFreeType = null, curFreeIdx = null;
 
 function loadData() {
-  try { data = JSON.parse(localStorage.getItem('dnd_inv') || '{}'); } catch(e) { data = {}; }
+  try { data = sanitizeImport(JSON.parse(safeLocalGet(ARKELITH_STORAGE_KEY, '{}') || '{}')); } catch(e) { data = {}; }
   document.getElementById('bagSize').value = data._bagSize || 'sacoche';
   buildBag(); buildPoche(); buildSpe(); refresh(); loadChar();
 }
 
 function persist() {
   if (window.__midjaasSpectatorActive) return;
-  localStorage.setItem('dnd_inv', JSON.stringify(data));
+  safeLocalSet(ARKELITH_STORAGE_KEY, JSON.stringify(data));
 }
 function saveData() {
   if (window.__midjaasSpectatorActive) { toast(uiT('spectator.readOnly','Mode spectateur : lecture seule.')); return; }
@@ -152,9 +243,11 @@ function exportData() {
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const nom = (data._char?.nom || '').trim().replace(/[^a-zA-Z0-9_\-\. ]/g,'').trim() || 'Personnage';
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  a.href = url;
   a.download = nom + ' - Arkelith.json';
   a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function saveKeepTheme(val) {
@@ -172,7 +265,7 @@ function importData(e) {
   r.onload = ev => {
     let parsed;
     try {
-      parsed = JSON.parse(ev.target.result);
+      parsed = sanitizeImport(JSON.parse(ev.target.result));
     } catch (err) {
       console.error(err);
       toast(uiT('toast.jsonError','Erreur JSON'));
@@ -213,8 +306,11 @@ function importData(e) {
         el.value = value.trim();
       };
 
+      // Snapshot de secours avant import
+      createRecoveryPoint('before-import');
+
       // Import des données de la fiche
-      data = parsed;
+      data = sanitizeImport(parsed);
       preloadFicheImages();
       data._keepThemeOnImport = keepTheme;
 
@@ -284,6 +380,7 @@ const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armo
 
 function clearFiche() {
   if (!confirm(uiT('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
+  createRecoveryPoint('before-clear-sheet');
   // Keep all param keys
   const kept = {};
   PARAM_KEYS.forEach(k => { if (data[k] !== undefined) kept[k] = data[k]; });
@@ -3830,10 +3927,11 @@ async function firebaseLoadByCode() {
 
     if (!confirm(uiT('confirm.loadSave','Charger cette sauvegarde ? La fiche actuelle sera remplacée.'))) return;
 
-    data = loaded;
+    createRecoveryPoint('before-firebase-load');
+    data = sanitizeImport(loaded);
     data._firebaseSaveCode = code;
     preloadFicheImages();
-    localStorage.setItem('midjaas_save_code', code);
+    safeLocalSet('midjaas_save_code', code);
 
     const bag = document.getElementById('bagSize');
     if (bag) bag.value = data._bagSize || 'sacoche';
@@ -4483,7 +4581,8 @@ async function gmLoadPlayerSheet(playerCode) {
       loaded = JSON.parse(loaded.payloadJson);
     }
 
-    data = loaded;
+    createRecoveryPoint('before-gm-load-player');
+    data = sanitizeImport(loaded);
     data._firebaseSaveCode = code;
     localStorage.setItem('midjaas_save_code', code);
 

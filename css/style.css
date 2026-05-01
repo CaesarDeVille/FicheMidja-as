@@ -3048,6 +3048,29 @@ select::-ms-expand {
 
 
 
+
+/* === ARKELITH 1.07 : ACCESSIBILITÉ & POLISH ===  */
+
+/* Focus visible accessible sur tous les éléments interactifs */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Respect du mode réduction de mouvement */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* === LEGAL FOOTER + VERSION === */
 .site-footer-bar {
   display: flex;
