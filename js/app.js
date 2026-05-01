@@ -46,7 +46,12 @@ function applyTheme(){
   s.setProperty('--select-bg',selectBg);
   s.setProperty('--cell-bg',cellBg);
   document.body.style.fontFamily=font;
-  localStorage.setItem('dnd_theme',JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,speSlot,charPanel,itemName,itemDesc,itemEffet,placeholder,selectBg,cellBg}));
+  const __arkelithThemeBefore = localStorage.getItem('dnd_theme') || '';
+  const __arkelithThemeNext = JSON.stringify({bg,bg2,gold,text,border,font,slotEmpty,speSlot,charPanel,itemName,itemDesc,itemEffet,placeholder,selectBg,cellBg});
+  localStorage.setItem('dnd_theme', __arkelithThemeNext);
+  if (typeof window.__arkelithRecordThemeChange === 'function') {
+    window.__arkelithRecordThemeChange(__arkelithThemeBefore, __arkelithThemeNext);
+  }
 }
 
 function resetTheme(){
@@ -136,7 +141,7 @@ let data = {}, curSlot = null;
    ARKELITH — STABILITÉ & SÉCURITÉ
    ══════════════════════════════════════════════════════ */
 
-const ARKELITH_VERSION    = 'Beta 1.07';
+const ARKELITH_VERSION    = 'Beta 1.14';
 const ARKELITH_STORAGE_KEY  = 'dnd_inv';
 const ARKELITH_RECOVERY_KEY = 'arkelith_recovery';
 
@@ -3418,8 +3423,14 @@ function renderParamList(type, containerId) {
       ta.rows = 1;
       ta.value = meta[field] || '';
       const autoResize = () => {
+        const cs = window.getComputedStyle(ta);
+        const lineHeight = parseFloat(cs.lineHeight) || 16;
+        const padding = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+        const border = (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+        const maxHeight = Math.ceil(lineHeight * 3 + padding + border);
         ta.style.height = 'auto';
-        ta.style.height = ta.scrollHeight + 'px';
+        ta.style.height = Math.min(ta.scrollHeight, maxHeight) + 'px';
+        ta.style.overflowY = ta.scrollHeight > maxHeight + 1 ? 'auto' : 'hidden';
       };
       ta.addEventListener('input', () => {
         autoResize();
@@ -3774,9 +3785,52 @@ let undoIsRestoring = false;
 const UNDO_LIMIT = 40;
 
 function undoSnapshot() {
-  try { return JSON.stringify(data); }
+  try {
+    return JSON.stringify({
+      data,
+      theme: localStorage.getItem('dnd_theme') || ''
+    });
+  }
   catch (e) { return null; }
 }
+
+function parseUndoSnapshot(snapshot) {
+  const parsed = JSON.parse(snapshot);
+  // Compatibilité avec les anciens snapshots qui ne contenaient que la fiche.
+  if (parsed && Object.prototype.hasOwnProperty.call(parsed, 'data')) return parsed;
+  return { data: parsed || {}, theme: localStorage.getItem('dnd_theme') || '' };
+}
+
+function restoreUndoSnapshot(snapshot) {
+  const parsed = parseUndoSnapshot(snapshot);
+  data = parsed.data || {};
+  localStorage.setItem('dnd_inv', JSON.stringify(data));
+  if (typeof parsed.theme === 'string') {
+    if (parsed.theme) localStorage.setItem('dnd_theme', parsed.theme);
+    else localStorage.removeItem('dnd_theme');
+    if (typeof loadTheme === 'function') loadTheme();
+  }
+}
+
+function pushUndoSnapshot(previousSnapshot, nextSnapshot) {
+  if (undoIsRestoring) return;
+  if (undoLastSnapshot === null || previousSnapshot === null || nextSnapshot === null) return;
+  if (previousSnapshot === nextSnapshot) return;
+  undoStack.push(previousSnapshot);
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  redoStack = [];
+  undoLastSnapshot = nextSnapshot;
+  updateUndoRedoButtons();
+}
+
+window.__arkelithRecordThemeChange = function(previousTheme, nextTheme) {
+  if (undoIsRestoring || previousTheme === nextTheme) return;
+  try {
+    const previousSnapshot = JSON.stringify({ data, theme: previousTheme || '' });
+    const nextSnapshot = JSON.stringify({ data, theme: nextTheme || '' });
+    pushUndoSnapshot(previousSnapshot, nextSnapshot);
+  } catch (e) {}
+};
 
 function updateUndoRedoButtons() {
   const u = document.getElementById('btn-undo');
@@ -3832,15 +3886,9 @@ function initUndoRedo() {
 
   const originalPersist = persist;
   persist = function() {
+    const previous = undoLastSnapshot;
     const current = undoSnapshot();
-
-    if (!undoIsRestoring && undoLastSnapshot !== null && current !== null && current !== undoLastSnapshot) {
-      undoStack.push(undoLastSnapshot);
-      if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-      redoStack = [];
-      undoLastSnapshot = current;
-    }
-
+    pushUndoSnapshot(previous, current);
     originalPersist();
     updateUndoRedoButtons();
   };
@@ -3860,9 +3908,8 @@ function undoAction() {
 
   undoIsRestoring = true;
   try {
-    data = JSON.parse(previous);
+    restoreUndoSnapshot(previous);
     undoLastSnapshot = previous;
-    localStorage.setItem('dnd_inv', previous);
     refreshAfterHistoryRestore();
     toast(uiT('toast.undo','Action annulée'));
   } finally {
@@ -3883,9 +3930,8 @@ function redoAction() {
 
   undoIsRestoring = true;
   try {
-    data = JSON.parse(next);
+    restoreUndoSnapshot(next);
     undoLastSnapshot = next;
-    localStorage.setItem('dnd_inv', next);
     refreshAfterHistoryRestore();
     toast(uiT('toast.redo','Action rétablie'));
   } finally {

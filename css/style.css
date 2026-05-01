@@ -2992,11 +2992,20 @@ select::-ms-expand {
   padding: 4px 8px;
   outline: none;
   resize: none;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
   min-height: 28px;
+  max-height: calc((1em * 1.4 * 3) + 10px);
   line-height: 1.4;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
   transition: border-color .15s;
 }
+
+
+.param-comp-meta-ta::-webkit-scrollbar { width: 6px; }
+.param-comp-meta-ta::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 999px; }
+.param-comp-meta-ta::-webkit-scrollbar-track { background: transparent; }
 
 .param-comp-meta-ta:focus { border-color: var(--gold); }
 .param-comp-meta-ta::placeholder { color: var(--muted); opacity: .7; }
@@ -3201,7 +3210,7 @@ body.spectator-mode input,body.spectator-mode textarea,body.spectator-mode selec
 }
 
 
-/* === ARKELITH v112+ : personnalisation fine des couleurs === */
+/* === ARKELITH v114 : champs paramètres compacts + personnalisation fine des couleurs === */
 .val, .fc-nom, .skill-dd, #slot-preview .sp-nom { color: var(--item-name) !important; }
 .val-type, .fc-type, .skill-meta-desc, .param-comp-meta-row .param-comp-meta-ta:not(.param-comp-effet-ta), #slot-preview .sp-type { color: var(--item-desc) !important; }
 .val-effet, .fc-effet, .skill-meta-effet, .param-comp-effet-ta, #slot-preview .sp-effet { color: var(--item-effet) !important; }
