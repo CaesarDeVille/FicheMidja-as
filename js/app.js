@@ -2804,7 +2804,15 @@ function applyI18n() {
   document.getElementById('nav-competences').textContent = t('nav_competences');
   document.getElementById('nav-inventaire').textContent  = t('nav_inventaire');
   document.getElementById('nav-capital').textContent     = t('nav_capital');
-  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    // Ne pas écraser les labels de slots renommés par le joueur
+    const slot = el.closest('[id^="sl-"]');
+    if (slot && el.classList.contains('lbl')) {
+      const key = slot.id.replace('sl-', '');
+      if (data._slotLabels?.[key]) { el.textContent = data._slotLabels[key]; return; }
+    }
+    el.textContent = t(el.dataset.i18n);
+  });
   document.querySelectorAll('[data-i18n-char]').forEach(el => { el.textContent = t(el.dataset.i18nChar); });
   const CAT_KEY_MAP2 = { comp_principales:'pri', comp_secondaires:'sec', comp_martiales:'mar', comp_magiques:'mag', savoirs:'savoirs', coups:'coups', livre_sorts:'livre' };
   document.querySelectorAll('[data-i18n-comp]').forEach(el => {
@@ -3976,9 +3984,8 @@ function preloadFicheImages() {
 
 /* === LEGAL FOOTER APPEARANCE === */
 function initLegalFooterReveal() {
-  const el = document.querySelector('.site-legal');
+  const el = document.querySelector('.site-footer-bar');
   if (!el) return;
-  // Position statique : on ajoute visible directement, pas besoin d'IntersectionObserver
   el.classList.add('visible');
 }
 

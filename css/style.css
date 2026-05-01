@@ -3047,48 +3047,30 @@ select::-ms-expand {
 }
 
 
-/* === VERSION BADGE === */
-.site-version {
-  position: fixed;
-  bottom: 6px;
-  right: 10px;
-  font-size: 9px;
-  color: var(--muted);
-  opacity: .38;
-  letter-spacing: .4px;
-  pointer-events: none;
-  user-select: none;
-  z-index: 10;
-}
 
-/* === LEGAL FOOTER === */
-.site-legal {
-  display: block;
-  position: static;
-  margin: 8px 0 0 8px;
-  padding: 0;
-  border: none;
-  text-align: left;
-  font-size: 10px;
-  color: var(--muted);
-  opacity: .62;
-  line-height: 1.2;
-  letter-spacing: .2px;
-  white-space: nowrap;
-  transform: none;
+/* === LEGAL FOOTER + VERSION === */
+.site-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 10px;
+  opacity: 0;
   transition: opacity .4s ease;
   pointer-events: none;
   user-select: none;
-  z-index: auto;
 }
 
-.site-legal::before {
-  content: none;
-  display: none;
-}
-
-.site-legal.visible {
+.site-footer-bar.visible {
   opacity: .62;
+}
+
+.site-legal,
+.site-version {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .2px;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 
