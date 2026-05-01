@@ -1176,6 +1176,10 @@
               <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
               <div id="cfg-armor-stats" style="margin-top:6px;"></div>
               <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('armorStats')">&#8635; Défaut</button>
+              <div class="param-section-title" style="margin-top:14px;">&#9632; Stats d'Arme</div>
+              <div class="param-info">☑ = actif · Nom complet · Abréviation</div>
+              <div id="cfg-weapon-stats" style="margin-top:6px;"></div>
+              <button class="param-add-btn" style="margin-top:4px;" onclick="resetParamSection('weaponStats')">&#8635; Défaut</button>
               <div class="param-section-title" style="margin-top:14px;">&#9632; Bourse</div>
               <div class="param-info">Nombre de monnaies affichées.</div>
               <div class="param-row" style="margin-top:6px;gap:8px;">
@@ -1367,7 +1371,7 @@
   </div><!-- end page-parametres -->
 
 </div><!-- end app -->
-<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.15</div></div>
+<div class="site-footer-bar"><div class="site-legal" data-i18n="legal.text"></div><div class="site-version">Beta 1.16</div></div>
 </div><!-- end aspect-wrap -->
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">
@@ -1388,6 +1392,13 @@
         <span style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">Stats d'Armure</span>
       </div>
       <div id="fArmorStatsList" style="display:none;flex-direction:column;gap:6px;"></div>
+    </div>
+    <div id="fWeaponStats" style="border-top:1px solid var(--border2);padding-top:8px;margin-top:4px;display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <input type="checkbox" id="fWeaponStatsToggle" class="blessure-cb" onchange="toggleWeaponStatsSection(this.checked)">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">Stats d'Arme</span>
+      </div>
+      <div id="fWeaponStatsList" style="display:none;flex-direction:column;gap:6px;"></div>
     </div>
     <div class="modal-btns">
       <button class="btn danger" onclick="clearSlot()" style="margin-right:auto;">Vider</button>

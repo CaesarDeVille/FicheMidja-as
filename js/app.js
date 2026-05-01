@@ -442,7 +442,7 @@ const PARAM_KEYS = ['_catLabels','_charLabels','_statLabels','_qualities','_armo
   '_resSplit','_resNames','_magieEnabled','_infusionEnabled','_showCats','_maxCats',
   '_compFormats','_compArrays','_effetsPlus','_bagConfig','_speConfig','_levelNames',
   '_levelColors','_magicColors','_themeColors','_fontChoice','_fsSizes','_exportTheme','_exportFont',
-  '_bourseCount','_bourseLabel','_banqueLabel','_bagSectionLabel','_pocheSectionLabel'];
+  '_bourseCount','_bourseLabel','_banqueLabel','_bagSectionLabel','_pocheSectionLabel','_weaponLabels','_weaponNames','_weaponEnabled'];
 
 function clearFiche() {
   if (!confirm(uiT('confirm.resetSheet','Réinitialiser la fiche du personnage ? Les paramètres seront conservés.'))) return;
@@ -513,6 +513,7 @@ function resetParamSection(section, skipConfirm = false) {
     catLabels:    () => { delete data._catLabels; applyCatLabels(); renderParametres(); },
     statLabels:   () => { delete data._statLabels; delete data._resNames; delete data._resSplit; applyStatLabels(); applyStatSplits(); renderParametres(); },
     armorStats:   () => { delete data._armorLabels; delete data._armorNames; delete data._armorEnabled; renderArmorParams(); refreshArmorStats(); },
+    weaponStats:  () => { delete data._weaponLabels; delete data._weaponNames; delete data._weaponEnabled; renderWeaponParams(); refreshWeaponStats(); },
     capLabels:    () => { delete data._capLabels; delete data._capWalletLabels; renderCapitalParams(); },
     theme:        () => { delete data._exportTheme; delete data._exportFont; resetTheme(); },
     pri:     () => { if(data._compArrays) delete data._compArrays.pri; renderParametres(); renderCompetences(); },
@@ -813,6 +814,15 @@ function open_(key, speLabel) {
   const toggleCb = document.getElementById('fArmorStatsToggle');
   if (toggleCb) toggleCb.checked = hasArmorStats;
   toggleArmorStatsSection(hasArmorStats, d.armorStats || {});
+  // Weapon stats — only on slot 'arme'
+  const weaponSection = document.getElementById('fWeaponStats');
+  if (weaponSection) weaponSection.style.display = (key === 'arme') ? '' : 'none';
+  if (key === 'arme') {
+    const hasWeaponStats = !!(d.weaponStats);
+    const wToggleCb = document.getElementById('fWeaponStatsToggle');
+    if (wToggleCb) wToggleCb.checked = hasWeaponStats;
+    toggleWeaponStatsSection(hasWeaponStats, d.weaponStats || {});
+  }
   _modalQuality = (d.quality !== undefined && d.quality !== null) ? d.quality : null;
   renderQualityBtns(_modalQuality);
   document.getElementById('modalOverlay').classList.add('open');
@@ -836,15 +846,24 @@ function saveSlot() {
       if (inp) armorStats[sk] = inp.value.trim();
     });
   }
-  if (nom || type || effet || img || armorStats) {
-    data[curSlot] = { nom, type, effet, img, quality: _modalQuality, armorStats };
+  const weaponToggle = document.getElementById('fWeaponStatsToggle');
+  let weaponStats = null;
+  if (weaponToggle?.checked) {
+    weaponStats = {};
+    WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key)).forEach(({ key: sk }) => {
+      const inp = document.getElementById('fweapon-'+sk);
+      if (inp) weaponStats[sk] = inp.value.trim();
+    });
+  }
+  if (nom || type || effet || img || armorStats || weaponStats) {
+    data[curSlot] = { nom, type, effet, img, quality: _modalQuality, armorStats, weaponStats };
   } else delete data[curSlot];
   persist();
   const k = curSlot;
   closeModal();
   if (k.startsWith('bag_') || k.startsWith('spe_')) { buildBag(); setTimeout(() => refreshArmorStats(), 0); }
   else if (k.startsWith('poche_')) buildPoche();
-  else refresh(); // refresh already calls refreshArmorStats
+  else { refresh(); if (k === 'arme') refreshWeaponStats(); } // refresh already calls refreshArmorStats
   if (typeof renderRingsSlot === 'function') renderRingsSlot();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
   if (typeof renderProsthesesPanel === 'function') renderProsthesesPanel();
@@ -1800,10 +1819,133 @@ function renderArmorParams() {
   });
 }
 
+/* ══ WEAPON STATS ══ */
+const WEAPON_STATS = [
+  { key: 'jet',    defaultLabel: 'Jet',    defaultName: 'Jet utilisé',  enabled: true  },
+  { key: 'degats', defaultLabel: 'DG',     defaultName: 'Dégâts',       enabled: true  },
+  { key: 'portee', defaultLabel: 'Portée', defaultName: 'Portée (Optionnelle)', enabled: true  },
+];
+
+function getWeaponStatLabel(key) {
+  return data._weaponLabels?.[key] || WEAPON_STATS.find(s=>s.key===key)?.defaultLabel || key.toUpperCase();
+}
+function getWeaponStatName(key) {
+  return data._weaponNames?.[key] || WEAPON_STATS.find(s=>s.key===key)?.defaultName || key;
+}
+function isWeaponStatEnabled(key) {
+  if (!data._weaponEnabled || data._weaponEnabled[key] === undefined) {
+    return WEAPON_STATS.find(s=>s.key===key)?.enabled ?? true;
+  }
+  return data._weaponEnabled[key];
+}
+function saveWeaponStatLabel(key, val) {
+  if (!data._weaponLabels) data._weaponLabels = {};
+  data._weaponLabels[key] = val || WEAPON_STATS.find(s=>s.key===key)?.defaultLabel;
+  persist(); refreshWeaponStats();
+}
+function saveWeaponStatName(key, val) {
+  if (!data._weaponNames) data._weaponNames = {};
+  data._weaponNames[key] = val; persist();
+}
+function saveWeaponStatEnabled(key, val) {
+  if (!data._weaponEnabled) data._weaponEnabled = {};
+  data._weaponEnabled[key] = val;
+  persist(); refreshWeaponStats();
+}
+function saveWeaponStat(key, val) {
+  if (!data.arme) data.arme = {};
+  if (!data.arme.weaponStats) data.arme.weaponStats = {};
+  data.arme.weaponStats[key] = val; persist();
+  refreshWeaponSlotOnly();
+}
+
+function refreshWeaponSlotOnly() {
+  const el = document.getElementById('sl-arme');
+  if (!el) return;
+  const d = data.arme || {};
+  const ws = d.weaponStats || {};
+  let inner = '';
+  if (d.img) inner += `<div class="slot-img-bg" style="background-image:url('${d.img}');"></div>`;
+  inner += `<span class="lbl" data-i18n-slot="arme">${getSlotLabel('arme')}</span>`;
+  inner += `<span class="val" id="dsp-arme-nom">${d.nom||'—'}</span>`;
+  if (d.type)  inner += `<span class="val-type" id="dsp-arme-type">${d.type}</span>`;
+  if (d.effet) inner += `<span class="val-effet" id="dsp-arme-effet">${parseMarkdown(d.effet)}</span>`;
+  const activeWs = WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key));
+  const hasWsVals = activeWs.some(s => ws[s.key]);
+  if (hasWsVals) {
+    inner += `<div class="armure-stats">`;
+    activeWs.forEach(({ key }) => {
+      const cur = ws[key] || '';
+      if (cur) inner += `<span class="armure-stat"><span class="armure-stat-lbl">${getWeaponStatLabel(key)}</span> <span class="armure-stat-val">${cur}</span></span>`;
+    });
+    inner += `</div>`;
+  }
+  el.innerHTML = inner;
+}
+
+function applyWeaponStatLabels() {
+  WEAPON_STATS.forEach(({ key }) => {
+    const lbl = getWeaponStatLabel(key);
+    document.querySelectorAll('[data-weapon-lbl="'+key+'"]').forEach(el => { el.textContent = lbl; });
+  });
+  refreshWeaponStats();
+}
+
+function refreshWeaponStats() {
+  refreshWeaponSlotOnly();
+}
+
+function toggleWeaponStatsSection(show, existingStats) {
+  const list = document.getElementById('fWeaponStatsList');
+  if (!list) return;
+  list.style.display = show ? 'flex' : 'none';
+  list.style.flexDirection = 'column';
+  if (show && list.children.length === 0) {
+    WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key)).forEach(({ key: sk }) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+      const val = existingStats?.[sk] || '';
+      wrap.innerHTML = `<label style="font-size:11px;color:var(--muted);white-space:nowrap;min-width:48px;">${getWeaponStatLabel(sk)}</label>
+        <input type="text" id="fweapon-${sk}" value="${val}" placeholder="—"
+          style="flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--gold);font-family:var(--font);font-size:12px;padding:3px 6px;border-radius:3px;outline:none;">`;
+      list.appendChild(wrap);
+    });
+  } else if (!show) {
+    list.innerHTML = '';
+  }
+}
+
+function renderWeaponParams() {
+  const container = document.getElementById('cfg-weapon-stats');
+  if (!container) return;
+  container.innerHTML = '';
+  WEAPON_STATS.forEach(({ key, defaultLabel, defaultName }) => {
+    const row = document.createElement('div');
+    row.className = 'param-row';
+    row.style.gap = '6px';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.className = 'blessure-cb'; cb.checked = isWeaponStatEnabled(key);
+    cb.title = 'Activer'; cb.onchange = () => saveWeaponStatEnabled(key, cb.checked);
+    const nameInp = document.createElement('input');
+    nameInp.className = 'param-input param-input-wide'; nameInp.type = 'text';
+    nameInp.placeholder = defaultName;
+    nameInp.value = data._weaponNames?.[key] && data._weaponNames[key] !== defaultName ? data._weaponNames[key] : '';
+    nameInp.oninput = () => saveWeaponStatName(key, nameInp.value);
+    const lblInp = document.createElement('input');
+    lblInp.className = 'param-input'; lblInp.type = 'text'; lblInp.style.width = '60px';
+    lblInp.placeholder = defaultLabel;
+    lblInp.value = data._weaponLabels?.[key] && data._weaponLabels[key] !== defaultLabel ? data._weaponLabels[key] : '';
+    lblInp.oninput = () => saveWeaponStatLabel(key, lblInp.value);
+    row.appendChild(cb); row.appendChild(nameInp); row.appendChild(lblInp);
+    container.appendChild(row);
+  });
+}
+
+
 /* ══ SLOT PREVIEW ══ */
 let previewTimer = null;
 
-function showSlotPreview(e, slotData, armorStats) {
+function showSlotPreview(e, slotData, armorStats, weaponStats) {
   e.preventDefault();
   if (!slotData?.nom) return;
   const pv = document.getElementById('slot-preview');
@@ -1821,6 +1963,16 @@ function showSlotPreview(e, slotData, armorStats) {
       const s = document.createElement('div');
       s.className = 'sp-armor-stat';
       s.innerHTML = getArmorStatLabel(key)+'<span>'+armorStats[key]+'</span>';
+      statsEl.appendChild(s);
+    });
+  }
+  // Weapon stats (même zone d'affichage)
+  const ws = slotData.weaponStats;
+  if (ws) {
+    WEAPON_STATS.filter(s=>isWeaponStatEnabled(s.key)&&ws[s.key]).forEach(({key})=>{
+      const s = document.createElement('div');
+      s.className = 'sp-armor-stat';
+      s.innerHTML = getWeaponStatLabel(key)+'<span>'+ws[key]+'</span>';
       statsEl.appendChild(s);
     });
   }
@@ -1845,7 +1997,7 @@ function attachSlotPreview(el, key) {
     if (e.button !== 2) return;
     e.preventDefault();
     const d = data[key] || {};
-    showSlotPreview(e, d, d.armorStats || null); document.querySelector('.slot-preview')?.style?.setProperty('z-index','9999');
+    showSlotPreview(e, d, d.armorStats || null, d.weaponStats || null); document.querySelector('.slot-preview')?.style?.setProperty('z-index','9999');
   });
   el.addEventListener('mouseup', e => { if (e.button === 2) hideSlotPreview(); });
   el.addEventListener('mouseleave', hideSlotPreview);
@@ -3472,6 +3624,7 @@ function renderParametres() {
   applyStatSplits();
   // Armor stats params
   renderArmorParams();
+  renderWeaponParams();
   // Bourse count
   const bourseCountSel = document.getElementById('cfg-bourse-count');
   if (bourseCountSel) bourseCountSel.value = getBourseCount();
@@ -3707,6 +3860,7 @@ applyEffetsPlus();
 updateBagSelect();
 refreshArmorStats();
 applyArmorStatLabels();
+refreshWeaponStats();
 applyAllQualityColors();
 applySlotLabels();
 applyFicheSectionLabels();
@@ -4278,6 +4432,7 @@ function applyAllCustomLabels() {
   if (typeof applyProsthesisGroupLabels === 'function')   applyProsthesisGroupLabels();
   if (typeof applyProsthesisLabels === 'function')        applyProsthesisLabels();
   if (typeof applyBagSectionLabels === 'function')         applyBagSectionLabels();
+  if (typeof applyWeaponStatLabels === 'function')         applyWeaponStatLabels();
 }
 
 async function loadTranslations(lang) {
